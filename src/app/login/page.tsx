@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -11,7 +11,8 @@ import {
   Briefcase, User, Loader2, AlertCircle
 } from 'lucide-react'
 
-export default function LoginPage() {
+// ✅ Composant interne qui utilise useSearchParams
+function LoginFormContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect')
@@ -23,12 +24,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [mounted, setMounted] = useState(false)
-
-  // ✅ CORRECTION HYDRATATION : Attendre le montage client
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,7 +41,6 @@ export default function LoginPage() {
       if (authError) {
         console.error('❌ Erreur Supabase:', authError)
         
-        // Message d'erreur utilisateur friendly
         if (authError.message.includes('Invalid login credentials')) {
           setError('Email ou mot de passe incorrect.')
         } else if (authError.message.includes('Email not confirmed')) {
@@ -66,8 +60,6 @@ export default function LoginPage() {
 
       console.log('✅ Connexion réussie, récupération du profil...')
 
-      // ✅ VÉRIFICATION DU RÔLE RÉEL DANS LA BASE DE DONNÉES
-      // Cela évite les bugs si l'utilisateur clique "Pro" mais se connecte avec un compte "Client"
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
@@ -98,15 +90,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  // ✅ Éviter le rendu pendant l'hydratation pour éviter les warnings Next.js
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
-      </div>
-    )
   }
 
   return (
@@ -302,5 +285,18 @@ export default function LoginPage() {
         </p>
       </footer>
     </div>
+  )
+}
+
+// ✅ Composant principal qui enveloppe le formulaire dans Suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+      </div>
+    }>
+      <LoginFormContent />
+    </Suspense>
   )
 }
