@@ -1,7 +1,9 @@
 // @ts-nocheck
 'use client'
 
-import { useState, Suspense } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
