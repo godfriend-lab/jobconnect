@@ -14,7 +14,8 @@ import {
   Car, Scissors, Shirt, Building, GraduationCap, Utensils, 
   Camera, Music, Dumbbell, Stethoscope, Scale, Truck, 
   Plane, Ship, Wifi, Loader2,
-  Phone, ExternalLink, MessageCircle, Briefcase, Upload, Crown
+  Phone, ExternalLink, MessageCircle, Briefcase, Upload, Crown,
+  User, Laptop, Briefcase as BriefcaseIcon, Scissors as ScissorsIcon
 } from 'lucide-react'
 
 interface Service {
@@ -159,32 +160,37 @@ export default function ClientDashboard() {
     'Binah-Nord', 'Binah-Sud'
   ]
 
-  const categories = [
-    { id: 'plumbing', name: 'Plomberie', icon: Wrench },
-    { id: 'electricity', name: 'Électricité', icon: Zap },
-    { id: 'masonry', name: 'Maçonnerie', icon: Hammer },
-    { id: 'painting', name: 'Peinture', icon: Paintbrush },
-    { id: 'carpentry', name: 'Menuiserie', icon: Hammer },
-    { id: 'mechanic', name: 'Mécanique Auto', icon: Car },
-    { id: 'hairdressing', name: 'Coiffure', icon: Scissors },
-    { id: 'sewing', name: 'Couture', icon: Shirt },
-    { id: 'realestate', name: 'Immobilier', icon: HomeIcon },
-    { id: 'construction', name: 'Construction', icon: Building },
-    { id: 'teaching', name: 'Enseignement', icon: GraduationCap },
-    { id: 'catering', name: 'Restauration', icon: Utensils },
-    { id: 'photography', name: 'Photographie', icon: Camera },
-    { id: 'music', name: 'Musique', icon: Music },
-    { id: 'fitness', name: 'Sport/Fitness', icon: Dumbbell },
-    { id: 'health', name: 'Santé', icon: Stethoscope },
-    { id: 'legal', name: 'Juridique', icon: Scale },
-    { id: 'transport', name: 'Transport', icon: Truck },
-    { id: 'cleaning', name: 'Nettoyage', icon: HomeIcon },
-    { id: 'gardening', name: 'Jardinage', icon: HomeIcon },
-    { id: 'beauty', name: 'Beauté/Esthétique', icon: Shield },
-    { id: 'it', name: 'Informatique', icon: Wifi },
-    { id: 'event', name: 'Événementiel', icon: Clock },
-    { id: 'tourism', name: 'Tourisme/Voyage', icon: Plane },
-    { id: 'maritime', name: 'Maritime', icon: Ship },
+  const categoriesMetiers = [
+    "Maçon", "Charpentier", "Menuisier", "Ébéniste", "Couvreur", "Plombier", "Électricien", "Peintre en bâtiment", "Carreleur", "Plâtrier", "Plaquiste", "Serrurier", "Ferronnier", "Forgeron", "Soudeur", "Vitrier", "Miroitier", "Tailleur de pierre", "Marbrier", "Façadier", "Étancheur", "Constructeur métallique", "Installateur sanitaire", "Installateur thermique", "Ramoneur", "Chimiste artisanal", "Potier", "Céramiste", "Sculpteur sur bois", "Sculpteur sur pierre", "Tourneur sur bois", "Graveur", "Doreur", "Encadreur", "Restaurateur de meubles", "Tapissier", "Cannage de chaises", "Vannier", "Tonnelier", "Luthier", "Facteur de piano", "Fabricant de guitares", "Fabricant de violons", "Horloger", "Bijoutier", "Joaillier", "Orfèvre", "Sertisseur", "Graveur sur bijoux", "Diamantaire", "Cordonnier", "Bottier", "Sellier", "Bourrelier", "Maroquinier", "Fabricant de sacs", "Fabricant de ceintures", "Fabricant de chaussures", "Chapelier", "Modiste", "Couturier", "Tailleur", "Brodeur", "Dentellier", "Styliste artisanal", "Tricoteur", "Tisserand", "Fileur de laine", "Teinturier textile", "Imprimeur textile", "Fabricant de tapis", "Fabricant de rideaux", "Fabricant de linge de maison", "Fabricant de vêtements traditionnels", "Savonnier", "Parfumeur artisanal", "Fabricant de bougies", "Fabricant d'encens", "Cosméticien artisanal", "Fabricant de produits naturels", "Fabricant de shampoings naturels", "Fabricant de lotions", "Fabricant de crèmes artisanales", "Apiculteur", "Chocolatier", "Confiseur", "Glacier artisanal", "Boulanger", "Pâtissier", "Viennoisier", "Biscuitier", "Traiteur artisanal", "Charcutier", "Boucher", "Poissonnier", "Fromager", "Affineur de fromage", "Torréfacteur", "Brasseur artisanal", "Distillateur artisanal", "Fabricant de jus naturels", "Fabricant de confitures", "Fabricant de miel", "Fabricant de sirops", "Fabricant de sauces", "Fabricant d'épices", "Fabricant de vinaigre", "Fabricant d'huile artisanale", "Fabricant de pâtes fraîches", "Fabricant de couscous", "Fabricant de yaourt", "Fabricant de beurre", "Fabricant de glace", "Fabricant de biscuits", "Fabricant de gâteaux", "Fabricant de bonbons", "Fabricant de nougat", "Fabricant de pâte d'arachide", "Fabricant de farine artisanale", "Meunier", "Brasseur de bière locale", "Vigneron artisanal", "Fabricant de vin de palme", "Fabricant de boissons locales", "Fabricant de fromage artisanal", "Producteur de beurre de karité", "Fabricant de savon noir", "Fabricant d'huile de coco", "Fabricant d'huile de palme", "Fabricant de produits à base d'aloès", "Fabricant de produits bio", "Fabricant de paniers", "Fabricant de nattes", "Fabricant de balais", "Fabricant de meubles en bambou", "Fabricant de meubles en rotin", "Fabricant de meubles en métal", "Fabricant de meubles en bois", "Fabricant de portes", "Fabricant de fenêtres", "Fabricant d'escaliers", "Fabricant de cuisines", "Fabricant de placards", "Fabricant de lits", "Fabricant de tables", "Fabricant de chaises", "Fabricant de canapés", "Fabricant d'armoires", "Fabricant de bureaux", "Fabricant d'étagères", "Fabricant de palettes", "Fabricant de caisses en bois", "Fabricant de jouets en bois", "Fabricant d'objets décoratifs", "Fabricant de sculptures", "Fabricant de cadres photo", "Fabricant de lampes artisanales", "Fabricant de lustres", "Fabricant de décorations murales", "Fabricant de miroirs", "Fabricant de statues", "Fabricant de fontaines", "Fabricant de pots de fleurs", "Fabricant de jardinières", "Fleuriste artisanal", "Paysagiste", "Jardinier", "Élagueur", "Pépiniériste", "Horticulteur", "Maraîcher", "Arboriculteur", "Producteur de fleurs", "Producteur de plantes médicinales", "Producteur de champignons", "Fabricant de compost", "Fabricant de terreau", "Fabricant de clôtures", "Constructeur de puits", "Foreur de puits", "Constructeur de citernes", "Installateur de pompes", "Installateur de panneaux solaires artisanaux", "Installateur d'antennes", "Réparateur de téléviseurs", "Réparateur de radios", "Réparateur d'ordinateurs", "Réparateur de téléphones", "Réparateur d'imprimantes", "Réparateur d'électroménagers", "Réparateur de climatiseurs", "Réparateur de réfrigérateurs", "Réparateur de machines à laver", "Réparateur de ventilateurs", "Réparateur de générateurs", "Réparateur de motos", "Réparateur de vélos", "Réparateur d'automobiles", "Carrossier", "Tôlier automobile", "Peintre automobile", "Vulcanisateur", "Monteur de pneus", "Mécanicien diesel", "Mécanicien essence", "Électricien automobile", "Climaticien automobile", "Réparateur de boîtes de vitesses", "Réparateur de moteurs", "Réparateur de tracteurs", "Réparateur de machines agricoles", "Réparateur de bateaux", "Constructeur de pirogues", "Constructeur de remorques", "Fabricant de pièces métalliques", "Fabricant de clôtures métalliques", "Fabricant de portails", "Fabricant de grilles", "Fabricant de rampes", "Fabricant de citernes métalliques", "Fabricant de réservoirs", "Fabricant de silos", "Fabricant d'enseignes", "Fabricant de panneaux publicitaires", "Calligraphe", "Peintre d'enseignes", "Décorateur", "Décorateur d'intérieur", "Restaurateur d'œuvres d'art", "Restaurateur de tableaux", "Restaurateur de sculptures", "Restaurateur de livres anciens", "Relieur", "Imprimeur artisanal", "Typographe", "Fabricant de papier artisanal", "Fabricant de cahiers", "Fabricant d'enveloppes", "Fabricant de cartes artisanales", "Fabricant de tampons", "Fabricant de cachets", "Fabricant de sceaux", "Fabricant de trophées", "Fabricant de médailles", "Fabricant de plaques signalétiques", "Fabricant de tam-tams", "Fabricant de djembés", "Fabricant de balafons", "Fabricant de flûtes", "Fabricant d'instruments traditionnels", "Fabricant de tambours", "Fabricant de maracas", "Fabricant de xylophones", "Fabricant de bijoux fantaisie", "Fabricant de perles", "Fabricant d'accessoires de mode", "Fabricant de lunettes artisanales", "Fabricant de montres artisanales", "Fabricant de porte-clés", "Fabricant de porte-monnaie", "Fabricant de portefeuilles", "Fabricant de boîtes cadeaux", "Fabricant de coffrets", "Fabricant de jouets artisanaux", "Fabricant de poupées", "Fabricant de figurines", "Fabricant de maquettes", "Fabricant de cerfs-volants", "Fabricant de jeux de société artisanaux", "Fabricant de puzzles", "Fabricant d'articles religieux", "Fabricant de croix", "Fabricant de statues religieuses", "Fabricant de chapelets", "Fabricant de bougeoirs", "Fabricant d'autels", "Fabricant de masques traditionnels", "Fabricant d'objets culturels", "Fabricant de souvenirs touristiques", "Fabricant d'articles en cuir", "Fabricant d'articles en cuivre", "Fabricant d'articles en aluminium", "Fabricant d'articles en inox", "Fabricant d'articles en verre", "Fabricant d'articles en pierre", "Fabricant d'articles en argile", "Fabricant d'articles en bambou", "Fabricant d'articles en rotin", "Fabricant d'articles en osier", "Fabricant d'articles en fibres naturelles", "Fabricant d'articles recyclés", "Artisan recycleur", "Créateur d'objets écologiques", "Fabricant de mobilier urbain", "Fabricant de bancs publics", "Fabricant de pergolas", "Fabricant d'abris de jardin", "Fabricant de kiosques", "Constructeur de cases traditionnelles", "Constructeur de maisons en terre", "Constructeur de maisons en bois", "Constructeur de maisons écologiques", "Constructeur de fours artisanaux", "Fabricant de briques", "Fabricant de tuiles", "Fabricant de pavés", "Fabricant de blocs de béton", "Fabricant de béton décoratif", "Fabricant de ciment artisanal", "Fabricant de chaux", "Fabricant de plâtre", "Fabricant de moules artisanaux", "Fabricant de filets de pêche", "Fabricant de cannes à pêche", "Fabricant de cages d'élevage", "Fabricant de ruches", "Fabricant de mangeoires", "Fabricant d'abreuvoirs", "Fabricant d'équipements agricoles", "Fabricant de brouettes", "Fabricant de charrues", "Fabricant de houes", "Fabricant de machettes", "Fabricant de couteaux artisanaux", "Fabricant de haches", "Fabricant de pelles", "Fabricant de râteaux", "Fabricant d'outils manuels", "Fabricant d'objets personnalisés", "Graveur laser artisanal", "Découpeur CNC artisanal", "Imprimeur 3D artisanal", "Artisan numérique", "Médecin généraliste", "Médecin spécialiste", "Chirurgien", "Cardiologue", "Neurologue", "Dermatologue", "Pédiatre", "Gynécologue", "Obstétricien", "Psychiatre", "Psychologue", "Dentiste", "Orthodontiste", "Pharmacien", "Infirmier", "Infirmière", "Sage-femme", "Kinésithérapeute", "Ostéopathe", "Chiropracteur", "Orthophoniste", "Ergothérapeute", "Opticien", "Ophtalmologue", "Audioprothésiste", "Nutritionniste", "Diététicien", "Biologiste médical", "Radiologue", "Anesthésiste", "Urgentiste", "Oncologue", "Pneumologue", "Gastro-entérologue", "Néphrologue", "Endocrinologue", "Rhumatologue", "Urologue", "Infectiologue", "Gériatre", "Vétérinaire", "Assistant médical", "Technicien de laboratoire", "Technicien en radiologie", "Ambulancier", "Aide-soignant", "Responsable hospitalier", "Directeur d'hôpital", "Responsable qualité santé", "Épidémiologiste", "Avocat", "Notaire", "Huissier de justice", "Magistrat", "Juge", "Procureur", "Greffier", "Juriste", "Conseiller juridique", "Fiscaliste", "Médiateur", "Arbitre", "Commissaire de justice", "Expert judiciaire", "Consultant juridique", "Responsable conformité", "Responsable RGPD", "Officier de police judiciaire", "Enquêteur privé", "Criminologue", "Architecte", "Architecte d'intérieur", "Urbaniste", "Géomètre", "Géomètre-expert", "Ingénieur civil", "Ingénieur en bâtiment", "Conducteur de travaux", "Chef de chantier", "Économiste de la construction", "Dessinateur industriel", "Dessinateur bâtiment", "BIM Manager", "Topographe", "Ingénieur structure", "Ingénieur géotechnique", "Ingénieur hydraulique", "Ingénieur environnement", "Consultant en construction", "Expert immobilier", "Développeur web", "Développeur Front-End", "Développeur Back-End", "Développeur Full Stack", "Développeur Mobile", "Développeur Android", "Développeur iOS", "Développeur Logiciel", "Développeur Jeux vidéo", "Ingénieur logiciel", "Architecte logiciel", "Architecte cloud", "Administrateur système", "Administrateur réseau", "Administrateur bases de données", "DevOps Engineer", "Site Reliability Engineer", "Ingénieur cloud", "Data Scientist", "Data Analyst", "Data Engineer", "Machine Learning Engineer", "Ingénieur IA", "Prompt Engineer", "Chercheur en intelligence artificielle", "Analyste cybersécurité", "Pentester", "Hacker éthique", "Consultant cybersécurité", "RSSI", "Analyste SOC", "Expert blockchain", "Développeur blockchain", "Administrateur Linux", "Administrateur Windows", "Testeur logiciel", "QA Engineer", "Product Manager", "Product Owner", "Scrum Master", "Chef de projet informatique", "Consultant ERP", "Consultant SAP", "Consultant CRM", "UX Designer", "UI Designer", "Web Designer", "Graphiste", "Motion Designer", "Animateur 2D", "Animateur 3D", "Monteur vidéo", "Réalisateur", "Directeur artistique", "Photographe", "Vidéaste", "Community Manager", "Social Media Manager", "Responsable marketing", "Directeur marketing", "Responsable communication", "Directeur communication", "Chargé de communication", "Consultant SEO", "Consultant SEA", "Consultant SEM", "Copywriter", "Rédacteur web", "Journaliste", "Reporter", "Présentateur TV", "Présentateur radio", "Attaché de presse", "Responsable événementiel", "Organisateur d'événements", "Brand Manager", "Responsable e-commerce", "Growth Hacker", "Spécialiste email marketing", "Responsable acquisition", "Responsable CRM", "Analyste marketing", "Chef de produit", "Commercial", "Ingénieur commercial", "Directeur commercial", "Responsable des ventes", "Account Manager", "Business Developer", "Responsable grands comptes", "Conseiller clientèle", "Téléconseiller", "Négociateur immobilier", "Agent immobilier", "Courtier immobilier", "Expert immobilier", "Gestionnaire de patrimoine", "Conseiller financier", "Analyste financier", "Contrôleur de gestion", "Comptable", "Expert-comptable", "Auditeur", "Commissaire aux comptes", "Trésorier", "Directeur financier", "Gestionnaire de paie", "Responsable paie", "Fiscaliste d'entreprise", "Analyste crédit", "Banquier", "Conseiller bancaire", "Gestionnaire de portefeuille", "Trader", "Courtier en bourse", "Gestionnaire d'actifs", "Actuaire", "Économiste", "Statisticien", "Analyste économique", "Responsable RH", "Directeur des ressources humaines", "Chargé de recrutement", "Talent Acquisition Specialist", "Responsable formation", "Coach professionnel", "Consultant RH", "Gestionnaire RH", "Responsable paie RH", "Psychologue du travail", "Responsable QVT", "Responsable diversité", "Enseignant", "Professeur des écoles", "Professeur de collège", "Professeur de lycée", "Professeur d'université", "Maître de conférences", "Formateur", "Chercheur", "Scientifique", "Physicien", "Chimiste", "Mathématicien", "Astronome", "Géologue", "Océanographe", "Climatologue", "Archéologue", "Historien", "Sociologue", "Anthropologue", "Linguiste", "Traducteur", "Interprète", "Bibliothécaire", "Documentaliste", "Conservateur de musée", "Archiviste", "Ingénieur mécanique", "Ingénieur électrique", "Ingénieur électronique", "Ingénieur industriel", "Ingénieur automobile", "Ingénieur aéronautique", "Ingénieur spatial", "Ingénieur robotique", "Ingénieur matériaux", "Ingénieur énergie", "Ingénieur nucléaire", "Ingénieur pétrolier", "Ingénieur minier", "Ingénieur chimiste", "Ingénieur qualité", "Ingénieur production", "Responsable maintenance", "Responsable logistique", "Supply Chain Manager", "Logisticien", "Acheteur", "Responsable achats", "Planificateur de production", "Analyste supply chain", "Responsable transport", "Responsable entrepôt", "Responsable exploitation", "Directeur des opérations", "Pilote de ligne", "Pilote d'hélicoptère", "Contrôleur aérien", "Hôtesse de l'air", "Steward", "Capitaine de navire", "Officier de marine marchande", "Logisticien maritime", "Douanier", "Agent de transit", "Agent portuaire", "Conducteur de train", "Régulateur ferroviaire", "Officier de police", "Gendarme", "Militaire", "Officier militaire", "Pompier", "Sapeur-pompier", "Garde du corps", "Agent de sécurité", "Responsable sécurité", "Agent pénitentiaire", "Garde forestier", "Garde-côte", "Diplomate", "Ambassadeur", "Consul", "Fonctionnaire", "Administrateur territorial", "Préfet", "Sous-préfet", "Inspecteur des impôts", "Contrôleur fiscal", "Inspecteur du travail", "Inspecteur des douanes", "Inspecteur de police", "Conseiller municipal", "Directeur général des services", "Consultant en management", "Consultant en stratégie", "Consultant en transformation digitale", "Consultant qualité", "Consultant environnement", "Consultant ISO", "Consultant Lean", "Consultant Six Sigma", "Coach agile", "Chef de projet", "PMO", "Directeur de programme", "Directeur de projet", "Entrepreneur", "Chef d'entreprise", "Fondateur de startup", "Investisseur", "Business Angel", "Capital-risqueur", "Franchiseur", "Franchisé", "Expert en innovation", "Responsable RSE", "Responsable développement durable", "Responsable qualité", "Responsable HSE", "Auditeur qualité", "Responsable conformité", "Analyste risques", "Risk Manager", "Responsable assurance", "Courtier en assurances", "Conseiller en assurances", "Gestionnaire de sinistres", "Actuaire assurance", "Agent de voyage", "Conseiller en voyages", "Guide touristique", "Directeur d'hôtel", "Réceptionniste", "Concierge d'hôtel", "Revenue Manager", "Responsable restauration", "Chef cuisinier", "Sommelier", "Responsable hébergement", "Responsable tourisme", "Organisateur de séjours", "Directeur de centre de loisirs", "Éducateur spécialisé", "Assistant social", "Conseiller d'orientation", "Conseiller en insertion professionnelle", "Médiateur social", "Animateur socioculturel", "Responsable ONG", "Humanitaire", "Coordinateur de projet humanitaire", "Chargé de mission", "Responsable de programme", "Expert en développement international", "Consultant en coopération internationale", "Analyste politique", "Conseiller politique", "Analyste géopolitique", "Écrivain", "Romancier", "Scénariste", "Dramaturge", "Critique d'art", "Critique de cinéma", "Critique littéraire", "Compositeur", "Chef d'orchestre", "Producteur musical", "Producteur audiovisuel", "Directeur de casting", "Agent artistique", "Influence Manager", "Créateur de contenu", "Podcasteur", "Conférencier", "Coach de vie", "Mentor professionnel", "Expert en intelligence économique", "Analyste veille stratégique", "Responsable innovation", "Responsable transformation", "Directeur général", "Directeur exécutif", "Président-directeur général", "Secrétaire général", "Assistant de direction", "Office Manager", "Responsable administratif", "Directeur administratif et financier", "Contrôleur interne", "Responsable audit interne", "Responsable gouvernance", "Expert en marchés publics", "Consultant en appels d'offres", "Analyste ESG", "Responsable relations investisseurs", "Conseiller en propriété intellectuelle", "Mandataire en brevets", "Expert en cybersurveillance", "Analyste fraude", "Responsable antifraude", "Consultant FinTech", "Consultant LegalTech", "Consultant HealthTech", "Consultant EdTech", "Consultant GreenTech", "Consultant GovTech", "Consultant MarTech", "Consultant PropTech", "Consultant InsurTech", "Consultant AgriTech", "Consultant en intelligence d'affaires", "Analyste BI", "Développeur Power BI", "Développeur Tableau", "Développeur Qlik", "Administrateur Salesforce", "Développeur Salesforce", "Consultant Salesforce", "Administrateur Microsoft 365", "Administrateur Google Workspace", "Consultant Microsoft Dynamics", "Développeur Dynamics 365", "Consultant Oracle", "Administrateur Oracle", "Développeur Oracle", "Consultant Odoo", "Développeur Odoo", "Administrateur Odoo", "Consultant Zoho", "Développeur Zoho", "Consultant HubSpot", "Administrateur HubSpot", "Consultant ServiceNow", "Développeur ServiceNow", "Consultant Workday", "Consultant SuccessFactors", "Consultant Sage", "Consultant Cegid", "Consultant EBP", "Architecte d'entreprise", "Urbaniste des systèmes d'information", "Analyste fonctionnel", "Analyste métier", "Business Analyst", "Analyste PMO", "Coordinateur de projet", "Responsable portefeuille projets", "Consultant en gouvernance IT", "Responsable transformation numérique", "Consultant Open Data", "Data Steward", "Data Governance Manager", "Data Protection Officer", "Responsable confidentialité", "Responsable sécurité informatique", "Responsable infrastructure IT", "Responsable support informatique", "Technicien support informatique", "Helpdesk", "Technicien réseaux", "Technicien télécom", "Ingénieur télécommunications", "Architecte télécom", "Consultant IoT", "Développeur IoT", "Ingénieur IoT", "Développeur embarqué", "Ingénieur systèmes embarqués", "Ingénieur FPGA", "Ingénieur microélectronique", "Ingénieur semi-conducteurs", "Ingénieur vision industrielle", "Ingénieur automatisme", "Automaticien", "Roboticien", "Programmeur PLC", "Programmeur SCADA", "Ingénieur instrumentation", "Ingénieur contrôle-commande", "Responsable méthodes", "Ingénieur procédés", "Responsable industrialisation", "Technicien méthodes", "Responsable amélioration continue", "Black Belt Lean Six Sigma", "Green Belt Lean Six Sigma", "Responsable excellence opérationnelle", "Responsable planification", "Ordonnanceur", "Prévisionniste de la demande", "Responsable approvisionnement", "Gestionnaire de stocks", "Responsable inventaire", "Coordinateur logistique", "Responsable export", "Responsable import", "Déclarant en douane", "Affréteur", "Responsable flotte", "Fleet Manager", "Gestionnaire de parc automobile", "Responsable aviation", "Ingénieur ferroviaire", "Ingénieur naval", "Architecte naval", "Officier mécanicien", "Expert maritime", "Responsable portuaire", "Responsable aéroportuaire", "Analyste transport", "Économiste des transports", "Conseiller en mobilité", "Expert mobilité urbaine", "Urbaniste transport", "Responsable énergie", "Energy Manager", "Auditeur énergétique", "Conseiller en efficacité énergétique", "Ingénieur solaire", "Ingénieur éolien", "Ingénieur biomasse", "Ingénieur hydrogène", "Consultant carbone", "Auditeur carbone", "Responsable climat", "Responsable biodiversité", "Écologue", "Hydrologue", "Ingénieur forestier", "Ingénieur agronome", "Agronome", "Zootechnicien", "Ingénieur agroalimentaire", "Responsable qualité alimentaire", "Responsable sécurité alimentaire", "Microbiologiste", "Toxicologue", "Généticien", "Bioinformaticien", "Biostatisticien", "Chercheur en biotechnologie", "Ingénieur biomédical", "Physicien médical", "Attaché de recherche clinique", "Coordinateur d'essais cliniques", "Responsable pharmacovigilance", "Affaires réglementaires", "Responsable affaires médicales", "Medical Science Liaison", "Pharmacologue", "Virologue", "Immunologiste", "Parasitologue", "Entomologiste", "Botaniste", "Zoologiste", "Paléontologue", "Géophysicien", "Sismologue", "Volcanologue", "Cartographe", "Spécialiste SIG", "Analyste géospatial", "Télédétection", "Météorologue", "Prévisionniste météo", "Océanologue", "Hydrogéologue", "Expert catastrophe naturelle", "Conseiller diplomatique", "Analyste défense", "Analyste renseignement", "Officier de renseignement", "Expert cybersouveraineté", "Conseiller en sécurité nationale", "Responsable protection civile", "Coordinateur gestion de crise", "Négociateur international", "Responsable affaires publiques", "Lobbyiste", "Chargé des relations institutionnelles", "Conseiller parlementaire", "Administrateur parlementaire", "Secrétaire de mairie", "Directeur de cabinet", "Conseiller ministériel", "Responsable marchés publics", "Gestionnaire des subventions", "Responsable coopération internationale", "Consultant ONU", "Expert Banque mondiale", "Expert Union africaine", "Expert Union européenne", "Consultant développement économique", "Consultant microfinance", "Responsable incubateur", "Conseiller en entrepreneuriat", "Consultant innovation sociale", "Analyste investissement", "Gestionnaire de fonds", "Analyste M&A", "Responsable fusions-acquisitions", "Évaluateur d'entreprises", "Conseiller en transmission d'entreprise", "Responsable capital-investissement", "Gestionnaire de fortune", "Family Office Manager", "Responsable conformité bancaire", "Analyste AML", "Analyste KYC", "Responsable lutte contre le blanchiment", "Responsable contrôle permanent", "Responsable recouvrement", "Gestionnaire contentieux", "Responsable service client", "Customer Success Manager", "Customer Experience Manager", "Responsable fidélisation", "Responsable relation partenaires", "Gestionnaire de communauté professionnelle", "Responsable développement international", "Responsable franchise", "Responsable réseau", "Directeur régional", "Directeur de filiale", "Directeur pays", "Directeur innovation", "Chief Technology Officer (CTO)", "Chief Information Officer (CIO)", "Chief Information Security Officer (CISO)", "Chief Marketing Officer (CMO)", "Chief Financial Officer (CFO)", "Chief Operating Officer (COO)", "Chief Human Resources Officer (CHRO)", "Chief Data Officer (CDO)", "Chief Digital Officer (CDO)", "Chief Product Officer (CPO)", "Chief Revenue Officer (CRO)", "Chief Compliance Officer (CCO)", "Chief Sustainability Officer (CSO)", "Chief Legal Officer (CLO)", "Secrétaire de direction", "Assistant exécutif", "Coordinateur administratif", "Responsable des services généraux", "Gestionnaire immobilier d'entreprise", "Facility Manager", "Office Coordinator", "Responsable archives", "Gestionnaire documentaire", "Responsable knowledge management"
+  ]
+
+  const getIconForCategory = (name: string) => {
+    const n = name.toLowerCase()
+    if (n.includes('plomber') || n.includes('serrur') || n.includes('mécanic') || n.includes('réparat')) return Wrench
+    if (n.includes('électric') || n.includes('énerg') || n.includes('soud')) return Zap
+    if (n.includes('maçon') || n.includes('charpent') || n.includes('menuis') || n.includes('bâtiment') || n.includes('construct')) return Hammer
+    if (n.includes('peintre') || n.includes('décorat')) return Paintbrush
+    if (n.includes('médecin') || n.includes('infirm') || n.includes('santé') || n.includes('dentist') || n.includes('pharmac')) return Stethoscope
+    if (n.includes('avocat') || n.includes('jurid') || n.includes('notair') || n.includes('juge')) return Scale
+    if (n.includes('enseign') || n.includes('profess') || n.includes('formateur')) return GraduationCap
+    if (n.includes('cuisin') || n.includes('boulang') || n.includes('restaur') || n.includes('traiteur')) return Utensils
+    if (n.includes('photo') || n.includes('vidéo') || n.includes('graphist')) return Camera
+    if (n.includes('inform') || n.includes('développ') || n.includes('web') || n.includes('logiciel') || n.includes('data')) return Laptop
+    if (n.includes('transport') || n.includes('chauffeur') || n.includes('livreur') || n.includes('logist')) return Truck
+    if (n.includes('beauté') || n.includes('coiff') || n.includes('esthét')) return ScissorsIcon
+    if (n.includes('comptab') || n.includes('financ') || n.includes('banqu') || n.includes('assur')) return BriefcaseIcon
+    if (n.includes('jardin') || n.includes('paysag') || n.includes('agricol')) return HomeIcon
+    if (n.includes('musiqu') || n.includes('instrument')) return Music
+    return Briefcase
+  }
+
+  const marqueeCategories = [
+    { id: 'all', name: 'Tous les métiers', icon: Home },
+    ...categoriesMetiers.map(cat => ({
+      id: cat,
+      name: cat,
+      icon: getIconForCategory(cat)
+    }))
   ]
 
   const filteredCities = allCities.filter(city => 
@@ -252,8 +258,6 @@ export default function ClientDashboard() {
 
   const loadServices = async () => {
     try {
-      console.log('🔍 Chargement des services...')
-      
       const { data: servicesData, error: servicesError } = await supabase
         .from('services')
         .select('*')
@@ -261,32 +265,21 @@ export default function ClientDashboard() {
         .order('created_at', { ascending: false })
 
       if (servicesError) {
-        console.error('❌ Erreur chargement services:', servicesError)
         setServices([])
         return
       }
 
       if (!servicesData || servicesData.length === 0) {
-        console.log('️ Aucun service trouvé')
         setServices([])
         return
       }
 
-      console.log(`✅ ${servicesData.length} services trouvés`)
-
       const proIds = [...new Set(servicesData.map(s => s.pro_id))]
-      console.log('👥 IDs des pros à charger:', proIds)
 
-      const { data: profilesData, error: profilesError } = await supabase
+      const { data: profilesData } = await supabase
         .from('profiles')
         .select('id, full_name, phone, avatar_url, specialty, rating, total_reviews, plan, is_verified, city')
         .in('id', proIds)
-
-      if (profilesError) {
-        console.error('❌ Erreur chargement profils:', profilesError)
-      }
-
-      console.log(`✅ ${profilesData?.length || 0} profils chargés`)
 
       const profilesMap = new Map(
         (profilesData || []).map(p => [p.id, {
@@ -317,10 +310,9 @@ export default function ClientDashboard() {
           profiles: profilesMap.get(service.pro_id)!
         }))
 
-      console.log(`✅ ${combinedServices.length} services combinés et prêts à l'affichage`)
       setServices(combinedServices)
     } catch (error) {
-      console.error('❌ Erreur critique chargement services:', error)
+      console.error('Erreur chargement services:', error)
       setServices([])
     }
   }
@@ -453,7 +445,6 @@ export default function ClientDashboard() {
       if (b.profiles.is_verified) scoreB += 100
       
       if (scoreA !== scoreB) return scoreB - scoreA
-      
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     })
 
@@ -469,49 +460,24 @@ export default function ClientDashboard() {
     try {
       setUploadingPhoto(true)
       const file = e.target.files?.[0]
-      if (!file || !profile) {
-        alert('Aucun fichier sélectionné')
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        alert('La photo doit faire moins de 5MB')
-        return
-      }
-
-      if (!file.type.startsWith('image/')) {
-        alert('Veuillez sélectionner une image valide')
-        return
-      }
+      if (!file || !profile) return
+      if (file.size > 5 * 1024 * 1024) { alert('La photo doit faire moins de 5MB'); return }
+      if (!file.type.startsWith('image/')) { alert('Veuillez sélectionner une image valide'); return }
 
       const fileExt = file.name.split('.').pop()
       const filePath = `${profile.id}/${Date.now()}.${fileExt}`
 
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true
-        })
-      
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, { cacheControl: '3600', upsert: true })
       if (uploadError) throw uploadError
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath)
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', profile.id)
-      
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath)
+      const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
       if (updateError) throw updateError
       
       setProfile({ ...profile, avatar_url: publicUrl })
       alert('✅ Photo de profil mise à jour')
     } catch (error) { 
-      console.error('Erreur upload photo:', error)
-      alert('❌ Erreur upload photo de profil') 
+      alert('❌ Erreur upload photo') 
     } finally { 
       setUploadingPhoto(false) 
     }
@@ -557,35 +523,32 @@ export default function ClientDashboard() {
     }
   }
 
-  const contactWhatsApp = (service: Service) => {
+  // ✅ CORRECTION ICI : Fonction rendue async avec try/catch au lieu de .catch()
+  const contactWhatsApp = async (service: Service) => {
     const pro = service.profiles
     let phone = pro.phone?.replace(/\s+/g, '') || ''
     
     if (phone && !phone.startsWith('+')) {
-      if (phone.startsWith('228')) {
-        phone = '+' + phone
-      } else if (phone.startsWith('9') || phone.startsWith('7')) {
-        phone = '+228' + phone
+      if (phone.startsWith('228')) phone = '+' + phone
+      else if (phone.startsWith('9') || phone.startsWith('7')) phone = '+228' + phone
+    }
+
+    const message = encodeURIComponent(`Bonjour ${pro.full_name}, je suis intéressé(e) par votre service "${service.title}" (${service.price} FCFA) sur JobConnect. Pouvez-vous me donner plus d'informations ?`)
+
+    if (profile) {
+      try {
+        await supabase.from('contact_history').insert({
+          client_id: profile.id,
+          pro_id: pro.id,
+          status: 'contacted',
+          contact_method: 'whatsapp'
+        })
+      } catch (err) {
+        console.error('Erreur historique:', err)
       }
     }
 
-    const message = encodeURIComponent(
-      `Bonjour ${pro.full_name}, je suis intéressé(e) par votre service "${service.title}" (${service.price} FCFA) sur JobConnect. Pouvez-vous me donner plus d'informations ?`
-    )
-
-    if (profile) {
-      supabase.from('contact_history').insert({
-        client_id: profile.id,
-        pro_id: pro.id,
-        status: 'contacted',
-        contact_method: 'whatsapp'
-      }).then(({ error }) => {
-        if (error) console.error('Erreur historique:', error)
-      })
-    }
-
-    const whatsappUrl = `https://wa.me/${phone.replace('+', '')}?text=${message}`
-    window.open(whatsappUrl, '_blank')
+    window.open(`https://wa.me/${phone.replace('+', '')}?text=${message}`, '_blank')
   }
 
   const LevelBadge = ({ plan }: { plan: string }) => {
@@ -624,6 +587,16 @@ export default function ClientDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <style>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: scroll 60s linear infinite;
+        }
+      `}</style>
+
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           <Link href="/dashboard/client" className="flex items-center gap-3 flex-shrink-0 group">
@@ -679,20 +652,24 @@ export default function ClientDashboard() {
             </div>
           </div>
         </div>
-        <div className="border-t border-slate-200 bg-white">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex gap-2 overflow-x-auto py-3">
-              <button onClick={() => setSelectedCategory('all')} className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition ${selectedCategory === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>Tous</button>
-              {categories.map((cat) => {
-                const Icon = cat.icon
-                return (
-                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition flex items-center gap-2 ${selectedCategory === cat.id ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
-                    <Icon className="w-4 h-4" />{cat.name}
-                  </button>
-                )
-              })}
-            </div>
+
+        <div className="border-t border-slate-200 bg-slate-50 overflow-hidden relative">
+          <div className="flex animate-marquee py-3 whitespace-nowrap">
+            {[...marqueeCategories, ...marqueeCategories].map((cat, index) => {
+              const Icon = cat.icon
+              return (
+                <div
+                  key={`${cat.id}-${index}`}
+                  className="mx-2 px-4 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 border border-slate-200 bg-white text-slate-700 flex-shrink-0 shadow-sm"
+                >
+                  <Icon className="w-4 h-4 text-indigo-600" />
+                  {cat.name}
+                </div>
+              )
+            })}
           </div>
+          <div className="absolute top-0 left-0 w-16 h-full bg-gradient-to-r from-slate-50 to-transparent pointer-events-none z-10" />
+          <div className="absolute top-0 right-0 w-16 h-full bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-10" />
         </div>
       </header>
 
@@ -728,7 +705,7 @@ export default function ClientDashboard() {
                           onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }}
                           className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 ${selectedCity === 'all' ? 'bg-indigo-50 text-indigo-600' : ''}`}
                         >
-                           Toutes les localités
+                          📍 Toutes les localités
                         </button>
                         {filteredCities.map((city) => (
                           <button
@@ -740,21 +717,14 @@ export default function ClientDashboard() {
                           </button>
                         ))}
                         {filteredCities.length === 0 && (
-                          <div className="px-4 py-2 text-sm text-slate-500">
-                            Aucune localité trouvée
-                          </div>
+                          <div className="px-4 py-2 text-sm text-slate-500">Aucune localité trouvée</div>
                         )}
                       </div>
                     </>
                   )}
                   
                   {selectedCity !== 'all' && (
-                    <button
-                      onClick={() => { setSelectedCity('all'); setCitySearchQuery('') }}
-                      className="ml-2 text-xs text-red-600 hover:text-red-700"
-                    >
-                      ✕
-                    </button>
+                    <button onClick={() => { setSelectedCity('all'); setCitySearchQuery('') }} className="ml-2 text-xs text-red-600 hover:text-red-700">✕</button>
                   )}
                 </div>
               </div>
@@ -770,8 +740,6 @@ export default function ClientDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredServices.map((service) => (
                   <div key={service.id} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                    {/* ✅ LAYOUT HORIZONTAL PARFAIT */}
-                    {/* Photo en haut - 50% de la hauteur */}
                     <div className="relative h-48 overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"></div>
                       {service.profiles.avatar_url ? (
@@ -782,14 +750,12 @@ export default function ClientDashboard() {
                         </div>
                       )}
                       
-                      {/* Badge vérifié */}
                       {service.profiles.is_verified && (
                         <div className="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-20">
                           <Shield className="w-3.5 h-3.5" />Vérifié
                         </div>
                       )}
                       
-                      {/* Badge plan */}
                       {service.profiles.plan && service.profiles.plan !== 'Gratuit' && (
                         <div className="absolute top-3 right-3 z-20">
                           <span className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold shadow-lg ${
@@ -803,7 +769,6 @@ export default function ClientDashboard() {
                         </div>
                       )}
                       
-                      {/* Bouton favori */}
                       <button 
                         onClick={() => toggleFavorite({
                           id: service.profiles.id,
@@ -823,18 +788,14 @@ export default function ClientDashboard() {
                       </button>
                     </div>
                     
-                    {/* Contenu en bas - 50% de la hauteur */}
                     <div className="p-4 flex flex-col">
-                      {/* Titre du service */}
                       <div className="flex items-start gap-2 mb-2">
                         <Briefcase className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                         <h3 className="font-bold text-slate-900 text-base line-clamp-2 flex-1">{service.title}</h3>
                       </div>
                       
-                      {/* Description */}
                       <p className="text-sm text-slate-600 mb-3 line-clamp-2">{service.description}</p>
                       
-                      {/* Info Pro */}
                       <div className="flex items-center gap-2 mb-3 p-2 bg-slate-50 rounded-lg">
                         <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md">
                           {service.profiles.full_name.charAt(0).toUpperCase()}
@@ -847,7 +808,6 @@ export default function ClientDashboard() {
                         </div>
                       </div>
                       
-                      {/* Rating et ville */}
                       <div className="flex items-center justify-between mb-3">
                         {service.profiles.rating > 0 && (
                           <div className="flex items-center gap-1">
@@ -866,7 +826,6 @@ export default function ClientDashboard() {
                         )}
                       </div>
                       
-                      {/* Prix et bouton sur la même ligne */}
                       <div className="flex items-center gap-2 mt-auto">
                         <div className="flex-1 bg-gradient-to-r from-indigo-50 to-purple-50 px-3 py-2.5 rounded-xl border border-indigo-100">
                           <span className="text-[10px] text-slate-600 font-semibold block">Prix</span>
@@ -881,11 +840,7 @@ export default function ClientDashboard() {
                         </button>
                       </div>
                       
-                      {/* Lien voir profil */}
-                      <Link 
-                        href={`/pro/${service.profiles.id}`}
-                        className="w-full py-2 mt-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
-                      >
+                      <Link href={`/pro/${service.profiles.id}`} className="w-full py-2 mt-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
                         <ExternalLink className="w-3.5 h-3.5" />
                         Voir le profil complet
                       </Link>
@@ -925,11 +880,8 @@ export default function ClientDashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        item.contact_method === 'whatsapp' 
-                          ? 'bg-green-100 text-green-700' 
-                          : item.status === 'completed' 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-yellow-100 text-yellow-700'
+                        item.contact_method === 'whatsapp' ? 'bg-green-100 text-green-700' : 
+                        item.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                       }`}>
                         {item.contact_method === 'whatsapp' ? 'WhatsApp' : item.status === 'completed' ? 'Terminé' : 'En attente'}
                       </span>
@@ -981,32 +933,18 @@ export default function ClientDashboard() {
                         <button 
                           onClick={() => {
                             const serviceData: Service = {
-                              id: pro.id,
-                              title: pro.specialty,
-                              description: '',
-                              category: '',
-                              price: '',
-                              city: pro.city,
-                              pro_id: pro.id,
-                              created_at: '',
-                              profiles: {
-                                ...pro,
-                                avatar_url: pro.avatar_url || null
-                              }
+                              id: pro.id, title: pro.specialty, description: '', category: '', price: '',
+                              city: pro.city, pro_id: pro.id, created_at: '',
+                              profiles: { ...pro, avatar_url: pro.avatar_url || null }
                             }
                             contactWhatsApp(serviceData)
                           }}
                           className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition"
                         >
-                          <MessageCircle className="w-4 h-4" />
-                          WhatsApp
+                          <MessageCircle className="w-4 h-4" /> WhatsApp
                         </button>
-                        <Link 
-                          href={`/pro/${pro.id}`}
-                          className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Voir le profil
+                        <Link href={`/pro/${pro.id}`} className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition">
+                          <ExternalLink className="w-4 h-4" /> Voir le profil
                         </Link>
                       </div>
                     </div>
@@ -1034,8 +972,7 @@ export default function ClientDashboard() {
                   )}
                 </div>
                 <label className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all font-semibold flex items-center gap-2">
-                  <Upload className="w-4 h-4" />
-                  Changer la photo
+                  <Upload className="w-4 h-4" /> Changer la photo
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
                 </label>
                 {uploadingPhoto && <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />}
