@@ -1,5 +1,12 @@
-// Ce fichier sert aux fonctions utilitaires personnalisées pour Supabase.
-// Exemple : une fonction pour vérifier si un utilisateur est Admin
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+// ✅ Fonction requise par les composants UI (shadcn/ui)
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+// ✅ Ta fonction personnalisée existante
 export function isAdmin(profile: any) {
   return profile?.role === 'admin'
 }
