@@ -1,9 +1,8 @@
 // @ts-nocheck
 'use client'
 
-export const dynamic = 'force-dynamic'
-
-import { useState, useEffect } from 'react'
+// ✅ CORRECTION : Ajout de Suspense dans les imports
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -13,7 +12,7 @@ import {
   Briefcase, User, Loader2, AlertCircle
 } from 'lucide-react'
 
-// ✅ Composant interne qui utilise useSearchParams
+// ✅ Composant interne qui utilise useSearchParams en toute sécurité
 function LoginFormContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -290,7 +289,7 @@ function LoginFormContent() {
   )
 }
 
-// ✅ Composant principal qui enveloppe le formulaire dans Suspense
+// ✅ Composant principal qui enveloppe le tout dans Suspense
 export default function LoginPage() {
   return (
     <Suspense fallback={
