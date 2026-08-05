@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { Logo } from '@/components/Logo'
 import LeaveReviewModal from '@/components/LeaveReviewModal'
 import { 
-  Search, MapPin, Star, Shield, 
+  Search, MapPin, Star, Shield, ShieldCheck, Pause,
   Heart, Home, Clock, Settings, LogOut, 
   Menu, X, Wrench, Zap, Hammer, Paintbrush, Home as HomeIcon, 
   Car, Scissors, Shirt, Building, GraduationCap, Utensils, 
@@ -17,6 +17,28 @@ import {
   Phone, ExternalLink, MessageCircle, Briefcase, Upload, Crown,
   User, Laptop, Briefcase as BriefcaseIcon, Scissors as ScissorsIcon
 } from 'lucide-react'
+
+// ✅ COMPOSANT BADGE SÉCURITÉ INTERNE (Propre, Professionnel et Coloré)
+const PlanBadge = ({ plan }: { plan: string }) => {
+  if (!plan || plan === 'Gratuit') return null
+
+  const config: Record<string, { iconColor: string; bgColor: string; tooltip: string }> = {
+    'Starter': { iconColor: 'text-emerald-600', bgColor: 'bg-emerald-100', tooltip: 'Forfait Starter' },
+    'Business': { iconColor: 'text-blue-600', bgColor: 'bg-blue-100', tooltip: 'Forfait Business' },
+    'Premium': { iconColor: 'text-amber-600', bgColor: 'bg-amber-100', tooltip: 'Forfait Premium' }
+  }
+
+  const { iconColor, bgColor, tooltip } = config[plan] || config['Starter']
+
+  return (
+    <div 
+      className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${bgColor} ${iconColor} flex-shrink-0 transition-transform hover:scale-110 cursor-help`}
+      title={tooltip}
+    >
+      <ShieldCheck className="w-3.5 h-3.5" />
+    </div>
+  )
+}
 
 interface Service {
   id: string
@@ -37,6 +59,7 @@ interface Service {
     total_reviews: number
     plan: string
     is_verified: boolean
+    is_available: boolean
   }
 }
 
@@ -50,6 +73,7 @@ interface Professional {
   total_reviews: number
   plan: string
   is_verified: boolean
+  is_available: boolean
   avatar_url?: string | null
 }
 
@@ -265,6 +289,7 @@ export default function ClientDashboard() {
         .order('created_at', { ascending: false })
 
       if (servicesError) {
+        console.error('Erreur services:', servicesError)
         setServices([])
         return
       }
@@ -276,10 +301,14 @@ export default function ClientDashboard() {
 
       const proIds = [...new Set(servicesData.map(s => s.pro_id))]
 
-      const { data: profilesData } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, full_name, phone, avatar_url, specialty, rating, total_reviews, plan, is_verified, city')
+        .select('id, full_name, phone, avatar_url, specialty, rating, total_reviews, plan, is_verified, is_available, city')
         .in('id', proIds)
+
+      if (profilesError) {
+        console.error('Erreur profils:', profilesError)
+      }
 
       const profilesMap = new Map(
         (profilesData || []).map(p => [p.id, {
@@ -292,6 +321,7 @@ export default function ClientDashboard() {
           total_reviews: p.total_reviews || 0,
           plan: p.plan || 'Gratuit',
           is_verified: p.is_verified || false,
+          is_available: p.is_available !== false, // Fallback sécurisé à true si la colonne est absente
           city: p.city || ''
         }])
       )
@@ -358,6 +388,7 @@ export default function ClientDashboard() {
       })
       setContactHistory(formatted)
     } catch (error) {
+      console.error('Erreur historique:', error)
       setContactHistory([])
     }
   }
@@ -376,9 +407,10 @@ export default function ClientDashboard() {
       }
 
       const proIds = favData.map(f => f.pro_id)
+      
       const { data: prosData } = await supabase
         .from('profiles')
-        .select('id, full_name, specialty, city, phone, rating, plan, total_reviews, is_verified, avatar_url')
+        .select('id, full_name, specialty, city, phone, rating, plan, total_reviews, is_verified, is_available, avatar_url')
         .in('id', proIds)
 
       const formatted = (prosData || []).map(p => ({
@@ -391,10 +423,12 @@ export default function ClientDashboard() {
         plan: p.plan || 'Gratuit',
         total_reviews: p.total_reviews || 0,
         is_verified: p.is_verified || false,
+        is_available: p.is_available !== false,
         avatar_url: p.avatar_url || undefined
       }))
       setFavorites(formatted)
     } catch (error) {
+      console.error('Erreur favoris:', error)
       setFavorites([])
     }
   }
@@ -427,6 +461,7 @@ export default function ClientDashboard() {
       })
     }
 
+    // ✅ TRI PUISSANT ET STABLE
     filtered.sort((a, b) => {
       let scoreA = 0, scoreB = 0
       const levelScores: Record<string, number> = { 
@@ -523,7 +558,6 @@ export default function ClientDashboard() {
     }
   }
 
-  // ✅ CORRECTION ICI : Fonction rendue async avec try/catch au lieu de .catch()
   const contactWhatsApp = async (service: Service) => {
     const pro = service.profiles
     let phone = pro.phone?.replace(/\s+/g, '') || ''
@@ -549,31 +583,6 @@ export default function ClientDashboard() {
     }
 
     window.open(`https://wa.me/${phone.replace('+', '')}?text=${message}`, '_blank')
-  }
-
-  const LevelBadge = ({ plan }: { plan: string }) => {
-    if (!plan || plan === 'Gratuit') return null
-    const config: Record<string, { colors: string[]; shadow: string }> = {
-      'Starter': { colors: ['#3B82F6', '#1D4ED8'], shadow: 'rgba(59, 130, 246, 0.4)' },
-      'Business': { colors: ['#10B981', '#047857'], shadow: 'rgba(16, 185, 129, 0.4)' },
-      'Premium': { colors: ['#FBBF24', '#D97706'], shadow: 'rgba(251, 191, 36, 0.4)' }
-    }
-    const { colors, shadow } = config[plan] || config['Starter']
-    const gradientId = `badge-${plan}`
-    return (
-      <div className="inline-flex items-center justify-center w-5 h-5 mr-2 flex-shrink-0" style={{ filter: `drop-shadow(0 1px 2px ${shadow})` }}>
-        <svg viewBox="0 0 24 24" className="w-full h-full">
-          <defs>
-            <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={colors[0]} />
-              <stop offset="100%" stopColor={colors[1]} />
-            </linearGradient>
-          </defs>
-          <path d="M12 2 L13.5 4.5 L16 3.5 L16.5 6 L19 6.5 L18.5 9 L21 10 L20 12.5 L21.5 14.5 L19.5 16 L20 18.5 L17.5 19 L17 21.5 L14.5 21 L13 22.5 L11 22.5 L9.5 21 L7 21.5 L6.5 19 L4 18.5 L4.5 16 L2.5 14.5 L4 12.5 L3 10 L5.5 9 L6 6.5 L8.5 6 L9 3.5 L11.5 4.5 Z" fill={`url(#${gradientId})`} />
-          <path d="M7 12 L10.5 15.5 L17 9" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </div>
-    )
   }
 
   if (loading) {
@@ -623,7 +632,7 @@ export default function ClientDashboard() {
               <button onClick={() => setSidebarOpen(!sidebarOpen)} className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden ring-2 ring-white shadow-lg">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover object-center" />
                   ) : (
                     profile?.full_name?.charAt(0).toUpperCase() || 'C'
                   )}
@@ -740,10 +749,16 @@ export default function ClientDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredServices.map((service) => (
                   <div key={service.id} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                    <div className="relative h-48 overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"></div>
+                    
+                    {/* ✅ IMAGE PARFAITEMENT CARRÉE ET CENTRÉE */}
+                    <div className="relative aspect-square overflow-hidden bg-slate-100">
+                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20"></div>
                       {service.profiles.avatar_url ? (
-                        <img src={service.profiles.avatar_url} alt={service.profiles.full_name} className="w-full h-full object-cover relative z-10" />
+                        <img 
+                          src={service.profiles.avatar_url} 
+                          alt={service.profiles.full_name} 
+                          className="w-full h-full object-cover object-center relative z-10 transition-transform duration-700 group-hover:scale-110" 
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center relative z-10">
                           <div className="text-8xl opacity-50">👤</div>
@@ -751,21 +766,15 @@ export default function ClientDashboard() {
                       )}
                       
                       {service.profiles.is_verified && (
-                        <div className="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-20">
+                        <div className="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-20 backdrop-blur-sm border border-white/20">
                           <Shield className="w-3.5 h-3.5" />Vérifié
                         </div>
                       )}
-                      
-                      {service.profiles.plan && service.profiles.plan !== 'Gratuit' && (
-                        <div className="absolute top-3 right-3 z-20">
-                          <span className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold shadow-lg ${
-                            service.profiles.plan === 'Premium' ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white' :
-                            service.profiles.plan === 'Business' ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white' :
-                            'bg-gradient-to-r from-blue-500 to-indigo-500 text-white'
-                          }`}>
-                            <Crown className="w-3.5 h-3.5" />
-                            {service.profiles.plan}
-                          </span>
+
+                      {/* ✅ BADGE INDISPONIBLE SI NÉCESSAIRE */}
+                      {!service.profiles.is_available && (
+                        <div className="absolute top-3 right-3 bg-slate-800/90 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-20 backdrop-blur-sm border border-white/20">
+                          <Pause className="w-3.5 h-3.5" /> Indisponible
                         </div>
                       )}
                       
@@ -780,9 +789,10 @@ export default function ClientDashboard() {
                           total_reviews: service.profiles.total_reviews,
                           plan: service.profiles.plan,
                           is_verified: service.profiles.is_verified,
+                          is_available: service.profiles.is_available,
                           avatar_url: service.profiles.avatar_url || undefined
                         })} 
-                        className="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center hover:bg-white shadow-lg transition-all hover:scale-110 z-20"
+                        className="absolute bottom-3 right-3 w-9 h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center hover:bg-white shadow-lg transition-all hover:scale-110 z-20"
                       >
                         <Heart className={`w-4.5 h-4.5 ${favorites.some(f => f.id === service.profiles.id) ? 'fill-red-500 text-red-500' : 'text-slate-600'}`} />
                       </button>
@@ -796,14 +806,24 @@ export default function ClientDashboard() {
                       
                       <p className="text-sm text-slate-600 mb-3 line-clamp-2">{service.description}</p>
                       
+                      {/* ✅ NOM AVEC SYMBOLE DE SÉCURITÉ COLORÉ À CÔTÉ */}
                       <div className="flex items-center gap-2 mb-3 p-2 bg-slate-50 rounded-lg">
-                        <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md">
-                          {service.profiles.full_name.charAt(0).toUpperCase()}
+                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md overflow-hidden">
+                          {service.profiles.avatar_url ? (
+                            <img src={service.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            service.profiles.full_name.charAt(0).toUpperCase()
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-semibold text-slate-900 truncate block">{service.profiles.full_name}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-semibold text-slate-900 truncate block">
+                              {service.profiles.full_name}
+                            </span>
+                            <PlanBadge plan={service.profiles.plan} />
+                          </div>
                           {service.profiles.specialty && (
-                            <span className="text-xs text-slate-500">{service.profiles.specialty}</span>
+                            <span className="text-xs text-slate-500 truncate block">{service.profiles.specialty}</span>
                           )}
                         </div>
                       </div>
@@ -826,18 +846,27 @@ export default function ClientDashboard() {
                         )}
                       </div>
                       
+                      {/* ✅ PRIX ET BOUTON PARFAITEMENT ALIGNÉS SUR LA MÊME LIGNE */}
                       <div className="flex items-center gap-2 mt-auto">
                         <div className="flex-1 bg-gradient-to-r from-indigo-50 to-purple-50 px-3 py-2.5 rounded-xl border border-indigo-100">
                           <span className="text-[10px] text-slate-600 font-semibold block">Prix</span>
                           <span className="text-lg font-black text-indigo-600">{service.price}</span>
                         </div>
-                        <button 
-                          onClick={() => contactWhatsApp(service)} 
-                          className="flex-1 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          Contacter
-                        </button>
+                        
+                        {service.profiles.is_available ? (
+                          <button 
+                            onClick={() => contactWhatsApp(service)} 
+                            className="flex-1 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            Contacter
+                          </button>
+                        ) : (
+                          <div className="flex-1 py-2.5 bg-slate-200 text-slate-500 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed">
+                            <Pause className="w-4 h-4" />
+                            Indisponible
+                          </div>
+                        )}
                       </div>
                       
                       <Link href={`/pro/${service.profiles.id}`} className="w-full py-2 mt-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
@@ -867,7 +896,7 @@ export default function ClientDashboard() {
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
                         {item.avatar ? (
-                          <img src={item.avatar} alt="" className="w-full h-full object-cover" />
+                          <img src={item.avatar} alt="" className="w-full h-full object-cover object-center" />
                         ) : (
                           item.proName.charAt(0).toUpperCase()
                         )}
@@ -915,34 +944,53 @@ export default function ClientDashboard() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {favorites.map((pro) => (
-                  <div key={pro.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="h-32 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden">
+                  <div key={pro.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all">
+                    
+                    {/* ✅ IMAGE PARFAITEMENT CARRÉE ET CENTRÉE DANS LES FAVORIS */}
+                    <div className="aspect-square bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden relative">
                       {pro.avatar_url ? (
-                        <img src={pro.avatar_url} alt={pro.full_name} className="w-full h-full object-cover" />
+                        <img src={pro.avatar_url} alt={pro.full_name} className="w-full h-full object-cover object-center" />
                       ) : (
                         <span className="text-6xl">👤</span>
                       )}
+                      {pro.is_verified && (
+                        <div className="absolute top-3 left-3 bg-blue-500 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-lg backdrop-blur-sm border border-white/20">
+                          <Shield className="w-3 h-3" /> Vérifié
+                        </div>
+                      )}
+                      {!pro.is_available && (
+                        <div className="absolute top-3 right-3 bg-slate-800/90 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-lg backdrop-blur-sm border border-white/20">
+                          <Pause className="w-3 h-3" /> Indisponible
+                        </div>
+                      )}
                     </div>
+                    
                     <div className="p-5">
-                      <div className="flex items-center mb-2">
-                        <LevelBadge plan={pro.plan} />
-                        <h3 className="font-bold text-slate-900">{pro.full_name}</h3>
+                      <div className="flex items-center mb-2 gap-1.5">
+                        <h3 className="font-bold text-slate-900 truncate flex-1">{pro.full_name}</h3>
+                        <PlanBadge plan={pro.plan} />
                       </div>
-                      <p className="text-sm text-slate-600 mb-3">{pro.specialty}</p>
+                      <p className="text-sm text-slate-600 mb-3 truncate">{pro.specialty}</p>
                       <div className="space-y-2">
-                        <button 
-                          onClick={() => {
-                            const serviceData: Service = {
-                              id: pro.id, title: pro.specialty, description: '', category: '', price: '',
-                              city: pro.city, pro_id: pro.id, created_at: '',
-                              profiles: { ...pro, avatar_url: pro.avatar_url || null }
-                            }
-                            contactWhatsApp(serviceData)
-                          }}
-                          className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition"
-                        >
-                          <MessageCircle className="w-4 h-4" /> WhatsApp
-                        </button>
+                        {pro.is_available ? (
+                          <button 
+                            onClick={() => {
+                              const serviceData: Service = {
+                                id: pro.id, title: pro.specialty, description: '', category: '', price: '',
+                                city: pro.city, pro_id: pro.id, created_at: '',
+                                profiles: { ...pro, avatar_url: pro.avatar_url || null }
+                              }
+                              contactWhatsApp(serviceData)
+                            }}
+                            className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition shadow-md hover:shadow-lg"
+                          >
+                            <MessageCircle className="w-4 h-4" /> WhatsApp
+                          </button>
+                        ) : (
+                          <div className="w-full py-2.5 bg-slate-200 text-slate-500 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 cursor-not-allowed">
+                            <Pause className="w-4 h-4" /> Indisponible
+                          </div>
+                        )}
                         <Link href={`/pro/${pro.id}`} className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition">
                           <ExternalLink className="w-4 h-4" /> Voir le profil
                         </Link>
@@ -962,20 +1010,27 @@ export default function ClientDashboard() {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <h2 className="font-bold text-slate-900 mb-4">Photo de profil</h2>
               <div className="flex items-center gap-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shadow-lg">
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shadow-lg ring-4 ring-indigo-50 flex-shrink-0">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                    <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover object-center" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-3xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold">
                       {profile?.full_name?.charAt(0).toUpperCase()}
                     </div>
                   )}
                 </div>
-                <label className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all font-semibold flex items-center gap-2">
-                  <Upload className="w-4 h-4" /> Changer la photo
-                  <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
-                </label>
-                {uploadingPhoto && <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />}
+                <div className="flex-1">
+                  <label className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all font-semibold flex items-center gap-2 w-fit">
+                    <Upload className="w-4 h-4" /> Changer la photo
+                    <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
+                  </label>
+                  {uploadingPhoto && (
+                    <div className="flex items-center gap-2 text-indigo-600 text-sm font-medium mt-3">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Upload en cours...
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -984,24 +1039,24 @@ export default function ClientDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Nom complet</label>
-                  <input type="text" value={settings.fullName} onChange={(e) => setSettings({...settings, fullName: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-lg" />
+                  <input type="text" value={settings.fullName} onChange={(e) => setSettings({...settings, fullName: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
-                  <input type="email" value={settings.email} disabled className="w-full px-4 py-2.5 border border-slate-200 rounded-lg bg-slate-50" />
+                  <input type="email" value={settings.email} disabled className="w-full px-4 py-2.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Téléphone</label>
-                  <input type="tel" value={settings.phone} onChange={(e) => setSettings({...settings, phone: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-lg" />
+                  <input type="tel" value={settings.phone} onChange={(e) => setSettings({...settings, phone: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Ville</label>
-                  <input type="text" value={settings.city} onChange={(e) => setSettings({...settings, city: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-lg" />
+                  <input type="text" value={settings.city} onChange={(e) => setSettings({...settings, city: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
                 </div>
               </div>
             </div>
             
-            <button onClick={saveSettings} className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-xl hover:scale-105 transition-all">
+            <button onClick={saveSettings} className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-xl hover:scale-105 transition-all shadow-lg shadow-indigo-200">
               Sauvegarder les modifications
             </button>
           </div>

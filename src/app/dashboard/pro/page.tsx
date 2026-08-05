@@ -9,9 +9,9 @@ import { Logo } from '@/components/Logo'
 import { 
   Home, Star, Settings, LogOut, CheckCircle, Clock, Upload, 
   Shield, Loader2, Menu, X, Crown, Award, Image as ImageIcon,
-  Trash2, Sun, Moon, Heart, Bot, CheckCircle2, AlertCircle, 
+  Trash2, Sun, Moon, Heart, CheckCircle2, AlertCircle, 
   Play, Pause, Save, Phone, MessageCircle, ExternalLink, Briefcase,
-  Plus, Eye, Zap, FileText, Camera, Globe, Rocket
+  Plus, Eye, Zap, FileText, Camera, Globe, Rocket, Edit3, ArrowRight
 } from 'lucide-react'
 
 // ✅ LISTE COMPLÈTE DE TOUTES LES CATÉGORIES DE MÉTIERS
@@ -108,13 +108,11 @@ export default function ProDashboard() {
   const [darkMode, setDarkMode] = useState(false)
 
   const [stats, setStats] = useState({
-    completedMissions: 0,
-    pendingMissions: 0,
     rating: 0,
     totalReviews: 0
   })
 
-  const [recentViewers, setRecentViewers] = useState<any[]>([])
+  const [isAvailable, setIsAvailable] = useState(true)
 
   const [profileData, setProfileData] = useState({
     full_name: '',
@@ -135,18 +133,10 @@ export default function ProDashboard() {
   const [serviceDesc, setServiceDesc] = useState('')
   const [servicePrice, setServicePrice] = useState('')
   const [serviceCategory, setServiceCategory] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
+  const [editingServiceId, setEditingServiceId] = useState<string | null>(null)
 
-  const [verificationStatus, setVerificationStatus] = useState('pending')
-  const [idCardFile, setIdCardFile] = useState<File | null>(null)
-  const [diplomaFile, setDiplomaFile] = useState<File | null>(null)
   const [reviews, setReviews] = useState<any[]>([])
-
-  const [autoMessages, setAutoMessages] = useState({
-    welcome: { enabled: false, message: '' },
-    unavailable: { enabled: false, message: '' },
-    thankYou: { enabled: false, message: '' }
-  })
-  const [isAvailable, setIsAvailable] = useState(true)
 
   useEffect(() => {
     const saved = localStorage.getItem('darkMode')
@@ -166,10 +156,7 @@ export default function ProDashboard() {
       loadStats()
       loadPortfolio()
       loadServices()
-      loadVerificationStatus()
       loadReviews()
-      loadAutoMessages()
-      loadRecentViewers()
     }
   }, [profile])
 
@@ -213,18 +200,6 @@ export default function ProDashboard() {
   const loadStats = async () => {
     if (!profile) return
     try {
-      const { count: completedCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .eq('professional_id', profile.id)
-        .eq('status', 'terminee')
-
-      const { count: pendingCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .eq('professional_id', profile.id)
-        .in('status', ['en_attente', 'en_cours'])
-
       const { data: reviewsData } = await supabase
         .from('reviews')
         .select('rating')
@@ -235,29 +210,11 @@ export default function ProDashboard() {
         : 0
 
       setStats({
-        completedMissions: completedCount || 0,
-        pendingMissions: pendingCount || 0,
         rating: avgRating,
         totalReviews: reviewsData?.length || 0
       })
     } catch (error) {
       console.error('Erreur stats:', error)
-    }
-  }
-
-  const loadRecentViewers = async () => {
-    if (!profile) return
-    try {
-      const { data } = await supabase
-        .from('profile_views_history')
-        .select('*')
-        .eq('pro_id', profile.id)
-        .order('created_at', { ascending: false })
-        .limit(5)
-      
-      if (data) setRecentViewers(data)
-    } catch (error) {
-      console.error('Erreur chargement visiteurs:', error)
     }
   }
 
@@ -297,60 +254,27 @@ export default function ProDashboard() {
     }
   }
 
-  const loadVerificationStatus = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('professional_verification')
-        .select('status')
-        .eq('professional_id', profile.id)
-        .maybeSingle()
-      
-      if (error) {
-        setVerificationStatus('pending')
-        return
-      }
-      if (data) setVerificationStatus(data.status)
-    } catch (error) { 
-      setVerificationStatus('pending')
-    }
-  }
-
   const loadReviews = async () => {
     try {
       const { data, error } = await supabase
         .from('reviews')
-        .select('*')
+        .select('*, profiles:client_id(full_name, avatar_url)')
         .eq('reviewee_id', profile.id)
         .order('created_at', { ascending: false })
         .limit(10)
       
       if (error) throw error
-      if (data) setReviews(data)
+      
+      if (data) {
+        const formattedReviews = data.map(review => ({
+          ...review,
+          reviewer_name: review.profiles?.full_name || 'Client',
+          reviewer_avatar: review.profiles?.avatar_url || null
+        }))
+        setReviews(formattedReviews)
+      }
     } catch (error) { 
       console.error('Erreur reviews:', error)
-    }
-  }
-
-  const loadAutoMessages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('auto_messages')
-        .select('*')
-        .eq('professional_id', profile.id)
-        .maybeSingle()
-      
-      if (error) {
-        return
-      }
-      if (data) {
-        setAutoMessages({
-          welcome: { enabled: data.welcome_enabled || false, message: data.welcome_message || '' },
-          unavailable: { enabled: data.unavailable_enabled || false, message: data.unavailable_message || '' },
-          thankYou: { enabled: data.thankyou_enabled || false, message: data.thankyou_message || '' }
-        })
-      }
-    } catch (error) { 
-      console.error('Erreur auto messages:', error)
     }
   }
 
@@ -378,16 +302,11 @@ export default function ProDashboard() {
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true
-        })
+        .upload(filePath, file, { cacheControl: '3600', upsert: true })
       
       if (uploadError) throw uploadError
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath)
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath)
 
       const { error: updateError } = await supabase
         .from('profiles')
@@ -400,7 +319,7 @@ export default function ProDashboard() {
       alert('✅ Photo de profil mise à jour')
     } catch (error) { 
       console.error('Erreur upload photo:', error)
-      alert(' Erreur upload photo de profil') 
+      alert('❌ Erreur upload photo de profil') 
     } finally { 
       setUploading(false) 
     }
@@ -474,7 +393,6 @@ export default function ProDashboard() {
     
     try {
       setUploading(true)
-      
       const { data, error } = await supabase
         .from('services')
         .insert({
@@ -495,65 +413,48 @@ export default function ProDashboard() {
       setServicePrice('')
       setServiceCategory('')
       await loadServices()
-      alert('✅ Service publié avec succès !')
+      alert('✅ Service publié avec succès ! Il est maintenant visible sur la marketplace.')
     } catch (error) { 
-      console.error(' Erreur publication service:', error)
+      console.error('Erreur publication service:', error)
       alert(`❌ Erreur: ${error.message}`)
     } finally { 
       setUploading(false) 
     }
   }
 
-  const handleVerificationSubmit = async () => {
-    if (!idCardFile || !diplomaFile || !profile) {
-      alert('⚠️ Les deux documents sont obligatoires')
+  const handleServiceUpdate = async () => {
+    if (!serviceTitle || !serviceDesc || !servicePrice || !serviceCategory || !profile || !editingServiceId) {
+      alert('Veuillez remplir tous les champs')
       return
     }
     
     try {
       setUploading(true)
-      
-      const idCardPath = `${profile.id}/id-card/${Date.now()}.${idCardFile.name.split('.').pop()}`
-      const { error: idCardError } = await supabase.storage
-        .from('verification-docs')
-        .upload(idCardPath, idCardFile)
-      
-      if (idCardError) throw idCardError
-      
-      const { data: { publicUrl: idCardUrl } } = supabase.storage
-        .from('verification-docs')
-        .getPublicUrl(idCardPath)
-      
-      const diplomaPath = `${profile.id}/diploma/${Date.now()}.${diplomaFile.name.split('.').pop()}`
-      const { error: diplomaError } = await supabase.storage
-        .from('verification-docs')
-        .upload(diplomaPath, diplomaFile)
-      
-      if (diplomaError) throw diplomaError
-      
-      const { data: { publicUrl: diplomaUrl } } = supabase.storage
-        .from('verification-docs')
-        .getPublicUrl(diplomaPath)
-      
-      const { error: verificationError } = await supabase
-        .from('professional_verification')
-        .upsert({
-          professional_id: profile.id,
-          id_card_url: idCardUrl,
-          diploma_url: diplomaUrl,
-          status: 'pending',
-          submitted_at: new Date().toISOString()
+      const { error } = await supabase
+        .from('services')
+        .update({
+          title: serviceTitle,
+          description: serviceDesc,
+          price: servicePrice,
+          category: serviceCategory,
+          city: profile.city || 'Lomé',
+          updated_at: new Date().toISOString()
         })
+        .eq('id', editingServiceId)
       
-      if (verificationError) throw verificationError
+      if (error) throw error
       
-      setVerificationStatus('pending')
-      setIdCardFile(null)
-      setDiplomaFile(null)
-      alert('✅ Documents envoyés ! Vérification en cours...')
+      setIsEditing(false)
+      setEditingServiceId(null)
+      setServiceTitle('')
+      setServiceDesc('')
+      setServicePrice('')
+      setServiceCategory('')
+      await loadServices()
+      alert('✅ Service mis à jour avec succès !')
     } catch (error) { 
-      console.error('Erreur vérification:', error)
-      alert('❌ Erreur lors de l\'envoi des documents') 
+      console.error('Erreur mise à jour service:', error)
+      alert(`❌ Erreur lors de la mise à jour: ${error.message}`)
     } finally { 
       setUploading(false) 
     }
@@ -593,31 +494,6 @@ export default function ProDashboard() {
       alert('✅ Profil sauvegardé avec succès')
     } catch (error) { 
       console.error('Erreur sauvegarde profil:', error)
-      alert('❌ Erreur lors de la sauvegarde') 
-    }
-  }
-
-  const saveAutoMessages = async () => {
-    if (!profile) return
-    
-    try {
-      const { error } = await supabase
-        .from('auto_messages')
-        .upsert({
-          professional_id: profile.id,
-          welcome_enabled: autoMessages.welcome.enabled,
-          welcome_message: autoMessages.welcome.message,
-          unavailable_enabled: autoMessages.unavailable.enabled,
-          unavailable_message: autoMessages.unavailable.message,
-          thankyou_enabled: autoMessages.thankYou.enabled,
-          thankyou_message: autoMessages.thankYou.message
-        })
-      
-      if (error) throw error
-      
-      alert('✅ Messages automatiques sauvegardés')
-    } catch (error) { 
-      console.error('Erreur sauvegarde auto messages:', error)
       alert('❌ Erreur lors de la sauvegarde') 
     }
   }
@@ -697,12 +573,11 @@ export default function ProDashboard() {
             <nav className="p-4 space-y-2">
               {[
                 { id: 'dashboard', label: 'Tableau de bord', icon: Home },
-                { id: 'services', label: 'Mes Services', icon: Briefcase },
+                { id: 'services', label: 'Mon Service', icon: Briefcase },
                 { id: 'profile', label: 'Mon Profil', icon: Settings },
                 { id: 'portfolio', label: 'Réalisations', icon: ImageIcon },
                 { id: 'reviews', label: 'Avis clients', icon: Star },
                 { id: 'verification', label: 'Vérification', icon: Shield },
-                { id: 'automation', label: 'Automatisation', icon: Bot },
               ].map(item => (
                 <button
                   key={item.id}
@@ -738,12 +613,11 @@ export default function ProDashboard() {
           <nav className="space-y-2 sticky top-24">
             {[
               { id: 'dashboard', label: 'Tableau de bord', icon: Home },
-              { id: 'services', label: 'Mes Services', icon: Briefcase },
+              { id: 'services', label: 'Mon Service', icon: Briefcase },
               { id: 'profile', label: 'Mon Profil', icon: Settings },
               { id: 'portfolio', label: 'Réalisations', icon: ImageIcon },
               { id: 'reviews', label: 'Avis clients', icon: Star },
               { id: 'verification', label: 'Vérification', icon: Shield },
-              { id: 'automation', label: 'Automatisation', icon: Bot },
             ].map(item => (
               <button
                 key={item.id}
@@ -775,7 +649,6 @@ export default function ProDashboard() {
         <main className="flex-1 min-w-0">
           {activeView === 'dashboard' && (
             <div className="space-y-8">
-              {/* Welcome Banner */}
               <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 p-8 text-white shadow-lg">
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                   <div>
@@ -796,12 +669,10 @@ export default function ProDashboard() {
                 </div>
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {[
-                  { label: 'Missions terminées', value: stats.completedMissions, icon: CheckCircle, color: 'from-emerald-500 to-emerald-600' },
-                  { label: 'En cours', value: stats.pendingMissions, icon: Clock, color: 'from-amber-500 to-orange-600' },
-                  { label: 'Note moyenne', value: `${stats.rating.toFixed(1)} `, icon: Star, color: 'from-yellow-500 to-amber-600' },
+                  { label: 'Note moyenne', value: `${stats.rating.toFixed(1)}/5`, icon: Star, color: 'from-yellow-500 to-amber-600' },
+                  { label: 'Total des avis', value: stats.totalReviews, icon: MessageCircle, color: 'from-blue-500 to-indigo-600' },
                 ].map((stat, i) => (
                   <div key={i} className={`${cardBg} border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all`}>
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}>
@@ -813,53 +684,19 @@ export default function ProDashboard() {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Recent Viewers */}
-                <div className={`lg:col-span-2 ${cardBg} border rounded-2xl p-6 shadow-sm`}>
-                  <h2 className={`text-lg font-semibold ${textPrimary} mb-4 flex items-center gap-2`}>
-                    <Eye className="w-5 h-5 text-indigo-500" />
-                    Derniers visiteurs
-                  </h2>
-                  {recentViewers.length === 0 ? (
-                    <p className={`text-sm ${textSecondary} py-8 text-center`}>Aucun visiteur récent</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {recentViewers.map((viewer, index) => (
-                        <div key={viewer.id || index} className={`flex items-center justify-between p-3 rounded-xl ${darkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50'} transition-colors`}>
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold overflow-hidden">
-                              {viewer.viewer_avatar ? (
-                                <img src={viewer.viewer_avatar} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                (viewer.viewer_name || 'V').charAt(0).toUpperCase()
-                              )}
-                            </div>
-                            <div>
-                              <p className={`font-medium text-sm ${textPrimary}`}>{viewer.viewer_name || 'Visiteur anonyme'}</p>
-                              <p className={`text-xs ${textSecondary}`}>
-                                {new Date(viewer.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Quick Actions */}
-                <div className="space-y-4">
-                  <h2 className={`text-lg font-semibold ${textPrimary}`}>Actions rapides</h2>
-                  <button onClick={() => setActiveView('services')} className={`w-full ${cardBg} border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all text-left`}>
+              <div className="space-y-4">
+                <h2 className={`text-lg font-semibold ${textPrimary}`}>Actions rapides</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <button onClick={() => setActiveView('services')} className={`${cardBg} border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all text-left`}>
                     <div className="w-10 h-10 rounded-xl bg-indigo-500 text-white flex items-center justify-center">
                       <Rocket className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className={`font-semibold text-sm ${textPrimary}`}>Nouveau service</p>
-                      <p className={`text-xs ${textSecondary}`}>Ajouter une offre</p>
+                      <p className={`font-semibold text-sm ${textPrimary}`}>{services.length > 0 ? 'Modifier mon service' : 'Publier mon service'}</p>
+                      <p className={`text-xs ${textSecondary}`}>{services.length > 0 ? 'Mettre à jour les informations' : 'Apparaître sur la marketplace'}</p>
                     </div>
                   </button>
-                  <button onClick={() => setActiveView('portfolio')} className={`w-full ${cardBg} border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all text-left`}>
+                  <button onClick={() => setActiveView('portfolio')} className={`${cardBg} border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all text-left`}>
                     <div className="w-10 h-10 rounded-xl bg-pink-500 text-white flex items-center justify-center">
                       <Camera className="w-5 h-5" />
                     </div>
@@ -868,7 +705,7 @@ export default function ProDashboard() {
                       <p className={`text-xs ${textSecondary}`}>Montrer votre travail</p>
                     </div>
                   </button>
-                  <Link href={`/pro/${profile?.id}`} className={`w-full ${cardBg} border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all text-left`}>
+                  <Link href={`/pro/${profile?.id}`} className={`${cardBg} border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all text-left`}>
                     <div className="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center">
                       <Globe className="w-5 h-5" />
                     </div>
@@ -885,76 +722,152 @@ export default function ProDashboard() {
           {activeView === 'services' && (
             <div className="space-y-8">
               <div>
-                <h1 className={`text-2xl font-bold ${textPrimary}`}>Mes Services</h1>
-                <p className={`text-sm ${textSecondary}`}>Publiez et gérez vos services</p>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Mon Service</h1>
+                <p className={`text-sm ${textSecondary}`}>
+                  {services.length > 0 
+                    ? "Vous avez déjà publié votre service unique. Vous pouvez le modifier ci-dessous pour mettre à jour vos informations."
+                    : "Publiez votre premier et unique service pour être visible sur la marketplace des clients."}
+                </p>
               </div>
 
-              <div className={`${cardBg} border rounded-2xl p-6 shadow-sm`}>
-                <h2 className={`text-lg font-semibold ${textPrimary} mb-6 flex items-center gap-2`}>
-                  <Plus className="w-5 h-5 text-indigo-500" />
-                  Publier un nouveau service
-                </h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Titre du service *</label>
-                    <input type="text" value={serviceTitle} onChange={(e) => setServiceTitle(e.target.value)} placeholder="Ex: Installation électrique complète" className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Description détaillée *</label>
-                    <textarea value={serviceDesc} onChange={(e) => setServiceDesc(e.target.value)} placeholder="Décrivez votre service..." rows={4} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {services.length === 0 ? (
+                <div className={`${cardBg} border rounded-2xl p-6 shadow-sm`}>
+                  <h2 className={`text-lg font-semibold ${textPrimary} mb-6 flex items-center gap-2`}>
+                    <Plus className="w-5 h-5 text-indigo-500" />
+                    Publier mon service
+                  </h2>
+                  <div className="space-y-4">
                     <div>
-                      <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Prix (FCFA) *</label>
-                      <input type="text" value={servicePrice} onChange={(e) => setServicePrice(e.target.value)} placeholder="Ex: 50000" className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
+                      <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Titre du service *</label>
+                      <input type="text" value={serviceTitle} onChange={(e) => setServiceTitle(e.target.value)} placeholder="Ex: Installation électrique complète" className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
                     </div>
                     <div>
-                      <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Catégorie *</label>
-                      {/* ✅ CHAMP RECHERCHABLE AVEC DATALIST POUR LES LONGUES LISTES */}
-                      <input 
-                        list="categories-metiers"
-                        value={serviceCategory}
-                        onChange={(e) => setServiceCategory(e.target.value)}
-                        placeholder="Tapez ou sélectionnez une catégorie..."
-                        className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`}
-                      />
-                      <datalist id="categories-metiers">
-                        {[...new Set(categoriesMetiers)].map((cat) => (
-                          <option key={cat} value={cat} />
-                        ))}
-                      </datalist>
+                      <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Description détaillée *</label>
+                      <textarea value={serviceDesc} onChange={(e) => setServiceDesc(e.target.value)} placeholder="Décrivez votre service..." rows={4} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
                     </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Prix (FCFA) *</label>
+                        <input type="text" value={servicePrice} onChange={(e) => setServicePrice(e.target.value)} placeholder="Ex: 50000" className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
+                      </div>
+                      <div>
+                        <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Catégorie *</label>
+                        <input 
+                          list="categories-metiers"
+                          value={serviceCategory}
+                          onChange={(e) => setServiceCategory(e.target.value)}
+                          placeholder="Tapez ou sélectionnez une catégorie..."
+                          className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`}
+                        />
+                        <datalist id="categories-metiers">
+                          {[...new Set(categoriesMetiers)].map((cat) => (
+                            <option key={cat} value={cat} />
+                          ))}
+                        </datalist>
+                      </div>
+                    </div>
+                    <button onClick={handleServicePublish} disabled={uploading || !serviceTitle || !serviceDesc || !servicePrice || !serviceCategory} className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                      {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Rocket className="w-5 h-5" />}
+                      Publier le service
+                    </button>
                   </div>
-                  <button onClick={handleServicePublish} disabled={uploading || !serviceTitle || !serviceDesc || !servicePrice || !serviceCategory} className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                    {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Rocket className="w-5 h-5" />}
-                    Publier le service
-                  </button>
                 </div>
-              </div>
-
-              {services.length > 0 && (
-                <div>
-                  <h2 className={`text-lg font-semibold ${textPrimary} mb-4`}>Services publiés ({services.length})</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {services.map(service => (
-                      <div key={service.id} className={`${cardBg} border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all`}>
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
-                            <Briefcase className="w-6 h-6 text-white" />
+              ) : (
+                <div className="space-y-6">
+                  {!isEditing ? (
+                    <div className={`${cardBg} border rounded-2xl p-6 shadow-sm`}>
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
+                        <div>
+                          <div className="flex items-center gap-3 mb-2">
+                            <Briefcase className="w-6 h-6 text-indigo-500" />
+                            <h3 className={`text-2xl font-bold ${textPrimary}`}>{services[0].title}</h3>
                           </div>
-                          <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-lg text-xs font-semibold">
-                            {service.is_active ? 'Actif' : 'Inactif'}
+                          <span className="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-semibold capitalize">
+                            {services[0].category}
                           </span>
                         </div>
-                        <h3 className={`text-xl font-bold ${textPrimary} mb-2`}>{service.title}</h3>
-                        <p className={`text-sm ${textSecondary} mb-4 line-clamp-2`}>{service.description}</p>
-                        <div className="flex items-center justify-between">
-                          <span className={`text-2xl font-bold ${textPrimary}`}>{service.price} FCFA</span>
-                          <span className="text-sm text-indigo-600 font-semibold capitalize">{service.category}</span>
+                        <div className="text-right">
+                          <span className={`text-3xl font-black text-emerald-600`}>{services[0].price} <span className="text-lg font-medium text-slate-500">FCFA</span></span>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                      
+                      <div className={`p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 mb-6`}>
+                        <p className={`${textSecondary} whitespace-pre-wrap leading-relaxed`}>{services[0].description}</p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          onClick={() => {
+                            setIsEditing(true)
+                            setServiceTitle(services[0].title)
+                            setServiceDesc(services[0].description)
+                            setServicePrice(services[0].price)
+                            setServiceCategory(services[0].category)
+                            setEditingServiceId(services[0].id)
+                          }}
+                          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all flex items-center gap-2 shadow-md hover:shadow-lg"
+                        >
+                          <Edit3 className="w-5 h-5" /> Modifier le service
+                        </button>
+                        <span className="px-4 py-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-xl font-medium flex items-center gap-2">
+                          <CheckCircle2 className="w-5 h-5" /> Service actif et visible
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={`${cardBg} border rounded-2xl p-6 shadow-sm`}>
+                      <h2 className={`text-lg font-semibold ${textPrimary} mb-6 flex items-center gap-2`}>
+                        <Settings className="w-5 h-5 text-indigo-500" />
+                        Modifier mon service
+                      </h2>
+                      <div className="space-y-4">
+                        <div>
+                          <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Titre du service *</label>
+                          <input type="text" value={serviceTitle} onChange={(e) => setServiceTitle(e.target.value)} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
+                        </div>
+                        <div>
+                          <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Description détaillée *</label>
+                          <textarea value={serviceDesc} onChange={(e) => setServiceDesc(e.target.value)} rows={4} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Prix (FCFA) *</label>
+                            <input type="text" value={servicePrice} onChange={(e) => setServicePrice(e.target.value)} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
+                          </div>
+                          <div>
+                            <label className={`block text-sm font-medium ${textSecondary} mb-2`}>Catégorie *</label>
+                            <input 
+                              list="categories-metiers"
+                              value={serviceCategory}
+                              onChange={(e) => setServiceCategory(e.target.value)}
+                              className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`}
+                            />
+                            <datalist id="categories-metiers">
+                              {[...new Set(categoriesMetiers)].map((cat) => (
+                                <option key={cat} value={cat} />
+                              ))}
+                            </datalist>
+                          </div>
+                        </div>
+                        <div className="flex gap-3 pt-2">
+                          <button onClick={handleServiceUpdate} disabled={uploading} className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                            {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                            Enregistrer les modifications
+                          </button>
+                          <button onClick={() => {
+                            setIsEditing(false)
+                            setEditingServiceId(null)
+                            setServiceTitle('')
+                            setServiceDesc('')
+                            setServicePrice('')
+                            setServiceCategory('')
+                          }} className="px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-xl transition-all">
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -969,22 +882,32 @@ export default function ProDashboard() {
 
               <div className={`${cardBg} border rounded-2xl p-6 shadow-sm`}>
                 <h2 className={`text-lg font-semibold ${textPrimary} mb-6`}>Photo de profil</h2>
-                <div className="flex items-center gap-6">
-                  <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shadow-lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                  <div className="w-40 h-40 rounded-2xl overflow-hidden bg-slate-200 shadow-lg border-4 border-indigo-100 dark:border-indigo-900 flex-shrink-0">
                     {profile?.avatar_url ? (
-                      <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                      <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover object-center" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-3xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold">
-                        {profile?.full_name?.charAt(0).toUpperCase()}
+                      <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold">
+                        {profile?.full_name?.charAt(0).toUpperCase() || 'P'}
                       </div>
                     )}
                   </div>
-                  <label className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl cursor-pointer transition-all font-semibold flex items-center gap-2">
-                    <Upload className="w-4 h-4" />
-                    Changer la photo
-                    <input type="file" accept="image/*" onChange={handleProfileImageUpload} className="hidden" disabled={uploading} />
-                  </label>
-                  {uploading && <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />}
+                  <div className="flex-1 space-y-3">
+                    <p className={`text-sm ${textSecondary}`}>
+                      💡 <strong>Conseil format :</strong> Pour un rendu professionnel optimal, utilisez une photo <strong>carrée (1:1)</strong> ou en portrait, bien éclairée, où votre visage est clairement visible au centre. Formats acceptés : JPG, PNG (Max 5MB).
+                    </p>
+                    <label className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl cursor-pointer transition-all font-semibold shadow-md hover:shadow-lg">
+                      <Upload className="w-5 h-5" />
+                      Changer la photo
+                      <input type="file" accept="image/*" onChange={handleProfileImageUpload} className="hidden" disabled={uploading} />
+                    </label>
+                    {uploading && (
+                      <div className="flex items-center gap-2 text-indigo-600 text-sm font-medium">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Upload en cours...
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -1094,18 +1017,34 @@ export default function ProDashboard() {
                 <div className="space-y-4">
                   {reviews.map(review => (
                     <div key={review.id} className={`${cardBg} border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all`}>
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className={`font-bold ${textPrimary} text-lg`}>{review.reviewer_name || 'Client'}</h3>
-                          <p className={`text-xs ${textSecondary}`}>{new Date(review.created_at).toLocaleDateString('fr-FR')}</p>
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
+                          {review.reviewer_avatar ? (
+                            <img src={review.reviewer_avatar} alt={review.reviewer_name} className="w-full h-full object-cover" />
+                          ) : (
+                            review.reviewer_name.charAt(0).toUpperCase()
+                          )}
                         </div>
-                        <div className="flex gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`w-5 h-5 ${i < review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-slate-300'}`} />
-                          ))}
+                        
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <h3 className={`font-bold ${textPrimary} text-lg`}>
+                                {review.reviewer_name}
+                              </h3>
+                              <p className={`text-xs ${textSecondary}`}>
+                                {new Date(review.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                              </p>
+                            </div>
+                            <div className="flex gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} className={`w-5 h-5 ${i < review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-slate-300'}`} />
+                              ))}
+                            </div>
+                          </div>
+                          <p className={`${textSecondary} leading-relaxed`}>{review.comment}</p>
                         </div>
                       </div>
-                      <p className={`${textSecondary} leading-relaxed`}>{review.comment}</p>
                     </div>
                   ))}
                 </div>
@@ -1113,112 +1052,65 @@ export default function ProDashboard() {
             </div>
           )}
 
+          {/* ✅ NOUVELLE INTERFACE DE VÉRIFICATION (Bientôt disponible) */}
           {activeView === 'verification' && (
-            <div className="max-w-2xl space-y-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Vérification</h1>
-                  <p className={`text-sm ${textSecondary}`}>Obtenez le badge "Pro Vérifié"</p>
-                </div>
-                <span className={`px-6 py-3 rounded-xl text-sm font-semibold shadow-lg ${
-                  verificationStatus === 'approved' ? 'bg-emerald-500 text-white' :
-                  verificationStatus === 'rejected' ? 'bg-red-500 text-white' :
-                  'bg-amber-500 text-white'
-                }`}>
-                  {verificationStatus === 'approved' ? '✅ Vérifié' : verificationStatus === 'rejected' ? '❌ Refusé' : '⏳ En attente'}
-                </span>
-              </div>
-
-              <div className={`${cardBg} border rounded-2xl p-6 shadow-sm`}>
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className={`text-xl font-bold ${textPrimary} mb-2`}>Badge "Pro Vérifié"</h3>
-                    <p className={`text-sm ${textSecondary}`}>Soumettez vos documents pour obtenir le badge vérifié</p>
-                  </div>
-                </div>
-                <div className="space-y-6">
-                  <div>
-                    <label className={`block font-semibold mb-2 ${textPrimary} flex items-center gap-2`}>
-                      <FileText className="w-5 h-5 text-indigo-500" />
-                      Carte d'identité / Passeport *
-                    </label>
-                    <input type="file" accept="image/*,.pdf" onChange={(e) => setIdCardFile(e.target.files?.[0] || null)} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
-                    {idCardFile && <p className="text-xs text-emerald-600 mt-2 font-semibold">✅ {idCardFile.name}</p>}
-                  </div>
-                  <div>
-                    <label className={`block font-semibold mb-2 ${textPrimary} flex items-center gap-2`}>
-                      <Award className="w-5 h-5 text-indigo-500" />
-                      Diplôme / Certification *
-                    </label>
-                    <input type="file" accept="image/*,.pdf" onChange={(e) => setDiplomaFile(e.target.files?.[0] || null)} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
-                    {diplomaFile && <p className="text-xs text-emerald-600 mt-2 font-semibold">✅ {diplomaFile.name}</p>}
-                  </div>
-                  <button onClick={handleVerificationSubmit} disabled={uploading || !idCardFile || !diplomaFile} className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                    {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Shield className="w-5 h-5" />}
-                    Envoyer les documents
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeView === 'automation' && (
-            <div className="max-w-3xl space-y-8">
+            <div className="max-w-3xl mx-auto space-y-8">
               <div>
-                <h1 className={`text-2xl font-bold ${textPrimary}`}>Automatisation</h1>
-                <p className={`text-sm ${textSecondary}`}>Configurez des réponses automatiques</p>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Vérification d'identité</h1>
+                <p className={`text-sm ${textSecondary}`}>Obtenez le badge "Pro Vérifié" pour gagner la confiance des clients.</p>
               </div>
 
-              <div className={`${cardBg} border rounded-2xl p-6 shadow-sm`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isAvailable ? 'bg-emerald-500' : 'bg-slate-500'}`}>
-                      {isAvailable ? <Play className="w-6 h-6 text-white" /> : <Pause className="w-6 h-6 text-white" />}
+              <div className={`${cardBg} border rounded-3xl p-8 md:p-12 shadow-sm text-center`}>
+                {/* Icône animée */}
+                <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/30">
+                  <Rocket className="w-12 h-12 text-white" />
+                </div>
+                
+                <h3 className={`text-3xl font-bold ${textPrimary} mb-3`}>
+                  Bientôt disponible 🚀
+                </h3>
+                
+                <p className={`${textSecondary} max-w-md mx-auto mb-8 text-lg`}>
+                  Nous travaillons actuellement sur cette fonctionnalité pour vous offrir une expérience de vérification simple, rapide et sécurisée.
+                </p>
+
+                {/* Badge "En développement" */}
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-full text-sm font-semibold border border-amber-200 dark:border-amber-800 mb-8">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                  </span>
+                  En cours de développement
+                </div>
+
+                {/* Timeline visuelle */}
+                <div className={`max-w-lg mx-auto ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'} rounded-2xl p-6 border ${darkMode ? 'border-slate-700' : 'border-slate-200'}`}>
+                  <h4 className={`font-bold ${textPrimary} mb-4`}>Ce qui arrive bientôt :</h4>
+                  <div className="space-y-3 text-left">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                      <span className={`text-sm ${textSecondary}`}>Paiement sécurisé via PayDunya (T-Money, Flooz, Carte)</span>
                     </div>
-                    <div>
-                      <h3 className={`text-lg font-semibold ${textPrimary}`}>Statut de disponibilité</h3>
-                      <p className={`text-sm ${textSecondary}`}>{isAvailable ? 'Vous acceptez de nouvelles missions' : 'Vous ne recevez plus de demandes'}</p>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                      <span className={`text-sm ${textSecondary}`}>Upload de documents (CNI, Diplôme)</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                      <span className={`text-sm ${textSecondary}`}>Validation par notre équipe sous 24-48h</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                      <span className={`text-sm ${textSecondary}`}>Badge bleu "Vérifié" sur votre profil</span>
                     </div>
                   </div>
-                  <button onClick={toggleAvailability} className={`px-6 py-3 rounded-xl font-semibold transition-all ${isAvailable ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-emerald-500 hover:bg-emerald-600 text-white'}`}>
-                    {isAvailable ? 'Passer indisponible' : 'Passer disponible'}
-                  </button>
                 </div>
+
+                {/* Prix indicatif */}
+                <p className={`mt-8 text-sm ${textSecondary}`}>
+                   Tarif prévu : <strong className="text-indigo-600 dark:text-indigo-400">5 000 FCFA / an</strong>
+                </p>
               </div>
-
-              {[
-                { key: 'welcome', label: 'Message de bienvenue', desc: 'Envoyé quand un client vous contacte', icon: Heart },
-                { key: 'unavailable', label: 'Message d\'indisponibilité', desc: 'Envoyé quand vous êtes indisponible', icon: AlertCircle },
-                { key: 'thankYou', label: 'Message de remerciement', desc: 'Envoyé après une mission terminée', icon: CheckCircle2 },
-              ].map(auto => (
-                <div key={auto.key} className={`${cardBg} border rounded-2xl p-6 shadow-sm`}>
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
-                        <auto.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className={`font-semibold ${textPrimary} text-lg`}>{auto.label}</h3>
-                        <p className={`text-sm ${textSecondary}`}>{auto.desc}</p>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" checked={autoMessages[auto.key as keyof typeof autoMessages].enabled} onChange={(e) => setAutoMessages({...autoMessages, [auto.key]: { ...autoMessages[auto.key as keyof typeof autoMessages], enabled: e.target.checked }})} className="sr-only peer" />
-                      <div className="w-11 h-6 bg-slate-300 peer-checked:bg-indigo-600 rounded-full transition peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                    </label>
-                  </div>
-                  {autoMessages[auto.key as keyof typeof autoMessages].enabled && (
-                    <textarea value={autoMessages[auto.key as keyof typeof autoMessages].message} onChange={(e) => setAutoMessages({...autoMessages, [auto.key]: { ...autoMessages[auto.key as keyof typeof autoMessages], message: e.target.value }})} placeholder="Votre message automatique..." rows={3} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} />
-                  )}
-                </div>
-              ))}
-
-              <button onClick={saveAutoMessages} className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all flex items-center gap-2">
-                <Save className="w-5 h-5" /> Sauvegarder les automatisations
-              </button>
             </div>
           )}
         </main>

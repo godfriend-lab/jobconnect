@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import "./globals.css"
+import Chatbot from "@/components/Chatbot" // ← 1. AJOUT DE L'IMPORT
 
 export const metadata: Metadata = {
   title: "JOBCONNECT - La Marketplace N°1 des Services au Togo",
@@ -28,6 +29,10 @@ export default function RootLayout({
       </head>
       <body className="antialiased font-sans">
         <main>{children}</main>
+        
+        {/* ← 2. AJOUT DU CHATBOT ICI (il sera présent sur TOUTES les pages) */}
+        <Chatbot /> 
+        
       </body>
     </html>
   )

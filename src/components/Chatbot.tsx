@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { MessageCircle, X, Send, Bot, User, Sparkles, ThumbsUp, ThumbsDown, RefreshCw } from "lucide-react"
+import { MessageCircle, X, Send, Bot, User, Sparkles, ThumbsUp, ThumbsDown, RefreshCw, Loader2 } from "lucide-react"
 
 interface Message {
   type: "bot" | "user"
@@ -17,7 +17,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     { 
       type: "bot", 
-      text: "👋 Bonjour et bienvenue sur JOBCONNECT !\n\nJe suis **JOBI**, votre assistant IA expert.\n\nJe peux vous aider à :\n• 🔍 Trouver le professionnel idéal\n• 💼 Devenir pro sur la plateforme\n• 💰 Comprendre nos tarifs\n• 💡 Obtenir des conseils personnalisés\n\nQue souhaitez-vous savoir ?",
+      text: "👋 Bonjour et bienvenue sur **JOBCONNECT** !\n\nJe suis **JOBI**, votre assistant IA expert.\n\nJe peux vous aider à :\n• 🔍 Trouver le professionnel idéal\n• 💼 Devenir pro sur la plateforme\n• 💰 Comprendre nos tarifs\n• 💡 Obtenir des conseils personnalisés\n\nQue souhaitez-vous savoir ?",
       time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     }
   ])
@@ -43,20 +43,29 @@ export default function Chatbot() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  }, [messages, isTyping])
+
+  // Formateur de texte sécurisé et élégant pour React
+  const formatText = (text: string) => {
+    return text.split('\n').map((line, i) => {
+      let formatted = line
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-white">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em class="italic text-white/90">$1</em>')
+      
+      if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
+        return `<div key="${i}" class="flex items-start gap-2 my-1.5"><span class="text-[#818CF8] mt-1 text-lg leading-none">•</span><span class="text-white/90 leading-relaxed">${formatted.replace(/^[•-]\s*/, '')}</span></div>`
+      }
+      return `<p key="${i}" class="mb-1.5 text-white/90 leading-relaxed last:mb-0">${formatted || '&nbsp;'}</p>`
+    }).join('')
+  }
 
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || isTyping) return
 
     const currentTime = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-    const userMessage: Message = { 
-      type: "user", 
-      text: messageText.trim(), 
-      time: currentTime 
-    }
+    const userMessage: Message = { type: "user", text: messageText.trim(), time: currentTime }
     
-    const newMessages = [...messages, userMessage]
-    setMessages(newMessages)
+    setMessages(prev => [...prev, userMessage])
     setInput("")
     setIsTyping(true)
 
@@ -65,26 +74,28 @@ export default function Chatbot() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: messages,
+          messages: messages, // Envoie l'historique pour le contexte
           userMessage: messageText.trim(),
           userRole: userRole
         })
       })
+
+      if (!response.ok) throw new Error('Erreur réseau')
 
       const data = await response.json()
       const botTime = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
       
       setMessages(prev => [...prev, { 
         type: "bot", 
-        text: data.reply, 
+        text: data.reply || "Désolé, je n'ai pas pu générer de réponse.", 
         time: botTime 
       }])
     } catch (error) {
-      console.error('Erreur:', error)
+      console.error('Erreur Chatbot:', error)
       const botTime = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
       setMessages(prev => [...prev, { 
         type: "bot", 
-        text: "⚠️ Je n'ai pas pu traiter votre demande. Contactez support@jobconnect.tg", 
+        text: "⚠️ Je rencontre un petit problème technique. Veuillez réessayer dans un instant ou contacter le support à **support@jobconnect.tg**.", 
         time: botTime 
       }])
     } finally {
@@ -92,10 +103,8 @@ export default function Chatbot() {
     }
   }
 
-  const handleSend = () => {
-    sendMessage(input)
-  }
-
+  const handleSend = () => sendMessage(input)
+  
   const handleQuickReply = (reply: string) => {
     const cleanReply = reply.replace(/[🔍💰🛡️⭐📈💼💡🎯]/g, '').trim()
     sendMessage(cleanReply)
@@ -109,225 +118,272 @@ export default function Chatbot() {
   }
 
   const handleFeedback = (index: number, type: 'up' | 'down') => {
-    const newMessages = [...messages]
-    newMessages[index] = { ...newMessages[index], feedback: type }
-    setMessages(newMessages)
+    setMessages(prev => prev.map((msg, i) => 
+      i === index ? { ...msg, feedback: type } : msg
+    ))
   }
 
   const handleReset = () => {
     setMessages([{
       type: "bot",
-      text: "👋 Bonjour ! Je suis **JOBI**, votre assistant expert.\n\nComment puis-je vous aider aujourd'hui ?",
+      text: "🔄 Conversation réinitialisée.\n\nJe suis **JOBI**, votre assistant expert. Comment puis-je vous aider aujourd'hui ?",
       time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     }])
   }
 
-  // Formatage markdown basique
-  const formatText = (text: string) => {
-    return text
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .split('\n')
-      .map((line, i) => {
-        if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
-          return `<div key="${i}" class="flex gap-2 my-1"><span class="text-blue-400">•</span><span>${line.replace(/^[•-]\s*/, '')}</span></div>`
-        }
-        return line || '<br/>'
-      })
-      .join('')
-  }
-
   return (
     <>
-      {/* Bouton flottant */}
+      {/* Bouton flottant avec effet de lueur (Glow) */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.1, rotate: 5 }}
-        whileTap={{ scale: 0.9 }}
-        className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-[#0F172A] to-[#1E293B] text-white rounded-full shadow-2xl flex items-center justify-center z-50 border border-white/10"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-white rounded-full shadow-[0_0_20px_rgba(79,70,229,0.5)] flex items-center justify-center z-[9999] border border-white/20 transition-all"
+        aria-label="Ouvrir le chat"
       >
-        {isOpen ? <X className="w-7 h-7" /> : <MessageCircle className="w-7 h-7" />}
+        <AnimatePresence mode="wait">
+          {isOpen ? (
+            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+              <X className="w-7 h-7" />
+            </motion.div>
+          ) : (
+            <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
+              <MessageCircle className="w-7 h-7" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.button>
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 w-[400px] max-w-[calc(100vw-2rem)] bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col border border-white/10"
-            style={{ height: "650px" }}
-          >
-            {/* Header */}
-            <div className="bg-white/5 backdrop-blur-lg border-b border-white/10 text-white p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <div className="w-11 h-11 bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] rounded-full flex items-center justify-center shadow-lg">
-                      <Bot className="w-6 h-6" />
-                    </div>
-                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-[#0F172A]"></span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg flex items-center gap-2">
-                      JOBI
-                      <Sparkles className="w-4 h-4 text-[#4F46E5]" />
-                    </h3>
-                    <p className="text-xs text-white/70">
-                      {isTyping ? "⌨️ Réflexion..." : "🟢 En ligne - IA Propulsée par Groq"}
-                    </p>
-                  </div>
-                </div>
-                <button 
-                  onClick={handleReset}
-                  className="p-2 hover:bg-white/10 rounded-full transition"
-                  title="Nouvelle conversation"
-                >
-                  <RefreshCw className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Sélecteur de rôle */}
-              <div className="flex gap-2 bg-white/10 backdrop-blur-sm p-1 rounded-xl">
-                <button
-                  onClick={() => setUserRole('client')}
-                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
-                    userRole === 'client' 
-                      ? 'bg-white text-[#0F172A]' 
-                      : 'text-white/80 hover:text-white'
-                  }`}
-                >
-                  👤 Client
-                </button>
-                <button
-                  onClick={() => setUserRole('professional')}
-                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
-                    userRole === 'professional' 
-                      ? 'bg-white text-[#0F172A]' 
-                      : 'text-white/80 hover:text-white'
-                  }`}
-                >
-                  💼 Professionnel
-                </button>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A]">
-              {messages.map((msg, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div className={`flex gap-2 max-w-[85%] ${msg.type === "user" ? "flex-row-reverse" : ""}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      msg.type === "user" 
-                        ? "bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-white" 
-                        : "bg-white/10 backdrop-blur text-white border border-white/20"
-                    }`}>
-                      {msg.type === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-                    </div>
-                    <div className="flex-1">
-                      <div className={`px-4 py-2.5 rounded-2xl ${
-                        msg.type === "user"
-                          ? "bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-white rounded-br-sm shadow-lg"
-                          : "bg-white/10 backdrop-blur text-white rounded-bl-sm border border-white/20"
-                      }`}>
-                        <div 
-                          className="text-sm whitespace-pre-line leading-relaxed"
-                          dangerouslySetInnerHTML={{ __html: formatText(msg.text) }}
-                        />
+          <>
+            {/* Overlay pour mobile */}
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] md:hidden"
+            />
+            
+            {/* Fenêtre de Chat */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed bottom-24 right-6 w-[95vw] md:w-[420px] max-h-[85vh] md:max-h-[650px] bg-[#0F172A] rounded-2xl shadow-2xl z-[9999] overflow-hidden flex flex-col border border-white/10"
+              style={{ 
+                scrollbarWidth: 'thin', 
+                scrollbarColor: 'rgba(255,255,255,0.2) transparent' 
+              }}
+            >
+              {/* Header */}
+              <div className="bg-[#0F172A]/80 backdrop-blur-xl border-b border-white/10 p-4 shrink-0">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="w-11 h-11 bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] rounded-full flex items-center justify-center shadow-lg ring-2 ring-[#0F172A]">
+                        <Bot className="w-6 h-6 text-white" />
                       </div>
-                      <div className={`flex items-center gap-2 mt-1 ${msg.type === "user" ? "justify-end" : ""}`}>
-                        <p className="text-xs text-white/50">
-                          {msg.time}
-                        </p>
-                        {msg.type === "bot" && i > 0 && (
-                          <div className="flex gap-1">
-                            <button
-                              onClick={() => handleFeedback(i, 'up')}
-                              className={`p-0.5 rounded transition-colors ${
-                                msg.feedback === 'up' ? 'bg-green-500/20 text-green-400' : 'text-white/40 hover:text-green-400'
-                              }`}
-                            >
-                              <ThumbsUp className="w-3 h-3" />
-                            </button>
-                            <button
-                              onClick={() => handleFeedback(i, 'down')}
-                              className={`p-0.5 rounded transition-colors ${
-                                msg.feedback === 'down' ? 'bg-red-500/20 text-red-400' : 'text-white/40 hover:text-red-400'
-                              }`}
-                            >
-                              <ThumbsDown className="w-3 h-3" />
-                            </button>
-                          </div>
+                      <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-[#0F172A]"></span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-white text-base flex items-center gap-2">
+                        JOBCONNECT AI
+                        <Sparkles className="w-4 h-4 text-[#818CF8]" />
+                      </h3>
+                      <p className="text-xs text-white/60 flex items-center gap-1.5">
+                        {isTyping ? (
+                          <><span className="w-1.5 h-1.5 bg-[#818CF8] rounded-full animate-pulse" /> Réflexion en cours...</>
+                        ) : (
+                          <><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> En ligne • Propulsé par Groq</>
                         )}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleReset}
+                    className="p-2 hover:bg-white/10 rounded-full transition text-white/70 hover:text-white"
+                    title="Nouvelle conversation"
+                  >
+                    <RefreshCw className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Sélecteur de rôle (Segmented Control) */}
+                <div className="flex bg-white/5 backdrop-blur-sm p-1 rounded-xl border border-white/10">
+                  <button
+                    onClick={() => setUserRole('client')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+                      userRole === 'client' 
+                        ? 'bg-white text-[#0F172A] shadow-sm' 
+                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <User className="w-3.5 h-3.5" /> Client
+                  </button>
+                  <button
+                    onClick={() => setUserRole('professional')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+                      userRole === 'professional' 
+                        ? 'bg-white text-[#0F172A] shadow-sm' 
+                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <BriefcaseIcon className="w-3.5 h-3.5" /> Pro
+                  </button>
+                </div>
+              </div>
+
+              {/* Zone des Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0F172A]">
+                {messages.map((msg, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div className={`flex gap-2.5 max-w-[85%] ${msg.type === "user" ? "flex-row-reverse" : ""}`}>
+                      {/* Avatar */}
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
+                        msg.type === "user" 
+                          ? "bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-white" 
+                          : "bg-white/10 border border-white/20 text-white"
+                      }`}>
+                        {msg.type === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                      </div>
+                      
+                      {/* Bulle de message */}
+                      <div className="flex flex-col">
+                        <div className={`px-4 py-3 rounded-2xl shadow-sm ${
+                          msg.type === "user"
+                            ? "bg-gradient-to-br from-[#4F46E5] to-[#6366F1] text-white rounded-br-md"
+                            : "bg-white/10 backdrop-blur-md text-white rounded-bl-md border border-white/10"
+                        }`}>
+                          <div 
+                            className="text-[13px] whitespace-normal"
+                            dangerouslySetInnerHTML={{ __html: formatText(msg.text) }}
+                          />
+                        </div>
+                        
+                        {/* Métadonnées (Heure + Feedback) */}
+                        <div className={`flex items-center gap-2 mt-1.5 px-1 ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
+                          <span className="text-[10px] text-white/40 font-medium">{msg.time}</span>
+                          {msg.type === "bot" && i > 0 && (
+                            <div className="flex gap-1">
+                              <button
+                                onClick={() => handleFeedback(i, 'up')}
+                                className={`p-1 rounded-md transition-all ${
+                                  msg.feedback === 'up' ? 'bg-emerald-500/20 text-emerald-400' : 'text-white/30 hover:text-emerald-400 hover:bg-white/5'
+                                }`}
+                                aria-label="Réponse utile"
+                              >
+                                <ThumbsUp className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={() => handleFeedback(i, 'down')}
+                                className={`p-1 rounded-md transition-all ${
+                                  msg.feedback === 'down' ? 'bg-red-500/20 text-red-400' : 'text-white/30 hover:text-red-400 hover:bg-white/5'
+                                }`}
+                                aria-label="Réponse inutile"
+                              >
+                                <ThumbsDown className="w-3 h-3" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-white/10 backdrop-blur px-4 py-3 rounded-2xl rounded-bl-sm border border-white/20">
-                    <div className="flex gap-1">
-                      <span className="w-2 h-2 bg-white/70 rounded-full animate-bounce" />
-                      <span className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </motion.div>
+                ))}
+                
+                {/* Indicateur de frappe */}
+                {isTyping && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }} 
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex justify-start"
+                  >
+                    <div className="flex gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+                        <Bot className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="bg-white/10 backdrop-blur-md px-4 py-3 rounded-2xl rounded-bl-md border border-white/10 flex items-center gap-1.5">
+                        <span className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
                     </div>
+                  </motion.div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Suggestions rapides */}
+              <AnimatePresence>
+                {messages.length <= 2 && !isTyping && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }} 
+                    animate={{ opacity: 1, height: 'auto' }} 
+                    exit={{ opacity: 0, height: 0 }}
+                    className="px-4 py-3 border-t border-white/10 bg-[#0F172A]/50 backdrop-blur-sm shrink-0"
+                  >
+                    <p className="text-[11px] text-white/50 mb-2 font-semibold uppercase tracking-wider">💡 Suggestions :</p>
+                    <div className="flex flex-wrap gap-2">
+                      {quickReplies[userRole].map((reply, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleQuickReply(reply)}
+                          className="text-[12px] bg-white/5 hover:bg-white/10 hover:border-white/30 text-white/90 px-3 py-2 rounded-xl transition-all border border-white/10 text-left"
+                        >
+                          {reply}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Zone de saisie */}
+              <div className="p-4 border-t border-white/10 bg-[#0F172A] shrink-0">
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                      disabled={isTyping}
+                      placeholder={isTyping ? "JOBI réfléchis..." : "Posez-moi n'importe quelle question..."}
+                      className="w-full px-4 py-3 bg-white text-[#0F172A] placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/50 text-sm font-medium transition-all disabled:opacity-70"
+                    />
                   </div>
+                  <button
+                    onClick={handleSend}
+                    disabled={!input.trim() || isTyping}
+                    className="w-12 h-12 bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-white rounded-xl flex items-center justify-center hover:shadow-lg hover:shadow-[#4F46E5]/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shrink-0"
+                    aria-label="Envoyer le message"
+                  >
+                    {isTyping ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-0.5" />}
+                  </button>
                 </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Quick replies */}
-            {messages.length <= 2 && !isTyping && (
-              <div className="px-4 py-3 border-t border-white/10 bg-white/5 backdrop-blur">
-                <p className="text-xs text-white/70 mb-2 font-medium">💡 Suggestions :</p>
-                <div className="flex flex-wrap gap-2">
-                  {quickReplies[userRole].map((reply, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleQuickReply(reply)}
-                      className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full transition border border-white/20"
-                    >
-                      {reply}
-                    </button>
-                  ))}
-                </div>
+                <p className="text-[10px] text-white/30 mt-2.5 text-center font-medium">
+                  ⏎ Entrée pour envoyer • Propulsé par Groq AI
+                </p>
               </div>
-            )}
-
-            {/* Input */}
-            <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  disabled={isTyping}
-                  placeholder={isTyping ? "Je réfléchis..." : "Posez-moi n'importe quelle question..."}
-                  className="flex-1 px-4 py-2.5 bg-white text-[#0F172A] placeholder-gray-500 rounded-full focus:outline-none focus:ring-2 focus:ring-[#4F46E5] text-sm border border-white/20"
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim() || isTyping}
-                  className="bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-white p-2.5 rounded-full hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-              <p className="text-xs text-white/50 mt-2 text-center">
-                ⏎ Entrée pour envoyer • Propulsé par Groq AI
-              </p>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
+  )
+}
+
+// Petit composant icône manquant dans les imports lucide par sécurité
+function BriefcaseIcon(props: any) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
   )
 }
