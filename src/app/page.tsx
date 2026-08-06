@@ -52,21 +52,21 @@ export default async function HomePage() {
   // 3. Modifie les noms de fichiers ci-dessous pour qu'ils correspondent EXACTEMENT aux tiens (sensible à la casse)
   const testimonials = [
     {
-      name: 'Koffi A.',
+      name: 'koffi A.',
       role: 'Client à Lomé',
       text: "J'ai trouvé un plombier en moins de 2 heures. Le service est fluide et le fait de payer directement l'artisan sans commission est un vrai plus.",
       rating: 5,
       image: '/image/testimonials/koffi.jpg' // ← Remplace 'koffi.jpg' par ton vrai nom de fichier
     },
     {
-      name: 'Amina S.',
+      name: 'amina S.',
       role: 'Couturière à Agoè',
-      text: "Depuis que je suis sur JobConnect, mon carnet de commandes est plein. La visibilité que m'offre le forfait Business vaut largement son prix.",
+      text: "Depuis que je suis sur JobConnect, mon carnet de commandes est plein.C est la meilleur plateforme que j ai jamais utiliser",
       rating: 5,
       image: '/image/testimonials/amina.jpg' // ← Remplace 'amina.jpg' par ton vrai nom de fichier
     },
     {
-      name: 'Jean M.',
+      name: 'jean M.',
       role: 'Électricien à Bè',
       text: "L'application est simple à utiliser. Je reçois des notifications claires et je peux discuter avec les clients avant de me déplacer.",
       rating: 5,
