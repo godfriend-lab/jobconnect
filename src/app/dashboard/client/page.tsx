@@ -256,6 +256,14 @@ export default function ClientDashboard() {
         return 
       }
 
+      // ✅ CORRECTION CRITIQUE : Redirige UNIQUEMENT si le rôle est explicitement 'pro'
+      // Cela empêche la boucle de redirection infinie si le rôle est null (anciens comptes)
+      if (profileData.role === 'pro') {
+        console.warn('Ce compte est un Pro. Redirection vers le dashboard Pro...')
+        router.push('/dashboard/pro')
+        return
+      }
+
       setProfile(profileData)
       
       const { data: settingsData } = await supabase

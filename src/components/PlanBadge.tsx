@@ -3,7 +3,7 @@
 
 import Image from 'next/image'
 
-// Importe tes 3 images de badges (à placer dans /public/badges/)
+// Importe tes 3 image de badges (à placer dans /public/badges/)
 // - badge-starter.png (vert)
 // - badge-business.png (bleu)  
 // - badge-premium.png (doré)

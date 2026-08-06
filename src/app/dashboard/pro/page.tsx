@@ -180,6 +180,14 @@ export default function ProDashboard() {
         return 
       }
 
+      // ✅ CORRECTION CRITIQUE : Redirige UNIQUEMENT si le rôle est explicitement 'client'
+      // Cela empêche la boucle de redirection infinie si le rôle est null (anciens comptes)
+      if (profileData.role === 'client') {
+        console.warn('Ce compte est un Client. Redirection vers le dashboard Client...')
+        router.push('/dashboard/client')
+        return
+      }
+
       setProfile(profileData)
       setIsAvailable(profileData.is_available !== false)
       setProfileData({
@@ -334,6 +342,7 @@ export default function ProDashboard() {
       const fileExt = file.name.split('.').pop()
       const fileName = `${profile.id}/${Date.now()}.${fileExt}`
       
+      // ⚠️ Assure-toi que le nom du bucket est bien 'portfolio-images' dans Supabase
       const { error } = await supabase.storage
         .from('portfolio-images')
         .upload(fileName, file)
@@ -1061,7 +1070,6 @@ export default function ProDashboard() {
               </div>
 
               <div className={`${cardBg} border rounded-3xl p-8 md:p-12 shadow-sm text-center`}>
-                {/* Icône animée */}
                 <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/30">
                   <Rocket className="w-12 h-12 text-white" />
                 </div>
@@ -1074,7 +1082,6 @@ export default function ProDashboard() {
                   Nous travaillons actuellement sur cette fonctionnalité pour vous offrir une expérience de vérification simple, rapide et sécurisée.
                 </p>
 
-                {/* Badge "En développement" */}
                 <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-full text-sm font-semibold border border-amber-200 dark:border-amber-800 mb-8">
                   <span className="relative flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -1083,7 +1090,6 @@ export default function ProDashboard() {
                   En cours de développement
                 </div>
 
-                {/* Timeline visuelle */}
                 <div className={`max-w-lg mx-auto ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'} rounded-2xl p-6 border ${darkMode ? 'border-slate-700' : 'border-slate-200'}`}>
                   <h4 className={`font-bold ${textPrimary} mb-4`}>Ce qui arrive bientôt :</h4>
                   <div className="space-y-3 text-left">
@@ -1106,7 +1112,6 @@ export default function ProDashboard() {
                   </div>
                 </div>
 
-                {/* Prix indicatif */}
                 <p className={`mt-8 text-sm ${textSecondary}`}>
                    Tarif prévu : <strong className="text-indigo-600 dark:text-indigo-400">5 000 FCFA / an</strong>
                 </p>

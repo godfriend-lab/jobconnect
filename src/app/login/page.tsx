@@ -1,15 +1,14 @@
 // @ts-nocheck
 'use client'
 
-// ✅ CORRECTION : Ajout de Suspense dans les imports
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { Logo } from '@/components/Logo'
 import { 
   Mail, Lock, Eye, EyeOff, ArrowRight, 
-  Briefcase, User, Loader2, AlertCircle
+  Briefcase, User, Loader2, AlertCircle, CheckCircle2 // ✅ CheckCircle2 ajouté ici
 } from 'lucide-react'
 
 // ✅ Composant interne qui utilise useSearchParams en toute sécurité
@@ -18,6 +17,9 @@ function LoginFormContent() {
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect')
   const defaultRole = searchParams.get('role')
+  
+  // ✅ RÉCUPÉRATION DU STATUT DE VÉRIFICATION
+  const isVerified = searchParams.get('verified') === 'true'
 
   const [role, setRole] = useState<'client' | 'pro' | null>(defaultRole as 'client' | 'pro' || null)
   const [email, setEmail] = useState('')
@@ -32,8 +34,9 @@ function LoginFormContent() {
     setLoading(true)
 
     try {
-      console.log('🔍 Tentative de connexion...', { email })
+      console.log('🔍 Tentative de connexion...', { email: email.trim().toLowerCase() })
 
+      // 1. Authentification
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password: password,
@@ -61,20 +64,24 @@ function LoginFormContent() {
 
       console.log('✅ Connexion réussie, récupération du profil...')
 
+      // 2. Récupération du rôle en base de données (Sécurité stricte)
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)
         .single()
 
-      if (profileError) {
+      if (profileError || !profile) {
         console.warn('⚠️ Impossible de récupérer le profil:', profileError)
+        setError('Erreur de configuration du compte. Veuillez contacter le support.')
+        setLoading(false)
+        return
       }
 
-      const userRole = profile?.role || 'client'
+      const userRole = profile.role || 'client'
+      console.log(`👉 Redirection vérifiée vers le dashboard: ${userRole}`)
 
-      console.log(`👉 Redirection vers le dashboard ${userRole}...`)
-
+      // 3. Redirection sécurisée
       setTimeout(() => {
         if (redirect) {
           router.push(redirect)
@@ -87,7 +94,7 @@ function LoginFormContent() {
 
     } catch (err) {
       console.error('❌ Erreur inattendue:', err)
-      setError('Une erreur est survenue. Veuillez réessayer.')
+      setError('Une erreur inattendue est survenue. Veuillez réessayer.')
     } finally {
       setLoading(false)
     }
@@ -127,6 +134,19 @@ function LoginFormContent() {
               Connectez-vous à votre espace
             </p>
           </div>
+
+          {/* ✅ MESSAGE DE SUCCÈS DE VÉRIFICATION EMAIL */}
+          {isVerified && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
+              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-green-800">Email vérifié avec succès ! 🎉</p>
+                <p className="text-xs text-green-700 mt-1">
+                  Votre compte est maintenant activé. Connectez-vous pour accéder à votre espace.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* SÉLECTEUR DE RÔLE (Étape 1) */}
           {!role && (
@@ -179,7 +199,7 @@ function LoginFormContent() {
                   role === 'pro' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
                 }`}>
                   {role === 'pro' ? <Briefcase className="w-3 h-3" /> : <User className="w-3 h-3" />}
-                  {role === 'pro' ? 'Pro' : 'Client'}
+                  {role === 'pro' ? 'Professionnel' : 'Client'}
                 </div>
               </div>
 
