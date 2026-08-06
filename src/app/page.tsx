@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Logo } from '@/components/Logo'
 import Chatbot from '@/components/Chatbot'
-import TestimonialCard from '@/components/TestimonialCard'
 import NewsletterForm from '@/components/NewsletterForm'
 import { 
   ShieldCheck, Wallet, Zap, MapPin, MessageSquare, 
@@ -45,34 +44,6 @@ export default async function HomePage() {
     if (n.includes('auto') || n.includes('mécanique')) return Car
     return Wrench
   }
-
-  // ✅ IMPORTANT : CONFIGURATION DES IMAGE DES TÉMOIGNAGES
-  // 1. Crée un dossier : public/image/testimonials/
-  // 2. Mets tes 3 image dedans (ex: koffi.jpg, amina.jpg, jean.jpg)
-  // 3. Modifie les noms de fichiers ci-dessous pour qu'ils correspondent EXACTEMENT aux tiens (sensible à la casse)
-  const testimonials = [
-    {
-      name: 'koffi A.',
-      role: 'Client à Lomé',
-      text: "J'ai trouvé un plombier en moins de 2 heures. Le service est fluide et le fait de payer directement l'artisan sans commission est un vrai plus.",
-      rating: 5,
-      image: '/image/testimonials/koffi.jpg' // ← Remplace 'koffi.jpg' par ton vrai nom de fichier
-    },
-    {
-      name: 'amina S.',
-      role: 'Couturière à Agoè',
-      text: "Depuis que je suis sur JobConnect, mon carnet de commandes est plein.C est la meilleur plateforme que j ai jamais utiliser",
-      rating: 5,
-      image: '/image/testimonials/amina.jpg' // ← Remplace 'amina.jpg' par ton vrai nom de fichier
-    },
-    {
-      name: 'jean M.',
-      role: 'Électricien à Bè',
-      text: "L'application est simple à utiliser. Je reçois des notifications claires et je peux discuter avec les clients avant de me déplacer.",
-      rating: 5,
-      image: '/image/testimonials/jean.jpg' // ← Remplace 'jean.jpg' par ton vrai nom de fichier
-    }
-  ]
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans text-slate-900 overflow-x-hidden selection:bg-indigo-500 selection:text-white">
@@ -263,19 +234,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 6. TÉMOIGNAGES */}
-      <section className="py-24 px-4 sm:px-6 bg-slate-100">
-        <div className="max-w-7xl mx-auto text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight">Ils ont transformé leur façon de travailler</h2>
-        </div>
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-          {testimonials.map((review, idx) => (
-            <TestimonialCard key={idx} review={review} />
-          ))}
-        </div>
-      </section>
-
-      {/* 7. BIG CTA SECTION */}
+      {/* 6. BIG CTA SECTION */}
       <section className="bg-indigo-600 text-white py-24 px-4 sm:px-6 text-center relative overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-[0.05] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:30px_30px]"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-purple-500/20 rounded-full blur-3xl -z-10"></div>
@@ -297,7 +256,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 8. FOOTER SECTION */}
+      {/* 7. FOOTER SECTION */}
       <footer className="bg-slate-950 text-slate-400 py-16 px-4 sm:px-6 border-t border-slate-900">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           
@@ -330,7 +289,7 @@ export default async function HomePage() {
             <h5 className="text-white font-bold uppercase tracking-wider text-xs">Contact</h5>
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-slate-300">
-                <span>📞</span> +228 96 31 50 29
+                <span></span> +228 96 31 50 29
               </li>
               <li className="flex items-center gap-2 text-slate-300">
                 <span>📞</span> +228 90 34 34 29
@@ -364,8 +323,8 @@ export default async function HomePage() {
         </div>
       </footer>
 
-      {/* 9. CHATBOT IA JOBI */}
+      {/* 8. CHATBOT IA JOBI */}
       <Chatbot />
     </div>
   )
-} 
+}
