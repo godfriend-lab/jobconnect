@@ -15,10 +15,10 @@ import {
   Camera, Music, Dumbbell, Stethoscope, Scale, Truck, 
   Plane, Ship, Wifi, Loader2,
   Phone, ExternalLink, MessageCircle, Briefcase, Upload, Crown,
-  User, Laptop, Briefcase as BriefcaseIcon, Scissors as ScissorsIcon
+  User, Laptop, Briefcase as BriefcaseIcon, Scissors as ScissorsIcon, Sparkles, CheckCircle
 } from 'lucide-react'
 
-// ✅ COMPOSANT BADGE SÉCURITÉ INTERNE (Propre, Professionnel et Coloré)
+// ✅ COMPOSANT BADGE SÉCURITÉ INTERNE
 const PlanBadge = ({ plan }: { plan: string }) => {
   if (!plan || plan === 'Gratuit') return null
 
@@ -32,10 +32,11 @@ const PlanBadge = ({ plan }: { plan: string }) => {
 
   return (
     <div 
-      className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${bgColor} ${iconColor} flex-shrink-0 transition-transform hover:scale-110 cursor-help`}
+      className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${bgColor} ${iconColor} flex-shrink-0 transition-all duration-300 hover:scale-110 cursor-help relative`}
       title={tooltip}
     >
-      <ShieldCheck className="w-3.5 h-3.5" />
+      <span className={`absolute inline-flex h-full w-full rounded-full ${iconColor.replace('text-', 'bg-')} opacity-20 animate-ping`}></span>
+      <ShieldCheck className="w-3.5 h-3.5 relative z-10" />
     </div>
   )
 }
@@ -93,6 +94,7 @@ export default function ClientDashboard() {
   const [showCityDropdown, setShowCityDropdown] = useState(false)
   const [contactHistory, setContactHistory] = useState<any[]>([])
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [imageError, setImageError] = useState(false)
   
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [selectedProId, setSelectedProId] = useState('')
@@ -256,8 +258,6 @@ export default function ClientDashboard() {
         return 
       }
 
-      // ✅ CORRECTION CRITIQUE : Redirige UNIQUEMENT si le rôle est explicitement 'pro'
-      // Cela empêche la boucle de redirection infinie si le rôle est null (anciens comptes)
       if (profileData.role === 'pro') {
         console.warn('Ce compte est un Pro. Redirection vers le dashboard Pro...')
         router.push('/dashboard/pro')
@@ -329,7 +329,7 @@ export default function ClientDashboard() {
           total_reviews: p.total_reviews || 0,
           plan: p.plan || 'Gratuit',
           is_verified: p.is_verified || false,
-          is_available: p.is_available !== false, // Fallback sécurisé à true si la colonne est absente
+          is_available: p.is_available !== false,
           city: p.city || ''
         }])
       )
@@ -469,7 +469,6 @@ export default function ClientDashboard() {
       })
     }
 
-    // ✅ TRI PUISSANT ET STABLE
     filtered.sort((a, b) => {
       let scoreA = 0, scoreB = 0
       const levelScores: Record<string, number> = { 
@@ -520,7 +519,7 @@ export default function ClientDashboard() {
       setProfile({ ...profile, avatar_url: publicUrl })
       alert('✅ Photo de profil mise à jour')
     } catch (error) { 
-      alert('❌ Erreur upload photo') 
+      alert(' Erreur upload photo') 
     } finally { 
       setUploadingPhoto(false) 
     }
@@ -595,73 +594,197 @@ export default function ClientDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="w-12 h-12 animate-spin text-indigo-600 mx-auto mb-4" />
-        <p className="text-slate-600">Chargement...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.1),transparent_50%)] animate-pulse"></div>
+        <div className="relative z-10 text-center">
+          <Loader2 className="w-16 h-16 animate-spin text-indigo-600 mx-auto mb-4" />
+          <p className="text-slate-600 font-medium animate-pulse">Chargement de votre espace...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 relative">
+      {/* ✅ FOND SUBTIL AVEC MOTIF POUR LA PROFONDEUR */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.4]" 
+           style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+      </div>
+      
+      {/* ✅ ANIMATIONS CSS PERSONNALISÉES */}
       <style>{`
         @keyframes scroll {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
         .animate-marquee {
-          animation: scroll 60s linear infinite;
+          animation: scroll 40s linear infinite;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+        @keyframes fade-in-up {
+          0% { opacity: 0; transform: translateY(20px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 0.6s ease-out forwards;
+        }
+        @keyframes shine {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .animate-shine {
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          background-size: 200% 100%;
+          animation: shine 3s infinite;
+        }
+        .glass-effect {
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
         }
       `}</style>
 
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+      {/* ✅ HEADER ÉLÉGANT AVEC LES DEUX CHAMPS DE RECHERCHE */}
+      <header className="glass-effect border-b border-slate-200/60 sticky top-0 z-50 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+          {/* Logo à gauche */}
           <Link href="/dashboard/client" className="flex items-center gap-3 flex-shrink-0 group">
-            <Logo className="w-10 h-10 shadow-lg group-hover:scale-110 transition-transform" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-40 group-hover:opacity-60 transition-opacity rounded-full"></div>
+              <Logo className="w-10 h-10 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+            </div>
             <span className="font-black text-xl hidden sm:block tracking-tight">
-              <span className="text-indigo-600">JOB</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">JOB</span>
               <span className="text-slate-900">CONNECT</span>
             </span>
           </Link>
-          <div className="flex-1 max-w-2xl">
+          
+          {/* Barre de recherche principale au centre */}
+          <div className="flex-1 max-w-2xl hidden md:block">
             <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Rechercher un service ou professionnel..." 
-                value={searchQuery} 
-                onChange={(e) => setSearchQuery(e.target.value)} 
-                className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-              />
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl opacity-0 group-focus-within:opacity-30 blur transition duration-300"></div>
+              <div className="relative flex items-center bg-white rounded-xl border border-slate-200 group-focus-within:border-indigo-300 transition-colors">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                <input 
+                  type="text" 
+                  placeholder="Rechercher un service ou professionnel..." 
+                  value={searchQuery} 
+                  onChange={(e) => setSearchQuery(e.target.value)} 
+                  className="w-full pl-10 pr-4 py-2.5 bg-transparent rounded-xl focus:outline-none text-slate-700 placeholder-slate-400" 
+                />
+              </div>
             </div>
           </div>
+
+          {/* Champ de recherche de localité à côté */}
+          <div className="hidden md:block relative" style={{ zIndex: 1 }}>
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl opacity-0 group-focus-within:opacity-30 blur transition duration-300"></div>
+              <div className="relative flex items-center bg-white rounded-xl border border-slate-200 group-focus-within:border-emerald-300 transition-colors">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+                <input 
+                  type="text" 
+                  placeholder="Localité..." 
+                  value={citySearchQuery}
+                  onChange={(e) => {
+                    setCitySearchQuery(e.target.value)
+                    setShowCityDropdown(true)
+                    setSelectedCity('all')
+                  }}
+                  onFocus={() => setShowCityDropdown(true)}
+                  className="w-40 pl-10 pr-4 py-2.5 bg-transparent rounded-xl focus:outline-none text-slate-700 placeholder-slate-400" 
+                />
+              </div>
+            </div>
+            
+            {/* Dropdown des villes avec z-index maximal */}
+            {showCityDropdown && (
+              <>
+                <div className="fixed inset-0 z-[9998]" onClick={() => setShowCityDropdown(false)} />
+                <div className="fixed bg-white border border-slate-200 rounded-xl shadow-2xl z-[9999] max-h-80 overflow-y-auto animate-fade-in-up" style={{
+                  top: '70px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '320px'
+                }}>
+                  <button
+                    onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }}
+                    className={`w-full px-4 py-3 text-left text-sm hover:bg-emerald-50 transition-colors flex items-center gap-2 ${selectedCity === 'all' ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-slate-700'}`}
+                  >
+                    <MapPin className="w-4 h-4" /> Toutes les localités
+                  </button>
+                  {filteredCities.map((city) => (
+                    <button
+                      key={city}
+                      onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }}
+                      className={`w-full px-4 py-3 text-left text-sm hover:bg-emerald-50 transition-colors flex items-center gap-2 ${selectedCity === city ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-slate-700'}`}
+                    >
+                      <MapPin className="w-4 h-4 text-slate-400" /> {city}
+                    </button>
+                  ))}
+                  {filteredCities.length === 0 && (
+                    <div className="px-4 py-3 text-sm text-slate-500 italic">Aucune localité trouvée</div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Avatar utilisateur à droite */}
           <div className="flex items-center gap-3">
             <div className="relative">
-              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="flex items-center">
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden ring-2 ring-white shadow-lg">
+              <button 
+                onClick={() => setSidebarOpen(!sidebarOpen)} 
+                className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-100 transition-colors group"
+              >
+                <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden ring-2 ring-white shadow-lg group-hover:shadow-indigo-200 group-hover:scale-105 transition-all duration-300">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="" className="w-full h-full object-cover object-center" />
                   ) : (
                     profile?.full_name?.charAt(0).toUpperCase() || 'C'
                   )}
                 </div>
+                <span className="hidden sm:block text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors">
+                  {profile?.full_name?.split(' ')[0] || 'Client'}
+                </span>
               </button>
+              
               {sidebarOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setSidebarOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden">
-                    <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-indigo-50 to-purple-50">
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden animate-fade-in-up origin-top-right">
+                    <div className="p-4 border-b border-slate-100 bg-gradient-to-br from-indigo-50 to-purple-50">
                       <p className="font-bold text-slate-900">{profile?.full_name || 'Client'}</p>
-                      <p className="text-xs text-slate-500">{profile?.email || ''}</p>
+                      <p className="text-xs text-slate-500 truncate">{profile?.email || ''}</p>
                     </div>
                     <nav className="p-2 space-y-1">
-                      <button onClick={() => { setActiveView('marketplace'); setSidebarOpen(false) }} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100"><Home className="w-5 h-5" /><span>Marketplace</span></button>
-                      <button onClick={() => { setActiveView('history'); setSidebarOpen(false) }} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100"><Clock className="w-5 h-5" /><span>Historique</span></button>
-                      <button onClick={() => { setActiveView('favorites'); setSidebarOpen(false) }} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100"><Heart className="w-5 h-5" /><span>Favoris</span></button>
-                      <button onClick={() => { setActiveView('settings'); setSidebarOpen(false) }} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100"><Settings className="w-5 h-5" /><span>Paramètres</span></button>
+                      {[
+                        { id: 'marketplace', label: 'Marketplace', icon: Home },
+                        { id: 'history', label: 'Historique', icon: Clock },
+                        { id: 'favorites', label: 'Favoris', icon: Heart },
+                        { id: 'settings', label: 'Paramètres', icon: Settings }
+                      ].map((item) => (
+                        <button 
+                          key={item.id}
+                          onClick={() => { setActiveView(item.id as any); setSidebarOpen(false) }} 
+                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                            activeView === item.id 
+                              ? 'bg-indigo-50 text-indigo-700 font-semibold' 
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.label}</span>
+                        </button>
+                      ))}
                     </nav>
-                    <div className="p-2 border-t border-slate-200">
-                      <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 text-red-600"><LogOut className="w-5 h-5" /><span>Déconnexion</span></button>
+                    <div className="p-2 border-t border-slate-100">
+                      <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-all duration-200">
+                        <LogOut className="w-5 h-5" />
+                        <span className="font-medium">Déconnexion</span>
+                      </button>
                     </div>
                   </div>
                 </>
@@ -670,97 +793,122 @@ export default function ClientDashboard() {
           </div>
         </div>
 
-        <div className="border-t border-slate-200 bg-slate-50 overflow-hidden relative">
+        {/* ✅ MARQUEE AMÉLIORÉ */}
+        <div className="border-t border-slate-200/60 bg-slate-50/50 overflow-hidden relative">
           <div className="flex animate-marquee py-3 whitespace-nowrap">
             {[...marqueeCategories, ...marqueeCategories].map((cat, index) => {
               const Icon = cat.icon
               return (
                 <div
                   key={`${cat.id}-${index}`}
-                  className="mx-2 px-4 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 border border-slate-200 bg-white text-slate-700 flex-shrink-0 shadow-sm"
+                  className="mx-2 px-4 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 border border-slate-200 bg-white text-slate-700 flex-shrink-0 shadow-sm hover:shadow-md hover:border-indigo-200 hover:text-indigo-600 transition-all duration-300 cursor-pointer group"
                 >
-                  <Icon className="w-4 h-4 text-indigo-600" />
+                  <Icon className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
                   {cat.name}
                 </div>
               )
             })}
           </div>
-          <div className="absolute top-0 left-0 w-16 h-full bg-gradient-to-r from-slate-50 to-transparent pointer-events-none z-10" />
-          <div className="absolute top-0 right-0 w-16 h-full bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-10" />
+          <div className="absolute top-0 left-0 w-24 h-full bg-gradient-to-r from-slate-50 to-transparent pointer-events-none z-10" />
+          <div className="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-10" />
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         {activeView === 'marketplace' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
-              <div className="flex flex-wrap items-center gap-4">
-                <span className="text-sm font-semibold text-slate-700">{filteredServices.length} services disponibles</span>
-                
-                <div className="relative">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-slate-400" />
-                    <input
-                      type="text"
-                      placeholder="Rechercher une localité..."
-                      value={citySearchQuery}
-                      onChange={(e) => {
-                        setCitySearchQuery(e.target.value)
-                        setShowCityDropdown(true)
-                        setSelectedCity('all')
-                      }}
-                      onFocus={() => setShowCityDropdown(true)}
-                      className="px-4 py-2 border border-slate-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
+          <div className="space-y-8">
+            {/* ✅ HERO SECTION - TEXTE ET ILLUSTRATION SEULEMENT */}
+            <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-indigo-100 animate-fade-in-up">
+              {/* Motif de points décoratif */}
+              <div className="absolute top-4 left-4 grid grid-cols-4 gap-2 opacity-30">
+                {[...Array(16)].map((_, i) => (
+                  <div key={i} className="w-2 h-2 bg-indigo-400 rounded-full"></div>
+                ))}
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
+                {/* Texte à gauche */}
+                <div className="space-y-6">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 leading-tight">
+                    Trouvez le <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">professionnel</span> qu'il vous faut
+                  </h1>
                   
-                  {showCityDropdown && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setShowCityDropdown(false)} />
-                      <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-slate-200 rounded-lg shadow-lg z-20 max-h-80 overflow-y-auto">
-                        <button
-                          onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }}
-                          className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 ${selectedCity === 'all' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                        >
-                          📍 Toutes les localités
-                        </button>
-                        {filteredCities.map((city) => (
-                          <button
-                            key={city}
-                            onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }}
-                            className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 ${selectedCity === city ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                          >
-                            {city}
-                          </button>
-                        ))}
-                        {filteredCities.length === 0 && (
-                          <div className="px-4 py-2 text-sm text-slate-500">Aucune localité trouvée</div>
-                        )}
+                  <p className="text-lg text-slate-600 leading-relaxed max-w-xl">
+                    JOBCONNECT vous connecte avec des professionnels qualifiés et vérifiés près de chez vous. Artisans, techniciens, prestataires de services... tous sont à portée de clic.
+                  </p>
+                  
+                  <div className="flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-2xl border border-emerald-200 shadow-sm w-fit">
+                    <div className="flex items-center gap-2 text-emerald-600 font-bold">
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
+                        <ShieldCheck className="w-4 h-4" />
                       </div>
-                    </>
+                      <span>Professionnels vérifiés</span>
+                    </div>
+                    <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Illustration à droite */}
+                <div className="relative hidden lg:block">
+                  {!imageError ? (
+                    <div className="relative z-10">
+                      <img 
+                        src="/image/professionals-illustration.png" 
+                        alt="Professionnels JOBCONNECT" 
+                        className="w-full h-auto object-contain drop-shadow-2xl"
+                        style={{ 
+                          maxHeight: '500px',
+                          transform: 'translateY(-20px)'
+                        }}
+                        onError={() => setImageError(true)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative z-10 w-full h-[400px] bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200 rounded-3xl flex items-center justify-center border-4 border-white shadow-2xl">
+                      <div className="text-center p-8">
+                        <div className="flex justify-center gap-4 mb-6 text-6xl">
+                          <span className="animate-bounce"></span>
+                          <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>👩‍</span>
+                          <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>🔧</span>
+                        </div>
+                        <p className="text-slate-700 font-bold text-lg mb-2">Professionnels JOBCONNECT</p>
+                        <p className="text-slate-500 text-sm">Artisans, techniciens et experts à votre service</p>
+                      </div>
+                    </div>
                   )}
-                  
-                  {selectedCity !== 'all' && (
-                    <button onClick={() => { setSelectedCity('all'); setCitySearchQuery('') }} className="ml-2 text-xs text-red-600 hover:text-red-700">✕</button>
-                  )}
+                  {/* Effet de lueur derrière l'illustration */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-r from-indigo-200/30 via-purple-200/30 to-pink-200/30 rounded-full blur-3xl -z-10"></div>
                 </div>
               </div>
             </div>
 
+            {/* Badge nombre de services */}
+            <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-xl w-fit animate-fade-in-up">
+              <Briefcase className="w-4 h-4 text-indigo-600" />
+              <span className="text-sm font-bold text-indigo-900">{filteredServices.length} <span className="font-normal text-indigo-700">services disponibles</span></span>
+            </div>
+
             {filteredServices.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
-                <Search className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-500">Aucun service trouvé</p>
-                <p className="text-sm text-slate-400 mt-2">Essayez de modifier vos filtres</p>
+              <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-16 text-center animate-fade-in-up">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-10 h-10 text-slate-300" />
+                </div>
+                <p className="text-slate-900 font-bold text-lg">Aucun service trouvé</p>
+                <p className="text-slate-500 mt-2">Essayez de modifier vos critères de recherche ou de localisation</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredServices.map((service) => (
-                  <div key={service.id} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                    
-                    {/* ✅ IMAGE PARFAITEMENT CARRÉE ET CENTRÉE */}
+                {filteredServices.map((service, index) => (
+                  <div 
+                    key={service.id} 
+                    className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-2xl hover:-translate-y-2 hover:border-indigo-200 transition-all duration-300 group flex flex-col animate-fade-in-up"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    {/* ✅ IMAGE AVEC EFFETS DE SURVOL */}
                     <div className="relative aspect-square overflow-hidden bg-slate-100">
-                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20"></div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 group-hover:opacity-0 transition-opacity duration-500"></div>
                       {service.profiles.avatar_url ? (
                         <img 
                           src={service.profiles.avatar_url} 
@@ -769,20 +917,24 @@ export default function ClientDashboard() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center relative z-10">
-                          <div className="text-8xl opacity-50">👤</div>
+                          <div className="text-8xl opacity-30 group-hover:scale-110 transition-transform duration-500"></div>
                         </div>
                       )}
                       
+                      {/* Effet de brillance au survol */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20 animate-shine"></div>
+                      
                       {service.profiles.is_verified && (
-                        <div className="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-20 backdrop-blur-sm border border-white/20">
-                          <Shield className="w-3.5 h-3.5" />Vérifié
+                        <div className="absolute top-3 left-3 bg-blue-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg z-30 border border-white/20">
+                          <Shield className="w-3.5 h-3.5" />
+                          Vérifié
                         </div>
                       )}
 
-                      {/* ✅ BADGE INDISPONIBLE SI NÉCESSAIRE */}
                       {!service.profiles.is_available && (
-                        <div className="absolute top-3 right-3 bg-slate-800/90 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-20 backdrop-blur-sm border border-white/20">
-                          <Pause className="w-3.5 h-3.5" /> Indisponible
+                        <div className="absolute top-3 left-3 bg-slate-800/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg z-30 border border-white/20">
+                          <Pause className="w-3.5 h-3.5" /> 
+                          Indisponible
                         </div>
                       )}
                       
@@ -800,23 +952,29 @@ export default function ClientDashboard() {
                           is_available: service.profiles.is_available,
                           avatar_url: service.profiles.avatar_url || undefined
                         })} 
-                        className="absolute bottom-3 right-3 w-9 h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center hover:bg-white shadow-lg transition-all hover:scale-110 z-20"
+                        className="absolute bottom-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl z-30 group/btn"
                       >
-                        <Heart className={`w-4.5 h-4.5 ${favorites.some(f => f.id === service.profiles.id) ? 'fill-red-500 text-red-500' : 'text-slate-600'}`} />
+                        <Heart className={`w-5 h-5 transition-all duration-300 ${favorites.some(f => f.id === service.profiles.id) ? 'fill-red-500 text-red-500 scale-110' : 'text-slate-400 group-hover/btn:text-red-400'}`} />
                       </button>
                     </div>
                     
-                    <div className="p-4 flex flex-col">
-                      <div className="flex items-start gap-2 mb-2">
-                        <Briefcase className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-                        <h3 className="font-bold text-slate-900 text-base line-clamp-2 flex-1">{service.title}</h3>
+                    <div className="p-5 flex flex-col flex-1">
+                      <div className="flex items-start gap-2 mb-3">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          {(() => {
+                            const Icon = getIconForCategory(service.category)
+                            return <Icon className="w-4 h-4 text-indigo-600" />
+                          })()}
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-base leading-tight line-clamp-2 flex-1 group-hover:text-indigo-600 transition-colors">
+                          {service.title}
+                        </h3>
                       </div>
                       
-                      <p className="text-sm text-slate-600 mb-3 line-clamp-2">{service.description}</p>
+                      <p className="text-sm text-slate-500 mb-4 line-clamp-2 leading-relaxed">{service.description}</p>
                       
-                      {/* ✅ NOM AVEC SYMBOLE DE SÉCURITÉ COLORÉ À CÔTÉ */}
-                      <div className="flex items-center gap-2 mb-3 p-2 bg-slate-50 rounded-lg">
-                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md overflow-hidden">
+                      <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded-xl border border-slate-100 group-hover:border-indigo-100 group-hover:bg-indigo-50/30 transition-all duration-300">
+                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-md overflow-hidden ring-2 ring-white">
                           {service.profiles.avatar_url ? (
                             <img src={service.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -824,8 +982,8 @@ export default function ClientDashboard() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sm font-semibold text-slate-900 truncate block">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="text-sm font-bold text-slate-900 truncate">
                               {service.profiles.full_name}
                             </span>
                             <PlanBadge plan={service.profiles.plan} />
@@ -836,10 +994,10 @@ export default function ClientDashboard() {
                         </div>
                       </div>
                       
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center justify-between mb-4">
                         {service.profiles.rating > 0 && (
-                          <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                          <div className="flex items-center gap-1.5 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-100">
+                            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                             <span className="font-bold text-slate-900 text-sm">{service.profiles.rating.toFixed(1)}</span>
                             {service.profiles.total_reviews > 0 && (
                               <span className="text-xs text-slate-500">({service.profiles.total_reviews})</span>
@@ -847,40 +1005,43 @@ export default function ClientDashboard() {
                           </div>
                         )}
                         {service.city && (
-                          <div className="flex items-center gap-1 text-xs text-slate-600">
+                          <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-2.5 py-1.5 rounded-lg">
                             <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                            <span>{service.city}</span>
+                            <span className="font-medium">{service.city}</span>
                           </div>
                         )}
                       </div>
                       
-                      {/* ✅ PRIX ET BOUTON PARFAITEMENT ALIGNÉS SUR LA MÊME LIGNE */}
-                      <div className="flex items-center gap-2 mt-auto">
-                        <div className="flex-1 bg-gradient-to-r from-indigo-50 to-purple-50 px-3 py-2.5 rounded-xl border border-indigo-100">
-                          <span className="text-[10px] text-slate-600 font-semibold block">Prix</span>
-                          <span className="text-lg font-black text-indigo-600">{service.price}</span>
+                      <div className="mt-auto space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-3 rounded-xl border border-indigo-100 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-200/30 rounded-full -mr-8 -mt-8 blur-xl"></div>
+                            <span className="text-[10px] text-slate-500 font-semibold block uppercase tracking-wider mb-0.5 relative z-10">Prix estimé</span>
+                            <span className="text-lg font-black text-indigo-600 relative z-10">{service.price}</span>
+                          </div>
+                          
+                          {service.profiles.is_available ? (
+                            <button 
+                              onClick={() => contactWhatsApp(service)} 
+                              className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300 hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group/btn"
+                            >
+                              <span className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></span>
+                              <MessageCircle className="w-4 h-4 relative z-10" />
+                              <span className="relative z-10">Contacter</span>
+                            </button>
+                          ) : (
+                            <div className="flex-1 py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-slate-200">
+                              <Pause className="w-4 h-4" />
+                              Indisponible
+                            </div>
+                          )}
                         </div>
                         
-                        {service.profiles.is_available ? (
-                          <button 
-                            onClick={() => contactWhatsApp(service)} 
-                            className="flex-1 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                            Contacter
-                          </button>
-                        ) : (
-                          <div className="flex-1 py-2.5 bg-slate-200 text-slate-500 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed">
-                            <Pause className="w-4 h-4" />
-                            Indisponible
-                          </div>
-                        )}
+                        <Link href={`/pro/${service.profiles.id}`} className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-indigo-600 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border border-slate-200 hover:border-indigo-200 group/link">
+                          <span>Voir le profil complet</span>
+                          <ExternalLink className="w-4 h-4 group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
+                        </Link>
                       </div>
-                      
-                      <Link href={`/pro/${service.profiles.id}`} className="w-full py-2 mt-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        Voir le profil complet
-                      </Link>
                     </div>
                   </div>
                 ))}
@@ -890,36 +1051,49 @@ export default function ClientDashboard() {
         )}
 
         {activeView === 'history' && (
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-slate-900">Historique des contacts</h1>
+          <div className="space-y-6 animate-fade-in-up">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                <Clock className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h1 className="text-2xl font-black text-slate-900">Historique des contacts</h1>
+            </div>
+            
             {contactHistory.length === 0 ? (
-              <div className="bg-white rounded-2xl p-12 text-center">
-                <Clock className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-500">Aucun historique</p>
+              <div className="bg-white rounded-3xl p-16 text-center border border-slate-200 shadow-sm">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-10 h-10 text-slate-300" />
+                </div>
+                <p className="text-slate-900 font-bold text-lg">Aucun historique</p>
+                <p className="text-slate-500 mt-2">Vos interactions avec les professionnels apparaîtront ici</p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 divide-y divide-slate-100">
-                {contactHistory.map((item) => (
-                  <div key={item.id} className="p-6 flex items-center justify-between flex-wrap gap-4">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+                {contactHistory.map((item, index) => (
+                  <div key={item.id} className="p-6 flex items-center justify-between flex-wrap gap-4 hover:bg-slate-50/50 transition-colors animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
+                      <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold overflow-hidden shadow-md ring-4 ring-white">
                         {item.avatar ? (
-                          <img src={item.avatar} alt="" className="w-full h-full object-cover object-center" />
+                          <img src={item.avatar} alt="" className="w-full h-full object-cover" />
                         ) : (
                           item.proName.charAt(0).toUpperCase()
                         )}
                       </div>
                       <div>
-                        <h3 className="font-bold">{item.proName}</h3>
-                        <p className="text-sm text-slate-600">{item.specialty}</p>
-                        <p className="text-xs text-slate-400">{new Date(item.date).toLocaleDateString('fr-FR')}</p>
+                        <h3 className="font-bold text-slate-900 text-lg">{item.proName}</h3>
+                        <p className="text-sm text-slate-600 font-medium">{item.specialty}</p>
+                        <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {new Date(item.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        item.contact_method === 'whatsapp' ? 'bg-green-100 text-green-700' : 
-                        item.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                    <div className="flex items-center gap-3">
+                      <span className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 ${
+                        item.contact_method === 'whatsapp' ? 'bg-green-100 text-green-700 border border-green-200' : 
+                        item.status === 'completed' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-amber-100 text-amber-700 border border-amber-200'
                       }`}>
+                        {item.contact_method === 'whatsapp' ? <MessageCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                         {item.contact_method === 'whatsapp' ? 'WhatsApp' : item.status === 'completed' ? 'Terminé' : 'En attente'}
                       </span>
                       <button
@@ -928,9 +1102,9 @@ export default function ClientDashboard() {
                           setSelectedProName(item.proName)
                           setShowReviewModal(true)
                         }}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition flex items-center gap-2"
+                        className="px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg hover:scale-105 flex items-center gap-2"
                       >
-                        <Star className="w-4 h-4" />
+                        <Star className="w-4 h-4 fill-white" />
                         Laisser un avis
                       </button>
                     </div>
@@ -942,44 +1116,73 @@ export default function ClientDashboard() {
         )}
 
         {activeView === 'favorites' && (
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-slate-900">Favoris</h1>
+          <div className="space-y-6 animate-fade-in-up">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                <Heart className="w-5 h-5 text-red-600 fill-red-600" />
+              </div>
+              <h1 className="text-2xl font-black text-slate-900">Mes Favoris</h1>
+            </div>
+            
             {favorites.length === 0 ? (
-              <div className="bg-white rounded-2xl p-12 text-center">
-                <Heart className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-500">Aucun favori</p>
+              <div className="bg-white rounded-3xl p-16 text-center border border-slate-200 shadow-sm">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Heart className="w-10 h-10 text-slate-300" />
+                </div>
+                <p className="text-slate-900 font-bold text-lg">Aucun favori</p>
+                <p className="text-slate-500 mt-2">Explorez la marketplace et sauvegardez les profils qui vous intéressent</p>
+                <button 
+                  onClick={() => setActiveView('marketplace')}
+                  className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg"
+                >
+                  Explorer la marketplace
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {favorites.map((pro) => (
-                  <div key={pro.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all">
-                    
-                    {/* ✅ IMAGE PARFAITEMENT CARRÉE ET CENTRÉE DANS LES FAVORIS */}
-                    <div className="aspect-square bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden relative">
+                {favorites.map((pro, index) => (
+                  <div key={pro.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
+                    <div className="relative h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden group">
                       {pro.avatar_url ? (
-                        <img src={pro.avatar_url} alt={pro.full_name} className="w-full h-full object-cover object-center" />
+                        <img src={pro.avatar_url} alt={pro.full_name} className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110" />
                       ) : (
-                        <span className="text-6xl">👤</span>
+                        <span className="text-7xl text-white/30 group-hover:scale-110 transition-transform duration-500"></span>
                       )}
+                      <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
+                      
                       {pro.is_verified && (
-                        <div className="absolute top-3 left-3 bg-blue-500 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-lg backdrop-blur-sm border border-white/20">
-                          <Shield className="w-3 h-3" /> Vérifié
+                        <div className="absolute top-3 left-3 bg-blue-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg border border-white/20">
+                          <Shield className="w-3.5 h-3.5" /> Vérifié
                         </div>
                       )}
                       {!pro.is_available && (
-                        <div className="absolute top-3 right-3 bg-slate-800/90 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-lg backdrop-blur-sm border border-white/20">
-                          <Pause className="w-3 h-3" /> Indisponible
+                        <div className="absolute top-3 right-3 bg-slate-800/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg border border-white/20">
+                          <Pause className="w-3.5 h-3.5" /> Indisponible
                         </div>
                       )}
+                      
+                      <button 
+                        onClick={() => toggleFavorite(pro)}
+                        className="absolute bottom-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-lg transition-all duration-300 hover:scale-110 z-10"
+                      >
+                        <Heart className="w-5 h-5 fill-red-500 text-red-500" />
+                      </button>
                     </div>
                     
-                    <div className="p-5">
-                      <div className="flex items-center mb-2 gap-1.5">
-                        <h3 className="font-bold text-slate-900 truncate flex-1">{pro.full_name}</h3>
+                    <div className="p-5 flex flex-col flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-bold text-slate-900 text-lg truncate flex-1">{pro.full_name}</h3>
                         <PlanBadge plan={pro.plan} />
                       </div>
-                      <p className="text-sm text-slate-600 mb-3 truncate">{pro.specialty}</p>
-                      <div className="space-y-2">
+                      <p className="text-sm text-slate-600 mb-4 font-medium">{pro.specialty}</p>
+                      
+                      <div className="flex items-center gap-2 mb-6 bg-amber-50 w-fit px-3 py-1.5 rounded-lg border border-amber-100">
+                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                        <span className="font-bold text-slate-900 text-sm">{pro.rating.toFixed(1)}</span>
+                        <span className="text-xs text-slate-500">({pro.total_reviews} avis)</span>
+                      </div>
+                      
+                      <div className="mt-auto space-y-3">
                         {pro.is_available ? (
                           <button 
                             onClick={() => {
@@ -990,17 +1193,17 @@ export default function ClientDashboard() {
                               }
                               contactWhatsApp(serviceData)
                             }}
-                            className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition shadow-md hover:shadow-lg"
+                            className="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                           >
-                            <MessageCircle className="w-4 h-4" /> WhatsApp
+                            <MessageCircle className="w-4 h-4" /> Contacter via WhatsApp
                           </button>
                         ) : (
-                          <div className="w-full py-2.5 bg-slate-200 text-slate-500 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 cursor-not-allowed">
+                          <div className="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-slate-200">
                             <Pause className="w-4 h-4" /> Indisponible
                           </div>
                         )}
-                        <Link href={`/pro/${pro.id}`} className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition">
-                          <ExternalLink className="w-4 h-4" /> Voir le profil
+                        <Link href={`/pro/${pro.id}`} className="w-full py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-indigo-600 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border border-slate-200 hover:border-indigo-200">
+                          <ExternalLink className="w-4 h-4" /> Voir le profil complet
                         </Link>
                       </div>
                     </div>
@@ -1012,28 +1215,42 @@ export default function ClientDashboard() {
         )}
 
         {activeView === 'settings' && (
-          <div className="space-y-6 max-w-4xl">
-            <h1 className="text-2xl font-bold text-slate-900">Paramètres</h1>
+          <div className="space-y-8 max-w-4xl animate-fade-in-up">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                <Settings className="w-5 h-5 text-purple-600" />
+              </div>
+              <h1 className="text-2xl font-black text-slate-900">Paramètres du compte</h1>
+            </div>
             
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-              <h2 className="font-bold text-slate-900 mb-4">Photo de profil</h2>
-              <div className="flex items-center gap-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shadow-lg ring-4 ring-indigo-50 flex-shrink-0">
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover object-center" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-3xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold">
-                      {profile?.full_name?.charAt(0).toUpperCase()}
-                    </div>
-                  )}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+              <h2 className="font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <User className="w-5 h-5 text-indigo-600" />
+                Photo de profil
+              </h2>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
+                <div className="relative group">
+                  <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 shadow-lg ring-4 ring-indigo-50 flex-shrink-0 transition-all duration-300 group-hover:ring-indigo-100">
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover object-center" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold">
+                        {profile?.full_name?.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <label className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all font-semibold flex items-center gap-2 w-fit">
-                    <Upload className="w-4 h-4" /> Changer la photo
+                <div className="flex-1 space-y-4">
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    💡 <strong className="text-slate-900">Conseil :</strong> Pour un rendu professionnel optimal, utilisez une photo <strong className="text-slate-900">carrée (1:1)</strong> ou en portrait, bien éclairée, où votre visage est clairement visible. Formats acceptés : JPG, PNG (Max 5MB).
+                  </p>
+                  <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl cursor-pointer transition-all font-semibold shadow-md hover:shadow-lg hover:scale-105 active:scale-95">
+                    <Upload className="w-4 h-4" /> 
+                    Changer la photo
                     <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
                   </label>
                   {uploadingPhoto && (
-                    <div className="flex items-center gap-2 text-indigo-600 text-sm font-medium mt-3">
+                    <div className="flex items-center gap-2 text-indigo-600 text-sm font-medium">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Upload en cours...
                     </div>
@@ -1042,31 +1259,37 @@ export default function ClientDashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-              <h2 className="font-bold text-slate-900 mb-4">Informations personnelles</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Nom complet</label>
-                  <input type="text" value={settings.fullName} onChange={(e) => setSettings({...settings, fullName: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+              <h2 className="font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-indigo-600" />
+                Informations personnelles
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">Nom complet</label>
+                  <input type="text" value={settings.fullName} onChange={(e) => setSettings({...settings, fullName: e.target.value})} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all bg-slate-50/50" />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
-                  <input type="email" value={settings.email} disabled className="w-full px-4 py-2.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-500" />
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">Email</label>
+                  <input type="email" value={settings.email} disabled className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed" />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Téléphone</label>
-                  <input type="tel" value={settings.phone} onChange={(e) => setSettings({...settings, phone: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">Téléphone</label>
+                  <input type="tel" value={settings.phone} onChange={(e) => setSettings({...settings, phone: e.target.value})} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all bg-slate-50/50" />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Ville</label>
-                  <input type="text" value={settings.city} onChange={(e) => setSettings({...settings, city: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">Ville</label>
+                  <input type="text" value={settings.city} onChange={(e) => setSettings({...settings, city: e.target.value})} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all bg-slate-50/50" />
                 </div>
               </div>
             </div>
             
-            <button onClick={saveSettings} className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-xl hover:scale-105 transition-all shadow-lg shadow-indigo-200">
-              Sauvegarder les modifications
-            </button>
+            <div className="flex justify-end">
+              <button onClick={saveSettings} className="px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold hover:shadow-xl hover:shadow-indigo-200 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                Sauvegarder les modifications
+              </button>
+            </div>
           </div>
         )}
 
@@ -1082,6 +1305,33 @@ export default function ClientDashboard() {
           />
         )}
       </main>
+
+      {/* ✅ FOOTER ORNÉ */}
+      <footer className="bg-white border-t border-slate-200 mt-16 relative z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.05),transparent_50%)] pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Logo className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-black text-lg text-slate-900">
+                JOB<span className="text-indigo-600">CONNECT</span>
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-6 text-sm text-slate-500 font-medium">
+              <a href="#" className="hover:text-indigo-600 transition-colors">Conditions d'utilisation</a>
+              <a href="#" className="hover:text-indigo-600 transition-colors">Politique de confidentialité</a>
+              <a href="#" className="hover:text-indigo-600 transition-colors">Aide & Support</a>
+            </div>
+            
+            <p className="text-sm text-slate-400">
+              © {new Date().getFullYear()} JobConnect Togo. Tous droits réservés.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

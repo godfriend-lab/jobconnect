@@ -180,8 +180,6 @@ export default function ProDashboard() {
         return 
       }
 
-      // ✅ CORRECTION CRITIQUE : Redirige UNIQUEMENT si le rôle est explicitement 'client'
-      // Cela empêche la boucle de redirection infinie si le rôle est null (anciens comptes)
       if (profileData.role === 'client') {
         console.warn('Ce compte est un Client. Redirection vers le dashboard Client...')
         router.push('/dashboard/client')
@@ -342,7 +340,6 @@ export default function ProDashboard() {
       const fileExt = file.name.split('.').pop()
       const fileName = `${profile.id}/${Date.now()}.${fileExt}`
       
-      // ⚠️ Assure-toi que le nom du bucket est bien 'portfolio-images' dans Supabase
       const { error } = await supabase.storage
         .from('portfolio-images')
         .upload(fileName, file)
@@ -503,7 +500,7 @@ export default function ProDashboard() {
       alert('✅ Profil sauvegardé avec succès')
     } catch (error) { 
       console.error('Erreur sauvegarde profil:', error)
-      alert('❌ Erreur lors de la sauvegarde') 
+      alert(' Erreur lors de la sauvegarde') 
     }
   }
 
@@ -521,10 +518,10 @@ export default function ProDashboard() {
       if (error) throw error
       
       setIsAvailable(newStatus)
-      alert(newStatus ? '✅ Vous êtes maintenant disponible' : '⏸️ Mode indisponible activé')
+      alert(newStatus ? '✅ Vous êtes maintenant disponible' : '️ Mode indisponible activé')
     } catch (error) { 
       console.error('Erreur toggle availability:', error)
-      alert('❌ Erreur lors du changement de statut') 
+      alert(' Erreur lors du changement de statut') 
     }
   }
 
@@ -602,6 +599,12 @@ export default function ProDashboard() {
                 </button>
               ))}
               
+              {/* ✅ LIEN MARKETPLACE AJOUTÉ (MOBILE) */}
+              <Link href="/marketplace" className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400 font-semibold border-t border-slate-200 dark:border-slate-800 mt-4 pt-4">
+                <Globe className="w-5 h-5" />
+                <span>Voir la Marketplace</span>
+              </Link>
+              
               <Link href="/pricing" className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-700'}`}>
                 <Crown className="w-5 h-5" />
                 <span className="font-medium">Forfaits</span>
@@ -641,6 +644,13 @@ export default function ProDashboard() {
                 {item.label}
               </button>
             ))}
+            
+            {/* ✅ LIEN MARKETPLACE AJOUTÉ (DESKTOP) */}
+            <Link href="/marketplace" className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400 font-semibold border-t border-slate-200 dark:border-slate-800 mt-4 pt-4">
+              <Globe className="w-5 h-5" />
+              Voir la Marketplace
+            </Link>
+
             <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
               <Link href="/pricing" className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${textSecondary} hover:bg-slate-100 dark:hover:bg-slate-800`}>
                 <Crown className="w-5 h-5" />
