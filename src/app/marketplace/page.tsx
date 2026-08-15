@@ -28,7 +28,7 @@ const PlanBadge = ({ plan }: { plan: string }) => {
 
   return (
     <div 
-      className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${bgColor} ${iconColor} flex-shrink-0 transition-all duration-300 hover:scale-110 cursor-help relative`}
+      className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${bgColor} ${iconColor} shrink-0 transition-all duration-300 hover:scale-110 cursor-help relative`}
       title={tooltip}
     >
       <span className={`absolute inline-flex h-full w-full rounded-full ${iconColor.replace('text-', 'bg-')} opacity-20 animate-ping`}></span>
@@ -138,6 +138,7 @@ export default function MarketplacePage() {
         const formatted = servicesData.map(s => ({
           ...s,
           profiles: s.profiles || { 
+            id: s.pro_id, // ✅ Ajout de l'ID ici pour sécurité
             full_name: 'Professionnel', phone: '', avatar_url: null, specialty: '', 
             rating: 0, total_reviews: 0, plan: 'Gratuit', is_verified: false, is_available: true, city: ''
           }
@@ -198,14 +199,12 @@ export default function MarketplacePage() {
 
   const handleMonEspace = () => {
     if (currentUser) {
-      // Si l'utilisateur est connecté, on le redirige vers son dashboard
       if (currentUser.role === 'pro') {
         router.push('/dashboard/pro')
       } else {
         router.push('/dashboard/client')
       }
     } else {
-      // Si non connecté, on redirige vers la page de connexion
       router.push('/login')
     }
   }
@@ -232,7 +231,7 @@ export default function MarketplacePage() {
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-3 flex-shrink-0 group">
+          <Link href="/" className="flex items-center gap-3 shrink-0 group">
             <Logo className="w-10 h-10 group-hover:scale-110 transition-transform duration-300" />
             <span className="font-black text-xl tracking-tight">
               <span className="text-indigo-600">JOB</span>
@@ -287,7 +286,6 @@ export default function MarketplacePage() {
             )}
           </div>
 
-          {/* ✅ REMPLACEMENT : "Mon Espace" au lieu de "Connexion" et "S'inscrire" */}
           <button 
             onClick={handleMonEspace}
             className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
@@ -302,7 +300,7 @@ export default function MarketplacePage() {
           <div className="flex animate-marquee py-3 whitespace-nowrap">
             {[{ id: 'all', name: 'Tous les métiers', icon: Home }, ...categoriesMetiers.map(cat => ({ id: cat, name: cat, icon: getIconForCategory(cat) }))].flatMap((cat, index, arr) => 
               Array(2).fill(cat).map((c, i) => (
-                <button key={`${c.id}-${index}-${i}`} onClick={() => setSelectedCategory(c.id)} className="mx-2 px-4 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 border border-slate-200 bg-white text-slate-700 flex-shrink-0 shadow-sm hover:border-indigo-200 hover:text-indigo-600 transition-all">
+                <button key={`${c.id}-${index}-${i}`} onClick={() => setSelectedCategory(c.id)} className="mx-2 px-4 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 border border-slate-200 bg-white text-slate-700 shrink-0 shadow-sm hover:border-indigo-200 hover:text-indigo-600 transition-all">
                   <c.icon className="w-4 h-4" /> {c.name}
                 </button>
               ))
@@ -394,7 +392,7 @@ export default function MarketplacePage() {
                 
                 <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-start gap-2 mb-3">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0 mt-0.5">
                       {(() => { const Icon = getIconForCategory(service.category); return <Icon className="w-4 h-4 text-indigo-600" /> })()}
                     </div>
                     <h3 className="font-bold text-slate-900 text-base leading-tight line-clamp-2 flex-1 group-hover:text-indigo-600 transition-colors">{service.title}</h3>
@@ -403,7 +401,7 @@ export default function MarketplacePage() {
                   <p className="text-sm text-slate-500 mb-4 line-clamp-2 leading-relaxed">{service.description}</p>
                   
                   <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded-xl border border-slate-100 group-hover:border-indigo-100 group-hover:bg-indigo-50/30 transition-all duration-300">
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-md overflow-hidden ring-2 ring-white">
+                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-md overflow-hidden ring-2 ring-white">
                       {service.profiles.avatar_url ? (
                         <img src={service.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -454,7 +452,8 @@ export default function MarketplacePage() {
                       )}
                     </div>
                     
-                    <Link href={`/pro/${service.profiles.id}`} className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-indigo-600 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border border-slate-200 hover:border-indigo-200 group/link">
+                    {/* ✅ CORRECTION ICI : Utilisation de service.pro_id au lieu de service.profiles.id */}
+                    <Link href={`/pro/${service.pro_id}`} className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-indigo-600 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border border-slate-200 hover:border-indigo-200 group/link">
                       <span>Voir le profil complet</span>
                       <ExternalLink className="w-4 h-4 group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
                     </Link>
@@ -475,9 +474,9 @@ export default function MarketplacePage() {
               <span className="font-black text-lg text-slate-900">JOB<span className="text-indigo-600">CONNECT</span></span>
             </div>
             <div className="flex items-center gap-6 text-sm text-slate-500 font-medium">
-              <a href="#" className="hover:text-indigo-600 transition-colors">Conditions d'utilisation</a>
-              <a href="#" className="hover:text-indigo-600 transition-colors">Confidentialité</a>
-              <a href="#" className="hover:text-indigo-600 transition-colors">Support</a>
+              <a href="/terms" className="hover:text-indigo-600 transition-colors">Conditions d'utilisation</a>
+              <a href="/privacy" className="hover:text-indigo-600 transition-colors">Confidentialité</a>
+              <a href="/contact" className="hover:text-indigo-600 transition-colors">Support</a>
             </div>
             <p className="text-sm text-slate-400">© {new Date().getFullYear()} JobConnect Togo.</p>
           </div>

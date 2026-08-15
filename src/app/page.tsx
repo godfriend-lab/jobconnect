@@ -5,10 +5,9 @@ import { Logo } from '@/components/Logo'
 import Chatbot from '@/components/Chatbot'
 import NewsletterForm from '@/components/NewsletterForm'
 import { 
-  ShieldCheck, Wallet, Zap, MapPin, MessageSquare, 
-  Star, TrendingUp, CheckCircle2, ArrowRight,
+  ShieldCheck, Wallet, Zap, Star, CheckCircle2, ArrowRight,
   Wrench, Zap as ZapIcon, Hammer, Paintbrush, 
-  Home, Car, Scissors, Shirt, Stethoscope, Laptop
+  Home, Car, Scissors, Stethoscope, Laptop
 } from 'lucide-react'
 
 export default async function HomePage() {
@@ -41,7 +40,7 @@ export default async function HomePage() {
     if (n.includes('santé')) return Stethoscope
     if (n.includes('couture')) return Scissors
     if (n.includes('immobilier')) return Home
-    if (n.includes('auto') || n.includes('mécanique')) return Car
+    if (n.includes('auto') || n.includes('véhicule')) return Car
     return Wrench
   }
 
@@ -110,7 +109,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="pt-8 flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+          <div className="pt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500 font-medium">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
               <span>Profils 100% vérifiés</span>
@@ -118,6 +117,10 @@ export default async function HomePage() {
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
               <span>Paiement direct (T-Money / Flooz)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+              <span>Support local réactif</span>
             </div>
           </div>
         </div>
@@ -209,7 +212,7 @@ export default async function HomePage() {
               <span className="text-indigo-600">d'experts vérifiés</span>
             </h2>
           </div>
-          <Link href="/register?role=pro" className="text-indigo-600 font-bold flex items-center gap-2 hover:gap-3 transition-all">
+          <Link href="/marketplace" className="text-indigo-600 font-bold flex items-center gap-2 hover:gap-3 transition-all">
             Voir tous les métiers <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
@@ -220,7 +223,7 @@ export default async function HomePage() {
             return (
               <Link 
                 key={idx} 
-                href={`/dashboard/client?category=${cat.name}`}
+                href={`/marketplace?category=${cat.name}`}
                 className="group bg-white border border-slate-200 rounded-2xl p-6 text-center hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 hover:-translate-y-1 transition-all duration-300"
               >
                 <div className="w-14 h-14 mx-auto mb-4 bg-slate-50 group-hover:bg-indigo-50 rounded-2xl flex items-center justify-center transition-colors">
@@ -256,75 +259,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 7. FOOTER SECTION */}
-      <footer className="bg-slate-950 text-slate-400 py-16 px-4 sm:px-6 border-t border-slate-900">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          
-          {/* Colonne 1 : Marque */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Logo className="w-10 h-10" />
-              <span className="text-xl font-black text-white tracking-tight">
-                JOB<span className="text-indigo-500">CONNECT</span>
-              </span>
-            </div>
-            <p className="text-sm max-w-sm leading-relaxed">
-              La plateforme de référence au Togo pour connecter les talents locaux aux besoins des particuliers et des entreprises, en toute sécurité.
-            </p>
-          </div>
-          
-          {/* Colonne 2 : Liens rapides */}
-          <div className="space-y-4 text-sm">
-            <h5 className="text-white font-bold uppercase tracking-wider text-xs">Plateforme</h5>
-            <ul className="space-y-3">
-              <li><a href="#avantages" className="hover:text-white transition-colors">Avantages</a></li>
-              <li><Link href="/pricing" className="hover:text-white transition-colors">Tarification</Link></li>
-              <li><a href="#categories" className="hover:text-white transition-colors">Catégories</a></li>
-              <li><Link href="/register?role=pro" className="hover:text-white transition-colors">Devenir Pro</Link></li>
-            </ul>
-          </div>
-          
-          {/* Colonne 3 : Contact */}
-          <div className="space-y-4 text-sm">
-            <h5 className="text-white font-bold uppercase tracking-wider text-xs">Contact</h5>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-slate-300">
-                <span></span> +228 96 31 50 29
-              </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <span>📞</span> +228 90 34 34 29
-              </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <span>✉️</span> contact@jobconnect.tg
-              </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <span>📍</span> Lomé, Togo
-              </li>
-            </ul>
-          </div>
-
-          {/* Colonne 4 : Newsletter */}
-          <div className="space-y-4 text-sm">
-            <h5 className="text-white font-bold uppercase tracking-wider text-xs">Newsletter</h5>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Recevez nos dernières actualités, conseils et offres exclusives directement dans votre boîte mail.
-            </p>
-            <NewsletterForm />
-          </div>
-
-        </div>
-        
-        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
-          <p>&copy; {new Date().getFullYear()} JobConnect Togo. Tous droits réservés.</p>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-            <span>Tous les systèmes sont opérationnels</span>
-          </div>
-        </div>
-      </footer>
-
-      {/* 8. CHATBOT IA JOBI */}
+      {/* 7. CHATBOT IA JOBI */}
       <Chatbot />
+      
     </div>
   )
 }

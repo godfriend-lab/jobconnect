@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import "./globals.css"
-import Chatbot from "@/components/Chatbot" // ← 1. AJOUT DE L'IMPORT
+import Chatbot from "@/components/Chatbot"
+import Footer from "@/components/Footer"
+import { LanguageProvider } from "@/contexts/LanguageContext" // ← 1. IMPORT DU PROVIDER
 
 export const metadata: Metadata = {
   title: "JOBCONNECT - La Marketplace N°1 des Services au Togo",
@@ -27,11 +29,19 @@ export default function RootLayout({
           rel="stylesheet" 
         />
       </head>
-      <body className="antialiased font-sans">
-        <main>{children}</main>
+      <body className="antialiased font-sans flex flex-col min-h-screen">
         
-        {/* ← 2. AJOUT DU CHATBOT ICI (il sera présent sur TOUTES les pages) */}
-        <Chatbot /> 
+        {/* ← 2. ENVELOPPE TOUT LE CONTENU AVEC LE LANGUAGE PROVIDER */}
+        <LanguageProvider>
+          
+          <main className="flex-grow">
+            {children}
+          </main>
+          
+          <Footer />
+          <Chatbot /> 
+          
+        </LanguageProvider>
         
       </body>
     </html>

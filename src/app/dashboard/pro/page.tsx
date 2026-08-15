@@ -9,9 +9,9 @@ import { Logo } from '@/components/Logo'
 import { 
   Home, Star, Settings, LogOut, CheckCircle, Clock, Upload, 
   Shield, Loader2, Menu, X, Crown, Award, Image as ImageIcon,
-  Trash2, Sun, Moon, Heart, CheckCircle2, AlertCircle, 
+  Trash2, Sun, Moon, Heart, CheckCircle2, AlertCircle, Info,
   Play, Pause, Save, Phone, MessageCircle, ExternalLink, Briefcase,
-  Plus, Eye, Zap, FileText, Camera, Globe, Rocket, Edit3, ArrowRight
+  Plus, Eye, Zap, FileText, Camera, Globe, Rocket, Edit3, ArrowRight, CreditCard
 } from 'lucide-react'
 
 // ✅ LISTE COMPLÈTE DE TOUTES LES CATÉGORIES DE MÉTIERS
@@ -284,6 +284,33 @@ export default function ProDashboard() {
     }
   }
 
+  const initiatePayment = async (planName: string, amount: number) => {
+    try {
+      setUploading(true)
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: profile.id,
+          planName: `Abonnement JobConnect - ${planName}`,
+          amount: amount,
+          userEmail: profile.email
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        window.location.href = data.checkoutUrl
+      } else {
+        alert('Erreur: ' + (data.message || 'Impossible de créer le paiement'))
+      }
+    } catch (error) {
+      console.error(error)
+      alert('Erreur de connexion au serveur de paiement')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploading(true)
@@ -536,6 +563,8 @@ export default function ProDashboard() {
   const textSecondary = darkMode ? 'text-slate-400' : 'text-slate-600'
   const inputBg = darkMode ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
 
+  const currentPlan = profile?.plan?.toLowerCase() || 'gratuit'
+
   if (loading) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${bg}`}>
@@ -583,6 +612,7 @@ export default function ProDashboard() {
                 { id: 'profile', label: 'Mon Profil', icon: Settings },
                 { id: 'portfolio', label: 'Réalisations', icon: ImageIcon },
                 { id: 'reviews', label: 'Avis clients', icon: Star },
+                { id: 'subscription', label: 'Mon Abonnement', icon: Crown },
                 { id: 'verification', label: 'Vérification', icon: Shield },
               ].map(item => (
                 <button
@@ -599,15 +629,9 @@ export default function ProDashboard() {
                 </button>
               ))}
               
-              {/* ✅ LIEN MARKETPLACE AJOUTÉ (MOBILE) */}
               <Link href="/marketplace" className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400 font-semibold border-t border-slate-200 dark:border-slate-800 mt-4 pt-4">
                 <Globe className="w-5 h-5" />
                 <span>Voir la Marketplace</span>
-              </Link>
-              
-              <Link href="/pricing" className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-700'}`}>
-                <Crown className="w-5 h-5" />
-                <span className="font-medium">Forfaits</span>
               </Link>
               
               <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-red-600 transition-all">
@@ -629,6 +653,7 @@ export default function ProDashboard() {
               { id: 'profile', label: 'Mon Profil', icon: Settings },
               { id: 'portfolio', label: 'Réalisations', icon: ImageIcon },
               { id: 'reviews', label: 'Avis clients', icon: Star },
+              { id: 'subscription', label: 'Mon Abonnement', icon: Crown },
               { id: 'verification', label: 'Vérification', icon: Shield },
             ].map(item => (
               <button
@@ -645,17 +670,12 @@ export default function ProDashboard() {
               </button>
             ))}
             
-            {/* ✅ LIEN MARKETPLACE AJOUTÉ (DESKTOP) */}
             <Link href="/marketplace" className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400 font-semibold border-t border-slate-200 dark:border-slate-800 mt-4 pt-4">
               <Globe className="w-5 h-5" />
               Voir la Marketplace
             </Link>
 
             <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
-              <Link href="/pricing" className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${textSecondary} hover:bg-slate-100 dark:hover:bg-slate-800`}>
-                <Crown className="w-5 h-5" />
-                Forfaits
-              </Link>
               <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 mt-2">
                 <LogOut className="w-5 h-5" />
                 Déconnexion
@@ -668,7 +688,7 @@ export default function ProDashboard() {
         <main className="flex-1 min-w-0">
           {activeView === 'dashboard' && (
             <div className="space-y-8">
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 p-8 text-white shadow-lg">
+              <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 to-violet-700 p-8 text-white shadow-lg">
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                   <div>
                     <h1 className="text-3xl font-bold mb-2">Bonjour, {profile?.full_name || 'Pro'} 👋</h1>
@@ -694,7 +714,7 @@ export default function ProDashboard() {
                   { label: 'Total des avis', value: stats.totalReviews, icon: MessageCircle, color: 'from-blue-500 to-indigo-600' },
                 ].map((stat, i) => (
                   <div key={i} className={`${cardBg} border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all`}>
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}>
+                    <div className={`w-12 h-12 rounded-xl bg-linear-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}>
                       <stat.icon className="w-6 h-6 text-white" />
                     </div>
                     <p className={`text-sm font-medium ${textSecondary} mb-1`}>{stat.label}</p>
@@ -715,13 +735,13 @@ export default function ProDashboard() {
                       <p className={`text-xs ${textSecondary}`}>{services.length > 0 ? 'Mettre à jour les informations' : 'Apparaître sur la marketplace'}</p>
                     </div>
                   </button>
-                  <button onClick={() => setActiveView('portfolio')} className={`${cardBg} border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all text-left`}>
-                    <div className="w-10 h-10 rounded-xl bg-pink-500 text-white flex items-center justify-center">
-                      <Camera className="w-5 h-5" />
+                  <button onClick={() => setActiveView('subscription')} className={`${cardBg} border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all text-left`}>
+                    <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center">
+                      <Crown className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className={`font-semibold text-sm ${textPrimary}`}>Portfolio</p>
-                      <p className={`text-xs ${textSecondary}`}>Montrer votre travail</p>
+                      <p className={`font-semibold text-sm ${textPrimary}`}>Mon Abonnement</p>
+                      <p className={`text-xs ${textSecondary}`}>Améliorer ma visibilité</p>
                     </div>
                   </button>
                   <Link href={`/pro/${profile?.id}`} className={`${cardBg} border rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all text-left`}>
@@ -906,7 +926,7 @@ export default function ProDashboard() {
                     {profile?.avatar_url ? (
                       <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover object-center" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold">
+                      <div className="w-full h-full flex items-center justify-center text-5xl bg-linear-to-br from-indigo-500 to-purple-600 text-white font-bold">
                         {profile?.full_name?.charAt(0).toUpperCase() || 'P'}
                       </div>
                     )}
@@ -1020,7 +1040,7 @@ export default function ProDashboard() {
                   <h1 className={`text-2xl font-bold ${textPrimary}`}>Avis Clients</h1>
                   <p className={`text-sm ${textSecondary}`}>Ce que disent vos clients</p>
                 </div>
-                <div className="flex items-center gap-3 bg-gradient-to-r from-yellow-500 to-amber-600 px-6 py-3 rounded-xl shadow-lg">
+                <div className="flex items-center gap-3 bg-linear-to-r from-yellow-500 to-amber-600 px-6 py-3 rounded-xl shadow-lg">
                   <Star className="w-6 h-6 text-white fill-white" />
                   <span className="text-2xl font-bold text-white">{stats.rating.toFixed(1)}</span>
                   <span className="text-white/90 font-semibold">({stats.totalReviews} avis)</span>
@@ -1037,7 +1057,7 @@ export default function ProDashboard() {
                   {reviews.map(review => (
                     <div key={review.id} className={`${cardBg} border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all`}>
                       <div className="flex items-start gap-4 mb-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
                           {review.reviewer_avatar ? (
                             <img src={review.reviewer_avatar} alt={review.reviewer_name} className="w-full h-full object-cover" />
                           ) : (
@@ -1071,60 +1091,159 @@ export default function ProDashboard() {
             </div>
           )}
 
-          {/* ✅ NOUVELLE INTERFACE DE VÉRIFICATION (Bientôt disponible) */}
+          {/* ✅ VUE MON ABONNEMENT (Connectée aux tarifs avec bouton Mon Espace) */}
+          {activeView === 'subscription' && (
+            <div className="space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Nos Forfaits</h1>
+                  <p className={`text-sm ${textSecondary}`}>Choisissez le plan qui correspond à vos objectifs de visibilité.</p>
+                </div>
+                <button 
+                  onClick={() => setActiveView('dashboard')}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all shadow-md"
+                >
+                  <Home className="w-4 h-4" />
+                  Mon Espace
+                </button>
+              </div>
+
+              {/* Current Plan Card */}
+              <div className={`${cardBg} border rounded-2xl p-6 shadow-sm`}>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <p className={`text-sm font-medium ${textSecondary} mb-1`}>Votre forfait actuel</p>
+                    <div className="flex items-center gap-3">
+                      <h2 className={`text-3xl font-black ${textPrimary} capitalize`}>
+                        {currentPlan === 'gratuit' ? 'Gratuit' : currentPlan}
+                      </h2>
+                      {currentPlan === 'premium' && <Crown className="w-8 h-8 text-amber-500 fill-amber-500" />}
+                      {currentPlan === 'business' && <Award className="w-8 h-8 text-blue-500" />}
+                      {currentPlan === 'starter' && <Zap className="w-8 h-8 text-emerald-500" />}
+                      {currentPlan === 'gratuit' && <CheckCircle className="w-8 h-8 text-slate-500" />}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-sm ${textSecondary}`}>Prochaine facturation</p>
+                    <p className={`text-lg font-bold ${textPrimary}`}>
+                      {currentPlan === 'premium' ? '30 000 FCFA/mois' : currentPlan === 'business' ? '15 000 FCFA/mois' : currentPlan === 'starter' ? '5 000 FCFA/mois' : 'Gratuit'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { name: 'Gratuit', price: '0 FCFA', period: '/mois', features: ['Profil professionnel de base', 'Publication de services illimitée', 'Visibilité standard', 'Messagerie illimitée'], color: 'border-slate-200 dark:border-slate-700', btnColor: 'bg-slate-600 hover:bg-slate-700', disabled: currentPlan === 'gratuit' },
+                  { name: 'Starter', price: '5 000 FCFA', period: '/mois', features: ['Tout du plan Gratuit, plus :', 'Visibilité accrue (milieu des résultats)', 'Mise en avant locale', 'Support email prioritaire'], color: 'border-emerald-200 dark:border-emerald-800', btnColor: 'bg-emerald-600 hover:bg-emerald-700', disabled: currentPlan === 'starter' || currentPlan === 'business' || currentPlan === 'premium' },
+                  { name: 'Business', price: '15 000 FCFA', period: '/mois', features: ['Tout Starter +', 'Top 5 des recherches', 'Statistiques avancées', 'Badge "Pro Actif"'], color: 'border-blue-200 dark:border-blue-800', btnColor: 'bg-blue-600 hover:bg-blue-700', disabled: currentPlan === 'business' || currentPlan === 'premium' },
+                  { name: 'Premium', price: '30 000 FCFA', period: '/mois', features: ['Tout Business +', 'Top 1 Garanti', 'Page d\'accueil', '🎁 -20% chez Ideenwerk'], color: 'border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-900/10', btnColor: 'bg-amber-600 hover:bg-amber-700', disabled: currentPlan === 'premium', highlight: true }
+                ].map((plan, idx) => (
+                  <div key={idx} className={`${cardBg} border-2 ${plan.color} rounded-2xl p-6 shadow-sm flex flex-col relative`}>
+                    {plan.highlight && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full shadow-md">Recommandé</div>}
+                    <h3 className={`text-xl font-bold ${textPrimary} mb-2`}>{plan.name}</h3>
+                    <div className="flex items-baseline gap-1 mb-4">
+                      <span className={`text-2xl font-black ${textPrimary}`}>{plan.price}</span>
+                      <span className={`text-sm ${textSecondary}`}>{plan.period}</span>
+                    </div>
+                    <ul className="space-y-2 mb-6 flex-1">
+                      {plan.features.map((f, i) => (
+                        <li key={i} className={`flex items-start gap-2 text-sm ${textSecondary}`}>
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <button 
+                      onClick={() => !plan.disabled && initiatePayment(plan.name, plan.name === 'Starter' ? 5000 : plan.name === 'Business' ? 15000 : 30000)}
+                      disabled={plan.disabled || uploading}
+                      className={`w-full py-3 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${plan.disabled ? 'bg-slate-400 cursor-not-allowed' : plan.btnColor}`}
+                    >
+                      {plan.disabled ? 'Forfait actuel' : (uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />)}
+                      {plan.disabled ? 'Actif' : 'Mettre à jour'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-6 flex items-start gap-4">
+                <Info className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-bold text-blue-900 dark:text-blue-300 mb-1">Transparence totale</h3>
+                  <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-disc list-inside">
+                    <li><strong>Services illimités :</strong> Quel que soit votre plan, publiez autant de services que vous le souhaitez.</li>
+                    <li><strong>0% de commission :</strong> Vous gardez 100% de vos gains. Le client vous paie directement.</li>
+                    <li><strong>Badges de vérification :</strong> Le badge "Vérifié" est obtenu via un processus de contrôle d'identité indépendant (5 000 FCFA/an) et n'est pas lié à votre abonnement de visibilité.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeView === 'verification' && (
             <div className="max-w-3xl mx-auto space-y-8">
               <div>
                 <h1 className={`text-2xl font-bold ${textPrimary}`}>Vérification d'identité</h1>
-                <p className={`text-sm ${textSecondary}`}>Obtenez le badge "Pro Vérifié" pour gagner la confiance des clients.</p>
+                <p className={`text-sm ${textSecondary}`}>Obtenez le badge bleu "Pro Vérifié" pour inspirer une confiance maximale.</p>
               </div>
 
-              <div className={`${cardBg} border rounded-3xl p-8 md:p-12 shadow-sm text-center`}>
-                <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/30">
-                  <Rocket className="w-12 h-12 text-white" />
-                </div>
-                
-                <h3 className={`text-3xl font-bold ${textPrimary} mb-3`}>
-                  Bientôt disponible 🚀
-                </h3>
-                
-                <p className={`${textSecondary} max-w-md mx-auto mb-8 text-lg`}>
-                  Nous travaillons actuellement sur cette fonctionnalité pour vous offrir une expérience de vérification simple, rapide et sécurisée.
-                </p>
-
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-full text-sm font-semibold border border-amber-200 dark:border-amber-800 mb-8">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                  </span>
-                  En cours de développement
-                </div>
-
-                <div className={`max-w-lg mx-auto ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'} rounded-2xl p-6 border ${darkMode ? 'border-slate-700' : 'border-slate-200'}`}>
-                  <h4 className={`font-bold ${textPrimary} mb-4`}>Ce qui arrive bientôt :</h4>
-                  <div className="space-y-3 text-left">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                      <span className={`text-sm ${textSecondary}`}>Paiement sécurisé via PayDunya (T-Money, Flooz, Carte)</span>
+              <div className={`${cardBg} border rounded-3xl p-8 md:p-12 shadow-sm`}>
+                <div className="flex flex-col md:flex-row gap-8 items-start">
+                  <div className="w-full md:w-1/3">
+                    <div className="w-24 h-24 bg-linear-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto md:mx-0 shadow-lg shadow-blue-500/30 mb-4">
+                      <Shield className="w-12 h-12 text-white" />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                      <span className={`text-sm ${textSecondary}`}>Upload de documents (CNI, Diplôme)</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                      <span className={`text-sm ${textSecondary}`}>Validation par notre équipe sous 24-48h</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                      <span className={`text-sm ${textSecondary}`}>Badge bleu "Vérifié" sur votre profil</span>
+                    <div className="text-center md:text-left">
+                      <h3 className={`text-2xl font-bold ${textPrimary} mb-2`}>Badge Vérifié</h3>
+                      <p className={`text-3xl font-black text-indigo-600 mb-1`}>5 000 FCFA <span className="text-sm font-medium text-slate-500">/an</span></p>
+                      <p className={`text-xs ${textSecondary}`}>Paiement unique annuel</p>
                     </div>
                   </div>
-                </div>
+                  
+                  <div className="flex-1 space-y-6">
+                    <div>
+                      <h4 className={`font-bold ${textPrimary} mb-3`}>Pourquoi se faire vérifier ?</h4>
+                      <ul className="space-y-3">
+                        {[
+                          'Badge bleu exclusif sur votre profil et vos services',
+                          'Apparition en priorité dans les résultats de recherche',
+                          'Confiance accrue : les clients sont 3x plus susceptibles de vous contacter',
+                          'Indépendant de votre abonnement visibilité (Gratuit, Starter, etc.)'
+                        ].map((item, i) => (
+                          <li key={i} className="flex items-start gap-3">
+                            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                            <span className={`text-sm ${textSecondary}`}>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-                <p className={`mt-8 text-sm ${textSecondary}`}>
-                   Tarif prévu : <strong className="text-indigo-600 dark:text-indigo-400">5 000 FCFA / an</strong>
-                </p>
+                    <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} border ${darkMode ? 'border-slate-700' : 'border-slate-200'}`}>
+                      <h4 className={`font-bold ${textPrimary} mb-2 flex items-center gap-2`}>
+                        <FileText className="w-4 h-4 text-indigo-500" />
+                        Documents requis
+                      </h4>
+                      <ul className={`text-sm ${textSecondary} space-y-1 list-disc list-inside`}>
+                        <li>Pièce d'identité valide (CNI ou Passeport)</li>
+                        <li>Casier judiciaire vierge (datant de moins de 3 mois)</li>
+                        <li>Justificatif de qualification (Diplôme, attestation, etc.)</li>
+                      </ul>
+                    </div>
+
+                    <button 
+                      onClick={() => alert("Le système de paiement pour la vérification sera activé très prochainement. Préparez vos documents !")}
+                      className="w-full md:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                    >
+                      <Shield className="w-5 h-5" />
+                      Lancer ma vérification (5 000 FCFA)
+                    </button>
+                    
+                    <p className={`text-xs ${textSecondary} text-center md:text-left`}>
+                      Une fois le paiement effectué, vous pourrez uploader vos documents. Notre équipe les validera sous 24 à 48h ouvrées.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

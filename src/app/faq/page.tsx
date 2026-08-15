@@ -1,133 +1,148 @@
-'use client'
-
-import React, { useState } from 'react'
 import Link from 'next/link'
+import { 
+  HelpCircle, 
+  UserPlus, 
+  Search, 
+  ShieldCheck, 
+  CreditCard, 
+  MessageCircle, 
+  ArrowLeft,
+  ChevronDown
+} from 'lucide-react'
 
 export default function FAQPage() {
   const faqs = [
     {
-      category: 'Général',
-      question: 'Qu\'est-ce que JobConnect et comment ça fonctionne ?',
-      answer: 'JobConnect est la plateforme de référence au Togo pour la mise en relation entre clients et professionnels du quotidien (électriciens, maçons, plombiers, répétiteurs, etc.). Les clients publient gratuitement leurs besoins de chantiers ou dépannages, et les artisans qualifiés à proximité postulent pour réaliser la mission.',
+      category: "Général",
+      icon: HelpCircle,
+      questions: [
+        {
+          q: "Qu'est-ce que JobConnect Togo ?",
+          a: "JobConnect est la première marketplace numérique au Togo qui met en relation directe les clients avec des professionnels qualifiés et vérifiés (artisans, prestataires de services, etc.) dans leur localité."
+        },
+        {
+          q: "L'inscription est-elle gratuite ?",
+          a: "Oui, l'inscription de base est 100% gratuite pour les clients et les professionnels. Nous proposons également des forfaits Premium pour les professionnels souhaitant booster leur visibilité."
+        }
+      ]
     },
     {
-      category: 'Pour les Artisans',
-      question: 'Comment obtenir le badge "Artisan Vérifié" sur mon profil ?',
-      answer: 'La confiance est notre priorité. Pour être certifié, vous devez soumettre via votre espace membre une pièce d\'identité valide (Carte d\'identité togolaise, Passeport ou Carte d\'électeur) et, si applicable, vos diplômes ou attestations de fin d\'apprentissage. Notre équipe examine et valide chaque dossier sous 24h à 48h.',
+      category: "Pour les Clients",
+      icon: Search,
+      questions: [
+        {
+          q: "Comment trouver un professionnel près de chez moi ?",
+          a: "Utilisez la barre de recherche sur la page d'accueil ou dans le menu 'Marketplace'. Vous pouvez filtrer par catégorie de service (Plombier, Électricien, etc.) et par ville (Lomé, Sokodé, Kara, etc.)."
+        },
+        {
+          q: "Comment contacter un professionnel ?",
+          a: "Une fois que vous avez trouvé le professionnel idéal, cliquez sur le bouton 'Contacter'. Vous serez redirigé vers WhatsApp pour discuter directement avec lui et convenir des détails."
+        },
+        {
+          q: "Les professionnels sont-ils fiables ?",
+          a: "Nous encourageons fortement la vérification d'identité. Les professionnels ayant soumis leurs documents et validés par notre équipe arborent un badge bleu 'Vérifié' pour garantir votre tranquillité."
+        }
+      ]
     },
     {
-      category: 'Paiements',
-      question: 'Quels sont les moyens de paiement acceptés pour les abonnements ?',
-      answer: 'Pour faciliter l\'accès à tous les professionnels au Togo, nous acceptons les paiements mobiles locaux les plus populaires : T-Money et Flooz. L\'activation de votre abonnement (Découverte, Pro, Entreprise) est instantanée dès la validation du transfert.',
+      category: "Pour les Professionnels",
+      icon: UserPlus,
+      questions: [
+        {
+          q: "Comment publier mon service sur la plateforme ?",
+          a: "Inscrivez-vous, complétez votre profil professionnel, puis rendez-vous dans votre tableau de bord (Dashboard Pro) et cliquez sur 'Publier un service'. Remplissez les informations et c'est en ligne !"
+        },
+        {
+          q: "Comment recevoir plus de clients ?",
+          a: "Assurez-vous d'avoir un profil complet avec une belle photo, des descriptions claires et des tarifs justes. Pensez aussi à demander à vos clients satisfaits de laisser un avis 5 étoiles sur votre profil."
+        }
+      ]
     },
     {
-      category: 'Pour les Clients',
-      question: 'Est-ce que la publication d\'une demande de service est payante ?',
-      answer: 'Non, c\'est 100% gratuit pour les clients ! Vous pouvez publier autant de demandes de chantiers ou de dépannages que vous le souhaitez. Vous ne payez que l\'artisan que vous aurez choisi, selon le devis convenu ensemble.',
-    },
-    {
-      category: 'Sécurité',
-      question: 'Que se passe-t-il en cas de litige ou de travail mal fait ?',
-      answer: 'JobConnect intègre un service de médiation. Nous recommandons d\'utiliser notre système de messagerie pour garder une trace écrite de vos échanges. En cas de désaccord sur la conformité des travaux, notre support local intervient pour analyser la situation et trouver une solution équitable.',
-    },
+      category: "Sécurité & Paiement",
+      icon: ShieldCheck,
+      questions: [
+        {
+          q: "Comment se passe le paiement ?",
+          a: "JobConnect est une plateforme de mise en relation. Le paiement du service se fait directement entre vous et le professionnel (espèces, T-Money, Flooz) une fois le travail convenu ou terminé."
+        },
+        {
+          q: "Que faire en cas de problème avec un professionnel ?",
+          a: "Si vous rencontrez un souci, vous pouvez signaler le professionnel directement via son profil ou nous contacter à service.proconnect.tg@gmail.com. Notre équipe interviendra rapidement."
+        }
+      ]
+    }
   ]
 
-  // État pour suivre quelle question est ouverte (null = aucune)
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
-
-  const toggleFaq = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index)
-  }
-
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-900">
-      {/* Barre de navigation */}
-      <div className="bg-white border-b border-slate-200 py-4">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-black tracking-tight text-blue-600">
-            JOB<span className="text-slate-800">CONNECT</span>
-          </Link>
-          <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition">
+    <div className="min-h-screen bg-slate-50">
+      {/* Header de la page */}
+      <div className="bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 text-indigo-100 hover:text-white transition-colors mb-6 group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Retour à l'accueil
           </Link>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
+              <HelpCircle className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight">Foire Aux Questions</h1>
+              <p className="text-indigo-200 mt-1">Tout ce que vous devez savoir sur JobConnect</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* En-tête de la page */}
-      <header className="max-w-3xl mx-auto text-center px-4 pt-16 pb-12">
-        <span className="bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border border-blue-100">
-          💬 Centre d'aide
-        </span>
-        <h1 className="mt-4 text-3xl sm:text-5xl font-black text-slate-950 tracking-tight">
-          Questions fréquemment <br />
-          <span className="text-blue-600">posées.</span>
-        </h1>
-        <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
-          Trouvez des réponses claires à toutes vos questions sur l'utilisation de la plateforme, les paiements mobiles et la sécurité.
-        </p>
-      </header>
-
-      {/* Liste des FAQ de type Accordéon */}
-      <main className="max-w-3xl mx-auto px-4 pb-24">
-        <div className="space-y-4">
-          {faqs.map((faq, idx) => {
-            const isOpen = openIndex === idx
+      {/* Contenu principal */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 -mt-8">
+        <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-12 space-y-10">
+          
+          {faqs.map((section, index) => {
+            const Icon = section.icon
             return (
-              <div
-                key={idx}
-                className="bg-white border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 shadow-sm"
-              >
-                <button
-                  type="button"
-                  onClick={() => toggleFaq(idx)}
-                  className="w-full flex items-center justify-between p-6 text-left focus:outline-none group"
-                >
-                  <div className="pr-4">
-                    <span className="text-[10px] uppercase font-extrabold tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md mb-2 inline-block">
-                      {faq.category}
-                    </span>
-                    <h3 className="text-base sm:text-lg font-bold text-slate-950 group-hover:text-blue-600 transition duration-150">
-                      {faq.question}
-                    </h3>
+              <div key={index}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-indigo-50 rounded-xl">
+                    <Icon className="w-6 h-6 text-indigo-600" />
                   </div>
-                  <span
-                    className={`text-xl font-bold shrink-0 text-slate-400 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 text-blue-600' : ''
-                    }`}
-                  >
-                    {isOpen ? '−' : '+'}
-                  </span>
-                </button>
-
-                {/* Zone de réponse animée en hauteur */}
-                <div
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isOpen ? 'max-h-[500px] border-t border-slate-100' : 'max-h-0'
-                  }`}
-                >
-                  <p className="p-6 text-sm sm:text-base text-slate-600 leading-relaxed bg-slate-50/50">
-                    {faq.answer}
-                  </p>
+                  <h2 className="text-2xl font-bold text-slate-900">{section.category}</h2>
+                </div>
+                
+                <div className="space-y-4 pl-0 md:pl-14">
+                  {section.questions.map((faq, qIndex) => (
+                    <div key={qIndex} className="border border-slate-200 rounded-2xl p-6 hover:border-indigo-200 hover:shadow-md transition-all duration-300 bg-slate-50/50">
+                      <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-start gap-2">
+                        <ChevronDown className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" />
+                        {faq.q}
+                      </h3>
+                      <p className="text-slate-600 leading-relaxed pl-7">
+                        {faq.a}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )
           })}
-        </div>
 
-        {/* Bannière de contact */}
-        <div className="mt-12 text-center bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-          <h4 className="font-extrabold text-slate-950 text-lg">Vous ne trouvez pas votre réponse ?</h4>
-          <p className="text-sm text-slate-500 mt-1">Notre équipe d'assistance est basée à Lomé et disponible pour vous guider.</p>
-          <div className="mt-5 flex items-center justify-center gap-4">
-            <a
-              href="https://wa.me/22890000000"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-3 px-5 rounded-xl transition shadow-md shadow-emerald-100 flex items-center gap-2"
+          {/* Appel à l'action final */}
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 text-center border border-indigo-100 mt-12">
+            <h3 className="text-xl font-bold text-slate-900 mb-3">Vous n'avez pas trouvé votre réponse ?</h3>
+            <p className="text-slate-600 mb-6">Notre équipe de support est à votre écoute pour vous aider.</p>
+            <Link 
+              href="/contact"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
             >
-              💬 Support WhatsApp
-            </a>
+              <MessageCircle className="w-5 h-5" />
+              Contactez-nous
+            </Link>
           </div>
+
         </div>
       </main>
     </div>
