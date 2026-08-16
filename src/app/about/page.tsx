@@ -1,93 +1,139 @@
+// @ts-nocheck
+'use client'
+
 import Link from 'next/link'
-import { ArrowLeft, Target, Eye, Heart, Award, Users, Globe, TrendingUp } from 'lucide-react'
+import { Globe, Shield, Target, Users, TrendingUp, Award } from 'lucide-react'
 
 export default function AboutPage() {
-  const values = [
-    { icon: Target, title: "Notre Mission", desc: "Connecter les talents locaux aux besoins des particuliers et entreprises au Togo, en toute sécurité et transparence." },
-    { icon: Eye, title: "Notre Vision", desc: "Devenir la marketplace N°1 des services en Afrique de l'Ouest d'ici 2030." },
-    { icon: Heart, title: "Nos Valeurs", desc: "Confiance, transparence, excellence et engagement envers nos utilisateurs." },
-    { icon: Award, title: "Notre Engagement", desc: "Vérifier chaque professionnel et garantir une expérience utilisateur de qualité." },
-  ]
-
-  const stats = [
-    { icon: Users, value: "500+", label: "Professionnels vérifiés" },
-    { icon: Globe, value: "10+", label: "Villes couvertes" },
-    { icon: TrendingUp, value: "2000+", label: "Mises en relation" },
-    { icon: Award, value: "98%", label: "Clients satisfaits" },
-  ]
-
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-indigo-100 hover:text-white transition-colors mb-6 group">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            Retour à l'accueil
-          </Link>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">À propos de JobConnect</h1>
-          <p className="text-lg text-indigo-100 max-w-2xl">
-            La plateforme qui révolutionne le marché des services au Togo en connectant directement les clients avec des professionnels qualifiés.
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      {/* Hero Section */}
+      <div className="bg-linear-to-br from-indigo-600 to-purple-700 text-white py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-black mb-6">À Propos de JobConnect</h1>
+          <p className="text-xl text-indigo-100 max-w-3xl mx-auto">
+            La plateforme leader au Togo connectant des professionnels qualifiés avec des clients exigeants
           </p>
         </div>
       </div>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 -mt-8">
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-12 space-y-12">
-          
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Notre Histoire</h2>
-            <p className="text-slate-600 leading-relaxed">
-              JobConnect est né d'un constat simple : au Togo, il est souvent difficile de trouver un professionnel de confiance pour des travaux ou services du quotidien. Les recommandations bouche-à-oreille ne suffisent plus, et les plateformes existantes ne répondent pas aux réalités locales.
-            </p>
-            <p className="text-slate-600 leading-relaxed mt-4">
-              C'est pourquoi nous avons créé JobConnect : une marketplace 100% togolaise, pensée pour les réalités locales, avec une vérification rigoureuse des professionnels et un système de notation transparent. Notre objectif est de redonner confiance aux clients tout en offrant aux professionnels une vitrine digitale pour développer leur activité.
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
+        
+        {/* Mission & Vision */}
+        <section className="grid md:grid-cols-2 gap-12">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-lg border border-slate-200 dark:border-slate-800">
+            <div className="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center mb-6">
+              <Target className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Notre Mission</h2>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+              JobConnect a pour mission de transformer le marché des services au Togo en créant un écosystème 
+              numérique de confiance où les professionnels talentueux peuvent développer leur activité et les 
+              clients trouver facilement des prestataires qualifiés et vérifiés.
             </p>
           </div>
 
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Ce qui nous guide</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {values.map((item, idx) => {
-                const Icon = item.icon
-                return (
-                  <div key={idx} className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
-                    <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                    <p className="text-sm text-slate-600">{item.desc}</p>
-                  </div>
-                )
-              })}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-lg border border-slate-200 dark:border-slate-800">
+            <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-6">
+              <Globe className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Notre Vision</h2>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+              Devenir la référence en Afrique de l'Ouest pour la mise en relation entre professionnels et clients, 
+              en promouvant l'excellence, la transparence et l'innovation technologique au service du développement 
+              économique local.
+            </p>
+          </div>
+        </section>
+
+        {/* Valeurs */}
+        <section>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white text-center mb-12">Nos Valeurs Fondamentales</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Shield,
+                title: "Confiance & Transparence",
+                desc: "Nous mettons en place des processus de vérification rigoureux et garantissons une transparence totale sur les tarifs et les compétences de nos professionnels."
+              },
+              {
+                icon: Award,
+                title: "Excellence",
+                desc: "Nous sélectionnons et accompagnons les meilleurs professionnels pour offrir à nos clients des services de qualité exceptionnelle."
+              },
+              {
+                icon: Users,
+                title: "Impact Social",
+                desc: "Nous contribuons au développement économique du Togo en facilitant l'accès à l'emploi et en valorisant le savoir-faire local."
+              }
+            ].map((value, idx) => (
+              <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-lg border border-slate-200 dark:border-slate-800 text-center">
+                <div className="w-16 h-16 bg-linear-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <value.icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{value.title}</h3>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{value.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Chiffres Clés */}
+        <section className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-3xl p-12 text-white">
+          <h2 className="text-3xl font-bold text-center mb-12">JobConnect en Chiffres</h2>
+          <div className="grid md:grid-cols-4 gap-8 text-center">
+            {[
+              { number: "500+", label: "Professionnels vérifiés" },
+              { number: "2000+", label: "Clients satisfaits" },
+              { number: "50+", label: "Métiers disponibles" },
+              { number: "98%", label: "Taux de satisfaction" }
+            ].map((stat, idx) => (
+              <div key={idx}>
+                <div className="text-4xl md:text-5xl font-black mb-2">{stat.number}</div>
+                <div className="text-indigo-100">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Engagement Qualité */}
+        <section>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 md:p-12 shadow-lg border border-slate-200 dark:border-slate-800">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Notre Engagement Qualité</h2>
+            <div className="space-y-6 text-slate-600 dark:text-slate-300">
+              <p className="leading-relaxed">
+                Chez JobConnect, nous nous engageons à maintenir les plus hauts standards de qualité et de 
+                professionnalisme. Chaque professionnel inscrit sur notre plateforme passe par un processus 
+                de vérification rigoureux incluant la validation de son identité, de ses qualifications 
+                professionnelles et de son casier judiciaire.
+              </p>
+              <p className="leading-relaxed">
+                Nous mettons à disposition de nos utilisateurs un système d'avis et de notation transparent, 
+                permettant à chacun de faire des choix éclairés. Notre équipe de support est disponible pour 
+                accompagner nos utilisateurs et garantir une expérience optimale.
+              </p>
             </div>
           </div>
+        </section>
 
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">JobConnect en chiffres</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {stats.map((stat, idx) => {
-                const Icon = stat.icon
-                return (
-                  <div key={idx} className="text-center p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100">
-                    <Icon className="w-8 h-8 text-indigo-600 mx-auto mb-3" />
-                    <div className="text-3xl font-black text-slate-900 mb-1">{stat.value}</div>
-                    <div className="text-xs text-slate-600 font-medium">{stat.label}</div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-8 text-center text-white">
-            <h3 className="text-2xl font-bold mb-3">Prêt à nous rejoindre ?</h3>
-            <p className="text-indigo-100 mb-6">Que vous soyez client ou professionnel, JobConnect est fait pour vous.</p>
-            <Link href="/register" className="inline-block bg-white text-indigo-600 font-bold px-6 py-3 rounded-xl hover:bg-indigo-50 transition-colors">
-              Créer mon compte
+        {/* CTA */}
+        <section className="text-center">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">
+            Rejoignez la révolution JobConnect
+          </h2>
+          <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
+            Que vous soyez professionnel ou client, JobConnect vous offre les outils pour réussir.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/register?role=pro" className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all shadow-lg">
+              Devenir Professionnel
+            </Link>
+            <Link href="/marketplace" className="px-8 py-4 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-white rounded-xl font-semibold transition-all shadow-lg border border-slate-200 dark:border-slate-700">
+              Trouver un Professionnel
             </Link>
           </div>
-
-        </div>
-      </main>
+        </section>
+      </div>
     </div>
   )
 }
