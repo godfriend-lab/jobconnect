@@ -14,24 +14,24 @@ import {
   User
 } from 'lucide-react'
 
-// ✅ COMPOSANT BADGE SÉCURITÉ INTERNE
+// ✅ COMPOSANT BADGE SÉCURITÉ ADAPTÉ AU THÈME SOMBRE
 const PlanBadge = ({ plan }: { plan: string }) => {
   if (!plan || plan === 'Gratuit') return null
 
   const config: Record<string, { iconColor: string; bgColor: string; tooltip: string }> = {
-    'Starter': { iconColor: 'text-emerald-600', bgColor: 'bg-emerald-100', tooltip: 'Forfait Starter' },
-    'Business': { iconColor: 'text-blue-600', bgColor: 'bg-blue-100', tooltip: 'Forfait Business' },
-    'Premium': { iconColor: 'text-amber-600', bgColor: 'bg-amber-100', tooltip: 'Forfait Premium' }
+    'Starter': { iconColor: 'text-emerald-400', bgColor: 'bg-emerald-900/30', tooltip: 'Forfait Starter' },
+    'Business': { iconColor: 'text-blue-400', bgColor: 'bg-blue-900/30', tooltip: 'Forfait Business' },
+    'Premium': { iconColor: 'text-amber-400', bgColor: 'bg-amber-900/30', tooltip: 'Forfait Premium' }
   }
 
   const { iconColor, bgColor, tooltip } = config[plan] || config['Starter']
 
   return (
     <div 
-      className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${bgColor} ${iconColor} shrink-0 transition-all duration-300 hover:scale-110 cursor-help relative`}
+      className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${bgColor} ${iconColor} shrink-0 transition-all duration-300 hover:scale-110 cursor-help relative border border-current/20`}
       title={tooltip}
     >
-      <span className={`absolute inline-flex h-full w-full rounded-full ${iconColor.replace('text-', 'bg-')} opacity-20 animate-ping`}></span>
+      <span className={`absolute inline-flex h-full w-full rounded-full ${iconColor} opacity-20 animate-ping`}></span>
       <ShieldCheck className="w-3.5 h-3.5 relative z-10" />
     </div>
   )
@@ -138,7 +138,7 @@ export default function MarketplacePage() {
         const formatted = servicesData.map(s => ({
           ...s,
           profiles: s.profiles || { 
-            id: s.pro_id, // ✅ Ajout de l'ID ici pour sécurité
+            id: s.pro_id,
             full_name: 'Professionnel', phone: '', avatar_url: null, specialty: '', 
             rating: 0, total_reviews: 0, plan: 'Gratuit', is_verified: false, is_available: true, city: ''
           }
@@ -211,15 +211,15 @@ export default function MarketplacePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="w-16 h-16 animate-spin text-indigo-600 mx-auto mb-4" />
-        <p className="text-slate-600 font-medium">Chargement de la marketplace...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <Loader2 className="w-16 h-16 animate-spin text-indigo-500 mx-auto mb-4" />
+        <p className="text-slate-300 font-medium">Chargement de la marketplace...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 relative">
+    <div className="min-h-screen bg-slate-950 text-slate-300 relative">
       <style>{`
         @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         .animate-marquee { animation: scroll 40s linear infinite; }
@@ -229,27 +229,27 @@ export default function MarketplacePage() {
       `}</style>
 
       {/* HEADER */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+      <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3 shrink-0 group">
             <Logo className="w-10 h-10 group-hover:scale-110 transition-transform duration-300" />
             <span className="font-black text-xl tracking-tight">
-              <span className="text-indigo-600">JOB</span>
-              <span className="text-slate-900">CONNECT</span>
+              <span className="text-indigo-400">JOB</span>
+              <span className="text-white">CONNECT</span>
             </span>
           </Link>
           
           <div className="flex-1 max-w-2xl hidden md:block">
             <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl opacity-0 group-focus-within:opacity-30 blur transition duration-300"></div>
-              <div className="relative flex items-center bg-white rounded-xl border border-slate-200 group-focus-within:border-indigo-300 transition-colors">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl opacity-0 group-focus-within:opacity-50 blur transition duration-300"></div>
+              <div className="relative flex items-center bg-slate-900 rounded-xl border border-slate-700 group-focus-within:border-indigo-500 transition-colors">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-400 transition-colors" />
                 <input 
                   type="text" 
                   placeholder="Rechercher un service ou professionnel..." 
                   value={searchQuery} 
                   onChange={(e) => setSearchQuery(e.target.value)} 
-                  className="w-full pl-10 pr-4 py-2.5 bg-transparent rounded-xl focus:outline-none text-slate-700 placeholder-slate-400" 
+                  className="w-full pl-10 pr-4 py-2.5 bg-transparent rounded-xl focus:outline-none text-white placeholder-slate-500" 
                 />
               </div>
             </div>
@@ -257,28 +257,28 @@ export default function MarketplacePage() {
 
           <div className="hidden md:block relative">
             <div className="relative group">
-              <div className="relative flex items-center bg-white rounded-xl border border-slate-200 focus-within:border-emerald-300 transition-colors">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative flex items-center bg-slate-900 rounded-xl border border-slate-700 group-focus-within:border-emerald-500 transition-colors">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-400 transition-colors" />
                 <input 
                   type="text" 
                   placeholder="Localité..." 
                   value={citySearchQuery}
                   onChange={(e) => { setCitySearchQuery(e.target.value); setShowCityDropdown(true); setSelectedCity('all') }}
                   onFocus={() => setShowCityDropdown(true)}
-                  className="w-40 pl-10 pr-4 py-2.5 bg-transparent rounded-xl focus:outline-none text-slate-700 placeholder-slate-400" 
+                  className="w-40 pl-10 pr-4 py-2.5 bg-transparent rounded-xl focus:outline-none text-white placeholder-slate-500" 
                 />
               </div>
             </div>
             {showCityDropdown && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowCityDropdown(false)} />
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto">
-                  <button onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }} className="w-full px-4 py-3 text-left text-sm hover:bg-indigo-50 text-slate-700 font-semibold">
-                    <MapPin className="w-4 h-4 inline mr-2" /> Toutes les localités
+                <div className="absolute top-full left-0 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto">
+                  <button onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-emerald-400 font-semibold flex items-center gap-2">
+                    <MapPin className="w-4 h-4" /> Toutes les localités
                   </button>
                   {filteredCities.map((city) => (
-                    <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }} className="w-full px-4 py-3 text-left text-sm hover:bg-indigo-50 text-slate-700">
-                      {city}
+                    <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-slate-300 flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-slate-500" /> {city}
                     </button>
                   ))}
                 </div>
@@ -288,43 +288,43 @@ export default function MarketplacePage() {
 
           <button 
             onClick={handleMonEspace}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2 shadow-md hover:shadow-lg"
           >
             <User className="w-4 h-4" />
             Mon Espace
           </button>
         </div>
 
-        {/* MARQUEE CATÉGORIES */}
-        <div className="border-t border-slate-200/60 bg-slate-50/50 overflow-hidden relative">
+        {/* MARQUEE CATÉGORIES (Thème sombre) */}
+        <div className="border-t border-slate-800/60 bg-slate-900/50 overflow-hidden relative">
           <div className="flex animate-marquee py-3 whitespace-nowrap">
             {[{ id: 'all', name: 'Tous les métiers', icon: Home }, ...categoriesMetiers.map(cat => ({ id: cat, name: cat, icon: getIconForCategory(cat) }))].flatMap((cat, index, arr) => 
               Array(2).fill(cat).map((c, i) => (
-                <button key={`${c.id}-${index}-${i}`} onClick={() => setSelectedCategory(c.id)} className="mx-2 px-4 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 border border-slate-200 bg-white text-slate-700 shrink-0 shadow-sm hover:border-indigo-200 hover:text-indigo-600 transition-all">
-                  <c.icon className="w-4 h-4" /> {c.name}
+                <button key={`${c.id}-${index}-${i}`} onClick={() => setSelectedCategory(c.id)} className="mx-2 px-4 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 border border-slate-700 bg-slate-800 text-slate-300 shrink-0 shadow-sm hover:border-indigo-500 hover:text-indigo-400 transition-all">
+                  <c.icon className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 transition-colors" /> {c.name}
                 </button>
               ))
             )}
           </div>
-          <div className="absolute top-0 left-0 w-24 h-full bg-gradient-to-r from-slate-50 to-transparent pointer-events-none z-10" />
-          <div className="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-10" />
+          <div className="absolute top-0 left-0 w-24 h-full bg-gradient-to-r from-slate-950 to-transparent pointer-events-none z-10" />
+          <div className="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-slate-950 to-transparent pointer-events-none z-10" />
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
-        {/* HERO SECTION */}
-        <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-indigo-100 animate-fade-in-up mb-8">
+        {/* HERO SECTION (Thème sombre) */}
+        <div className="bg-gradient-to-br from-indigo-900/30 via-purple-900/30 to-pink-900/30 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-indigo-500/30 animate-fade-in-up mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
             <div className="space-y-6">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 leading-tight">
-                Trouvez le <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">professionnel</span> qu'il vous faut
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight">
+                Trouvez le <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">professionnel</span> qu'il vous faut
               </h1>
-              <p className="text-lg text-slate-600 leading-relaxed max-w-xl">
+              <p className="text-lg text-slate-300 leading-relaxed max-w-xl">
                 JOBCONNECT vous connecte avec des professionnels qualifiés et vérifiés près de chez vous.
               </p>
-              <div className="flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-2xl border border-emerald-200 shadow-sm w-fit">
-                <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                <span className="text-emerald-700 font-bold">Professionnels vérifiés</span>
+              <div className="flex items-center gap-3 bg-slate-900/80 backdrop-blur-sm px-6 py-3 rounded-2xl border border-emerald-500/50 shadow-lg w-fit">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <span className="text-emerald-400 font-bold">Professionnels vérifiés</span>
               </div>
             </div>
 
@@ -338,33 +338,33 @@ export default function MarketplacePage() {
                   onError={() => setImageError(true)}
                 />
               ) : (
-                <div className="w-full h-[300px] bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200 rounded-3xl flex items-center justify-center border-4 border-white shadow-2xl">
+                <div className="w-full h-[300px] bg-gradient-to-br from-indigo-900/50 via-purple-900/50 to-pink-900/50 rounded-3xl flex items-center justify-center border-4 border-slate-700 shadow-2xl">
                   <div className="text-center">
                     <div className="flex justify-center gap-4 mb-4 text-5xl">
                       <span>👷</span><span>👩‍🔧</span><span>🛠️</span>
                     </div>
-                    <p className="text-slate-700 font-bold text-lg">Professionnels JOBCONNECT</p>
+                    <p className="text-white font-bold text-lg">Professionnels JOBCONNECT</p>
                   </div>
                 </div>
               )}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-r from-indigo-200/30 via-purple-200/30 to-pink-200/30 rounded-full blur-3xl -z-10"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-full blur-3xl -z-10"></div>
             </div>
           </div>
         </div>
 
-        {/* GRILLE DE SERVICES */}
+        {/* GRILLE DE SERVICES (Thème sombre) */}
         {filteredServices.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-16 text-center animate-fade-in-up">
-            <Search className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-900 font-bold text-lg">Aucun service trouvé</p>
-            <p className="text-slate-500 mt-2">Essayez de modifier vos critères de recherche</p>
+          <div className="bg-slate-900 rounded-3xl shadow-lg border border-slate-800 p-16 text-center animate-fade-in-up">
+            <Search className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+            <p className="text-white font-bold text-lg">Aucun service trouvé</p>
+            <p className="text-slate-400 mt-2">Essayez de modifier vos critères de recherche</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredServices.map((service, index) => (
-              <div key={service.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-2xl hover:-translate-y-2 hover:border-indigo-200 transition-all duration-300 group flex flex-col animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
-                <div className="relative aspect-square overflow-hidden bg-slate-100">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 group-hover:opacity-0 transition-opacity duration-500"></div>
+              <div key={service.id} className="bg-slate-900 rounded-2xl shadow-lg border border-slate-800 overflow-hidden hover:shadow-2xl hover:-translate-y-2 hover:border-indigo-500/50 transition-all duration-300 group flex flex-col animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
+                <div className="relative aspect-square overflow-hidden bg-slate-800">
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 group-hover:opacity-0 transition-opacity duration-500"></div>
                   {service.profiles.avatar_url ? (
                     <img src={service.profiles.avatar_url} alt={service.profiles.full_name} className="w-full h-full object-cover object-center relative z-10 transition-transform duration-700 group-hover:scale-110" />
                   ) : (
@@ -380,28 +380,33 @@ export default function MarketplacePage() {
                   )}
 
                   {!service.profiles.is_available && (
-                    <div className="absolute top-3 left-3 bg-slate-800/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg z-30 border border-white/20">
+                    <div className="absolute top-3 left-3 bg-slate-800/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg z-30 border border-slate-600">
                       <Pause className="w-3.5 h-3.5" /> Indisponible
                     </div>
                   )}
+                  {service.profiles.is_available && (
+                    <div className="absolute top-3 left-3 bg-emerald-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg z-30 border border-white/20">
+                      Disponible
+                    </div>
+                  )}
                   
-                  <button onClick={() => toggleFavorite(service.id)} className="absolute bottom-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl z-30 group/btn">
+                  <button onClick={() => toggleFavorite(service.id)} className="absolute bottom-3 right-3 w-10 h-10 bg-slate-900/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-slate-800 shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl z-30 group/btn border border-slate-700">
                     <Heart className={`w-5 h-5 transition-all duration-300 ${favorites.includes(service.id) ? 'fill-red-500 text-red-500 scale-110' : 'text-slate-400 group-hover/btn:text-red-400'}`} />
                   </button>
                 </div>
                 
                 <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-start gap-2 mb-3">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0 mt-0.5">
-                      {(() => { const Icon = getIconForCategory(service.category); return <Icon className="w-4 h-4 text-indigo-600" /> })()}
+                    <div className="w-8 h-8 rounded-lg bg-indigo-900/30 flex items-center justify-center shrink-0 mt-0.5">
+                      {(() => { const Icon = getIconForCategory(service.category); return <Icon className="w-4 h-4 text-indigo-400" /> })()}
                     </div>
-                    <h3 className="font-bold text-slate-900 text-base leading-tight line-clamp-2 flex-1 group-hover:text-indigo-600 transition-colors">{service.title}</h3>
+                    <h3 className="font-bold text-white text-base leading-tight line-clamp-2 flex-1 group-hover:text-indigo-400 transition-colors">{service.title}</h3>
                   </div>
                   
-                  <p className="text-sm text-slate-500 mb-4 line-clamp-2 leading-relaxed">{service.description}</p>
+                  <p className="text-sm text-slate-400 mb-4 line-clamp-2 leading-relaxed">{service.description}</p>
                   
-                  <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded-xl border border-slate-100 group-hover:border-indigo-100 group-hover:bg-indigo-50/30 transition-all duration-300">
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-md overflow-hidden ring-2 ring-white">
+                  <div className="flex items-center gap-3 mb-4 p-3 bg-slate-800/50 rounded-xl border border-slate-700 group-hover:border-indigo-500/30 transition-all duration-300">
+                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-md overflow-hidden ring-2 ring-slate-700">
                       {service.profiles.avatar_url ? (
                         <img src={service.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -410,24 +415,24 @@ export default function MarketplacePage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="text-sm font-bold text-slate-900 truncate">{service.profiles.full_name}</span>
+                        <span className="text-sm font-bold text-white truncate">{service.profiles.full_name}</span>
                         <PlanBadge plan={service.profiles.plan} />
                       </div>
-                      {service.profiles.specialty && <span className="text-xs text-slate-500 truncate block">{service.profiles.specialty}</span>}
+                      {service.profiles.specialty && <span className="text-xs text-slate-400 truncate block">{service.profiles.specialty}</span>}
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-between mb-4">
                     {service.profiles.rating > 0 && (
-                      <div className="flex items-center gap-1.5 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-100">
-                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                        <span className="font-bold text-slate-900 text-sm">{service.profiles.rating.toFixed(1)}</span>
-                        {service.profiles.total_reviews > 0 && <span className="text-xs text-slate-500">({service.profiles.total_reviews})</span>}
+                      <div className="flex items-center gap-1.5 bg-amber-900/30 px-2.5 py-1.5 rounded-lg border border-amber-700/50">
+                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                        <span className="font-bold text-white text-sm">{service.profiles.rating.toFixed(1)}</span>
+                        {service.profiles.total_reviews > 0 && <span className="text-xs text-slate-400">({service.profiles.total_reviews})</span>}
                       </div>
                     )}
                     {service.city && (
-                      <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-2.5 py-1.5 rounded-lg">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                      <div className="flex items-center gap-1.5 text-xs text-slate-300 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                        <MapPin className="w-3.5 h-3.5 text-slate-500" />
                         <span className="font-medium">{service.city}</span>
                       </div>
                     )}
@@ -435,25 +440,25 @@ export default function MarketplacePage() {
                   
                   <div className="mt-auto space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-3 rounded-xl border border-indigo-100 relative overflow-hidden">
-                        <span className="text-[10px] text-slate-500 font-semibold block uppercase tracking-wider mb-0.5 relative z-10">Prix estimé</span>
-                        <span className="text-lg font-black text-indigo-600 relative z-10">{service.price}</span>
+                      <div className="flex-1 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 px-4 py-3 rounded-xl border border-indigo-500/30 relative overflow-hidden">
+                        <span className="text-[10px] text-slate-400 font-semibold block uppercase tracking-wider mb-0.5 relative z-10">Prix estimé</span>
+                        <span className="text-lg font-black text-indigo-400 relative z-10">{service.price}</span>
                       </div>
                       
+                      {/* ✅ BOUTON CONTACTER TOUJOURS EN VERT VIF */}
                       {service.profiles.is_available ? (
-                        <button onClick={() => contactWhatsApp(service)} className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group/btn">
+                        <button onClick={() => contactWhatsApp(service)} className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/50 hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group/btn">
                           <MessageCircle className="w-4 h-4 relative z-10" />
                           <span className="relative z-10">Contacter</span>
                         </button>
                       ) : (
-                        <div className="flex-1 py-3 bg-slate-100 text-slate-400 rounded-xl font-bold text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-slate-200">
+                        <div className="flex-1 py-3 bg-slate-800 text-slate-500 rounded-xl font-bold text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-slate-700">
                           <Pause className="w-4 h-4" /> Indisponible
                         </div>
                       )}
                     </div>
                     
-                    {/* ✅ CORRECTION ICI : Utilisation de service.pro_id au lieu de service.profiles.id */}
-                    <Link href={`/pro/${service.pro_id}`} className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-indigo-600 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border border-slate-200 hover:border-indigo-200 group/link">
+                    <Link href={`/pro/${service.pro_id}`} className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border border-slate-700 hover:border-indigo-500/50 group/link">
                       <span>Voir le profil complet</span>
                       <ExternalLink className="w-4 h-4 group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
                     </Link>
@@ -465,20 +470,20 @@ export default function MarketplacePage() {
         )}
       </main>
 
-      {/* FOOTER */}
-      <footer className="bg-white border-t border-slate-200 mt-16 relative z-10">
+      {/* FOOTER (Thème sombre) */}
+      <footer className="bg-slate-900 border-t border-slate-800 mt-16 relative z-10">
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
               <Logo className="w-8 h-8" />
-              <span className="font-black text-lg text-slate-900">JOB<span className="text-indigo-600">CONNECT</span></span>
+              <span className="font-black text-lg text-white">JOB<span className="text-indigo-400">CONNECT</span></span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-slate-500 font-medium">
-              <a href="/terms" className="hover:text-indigo-600 transition-colors">Conditions d'utilisation</a>
-              <a href="/privacy" className="hover:text-indigo-600 transition-colors">Confidentialité</a>
-              <a href="/contact" className="hover:text-indigo-600 transition-colors">Support</a>
+            <div className="flex items-center gap-6 text-sm text-slate-400 font-medium">
+              <a href="/terms" className="hover:text-indigo-400 transition-colors">Conditions d'utilisation</a>
+              <a href="/privacy" className="hover:text-indigo-400 transition-colors">Confidentialité</a>
+              <a href="/contact" className="hover:text-indigo-400 transition-colors">Support</a>
             </div>
-            <p className="text-sm text-slate-400">© {new Date().getFullYear()} JobConnect Togo.</p>
+            <p className="text-sm text-slate-500">© {new Date().getFullYear()} JobConnect Togo.</p>
           </div>
         </div>
       </footer>

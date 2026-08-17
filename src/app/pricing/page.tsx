@@ -1,111 +1,212 @@
 // @ts-nocheck
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 import { 
-  ArrowLeft, CheckCircle2, Star, Crown, Award, Zap, 
-  Building2, Info, Shield, ShieldCheck, Clock, TrendingUp,
-  Eye, Search, Home as HomeIcon, MessageSquare
+  Check, Zap, TrendingUp, Crown, ShieldCheck, Info, 
+  ArrowRight, Loader2, CreditCard, Star, Building2 
 } from 'lucide-react'
 
 export default function PricingPage() {
-  const [billingCycle, setBillingCycle] = useState<'semester' | 'annual'>('semester')
+  const router = useRouter()
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly')
+  const [currentPlan, setCurrentPlan] = useState<string>('gratuit')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null)
 
-  // ✅ PRIX CALCULÉS : Semestriel = base, Annuel = -17%
+  // 1. Récupérer le statut de l'utilisateur au chargement
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        setIsLoggedIn(true)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('plan')
+          .eq('id', session.user.id)
+          .single()
+        
+        if (profile) {
+          setCurrentPlan(profile.plan?.toLowerCase() || 'gratuit')
+        }
+      }
+      setLoading(false)
+    }
+    checkUser()
+  }, [])
+
+  // 2. Données des plans (Prix annuels = Prix mensuel * 12 * 0.90)
   const plans = [
     {
-      name: "Starter",
-      semesterPrice: 30000,
-      annualPrice: 50000, // 30000 × 2 × 0.83 = 49 800 → arrondi
-      icon: Zap,
-      color: "from-emerald-500 to-green-600",
-      borderColor: "border-emerald-200 dark:border-emerald-800",
-      btnColor: "bg-emerald-600 hover:bg-emerald-700",
-      description: "Pour les indépendants qui veulent être remarqués localement.",
+      name: 'Gratuit',
+      monthlyPrice: 0,
+      annualPrice: 0,
+      description: "L'essentiel pour démarrer sans barrière financière.",
       features: [
-        { text: "Visibilité accrue dans les résultats de recherche", icon: Eye },
-        { text: "Positionnement au milieu des résultats", icon: TrendingUp },
-        { text: "Mise en avant dans votre ville", icon: Search },
-        { text: "Support par email prioritaire", icon: MessageSquare },
-      ]
+        'Profil professionnel complet',
+        'Publication de services illimitée',
+        'Présence sur la marketplace',
+        'Recherches et classement standards',
+        'Réception de demandes et avis clients'
+      ],
+      highlight: false,
+      color: 'border-slate-200 dark:border-slate-700',
+      btnColor: 'bg-slate-600 hover:bg-slate-700'
     },
     {
-      name: "Business",
-      semesterPrice: 75000,
-      annualPrice: 125000, // 75000 × 2 × 0.83 = 124 500 → arrondi
-      icon: Award,
-      color: "from-blue-500 to-indigo-600",
-      borderColor: "border-blue-200 dark:border-blue-800",
-      btnColor: "bg-blue-600 hover:bg-blue-700",
-      description: "Pour les professionnels établis qui veulent développer leur chiffre d'affaires.",
+      name: 'Starter',
+      monthlyPrice: 2000,
+      annualPrice: 21600, // 24 000 - 10%
+      description: "L'accélérateur pour obtenir une première augmentation de visibilité.",
       features: [
-        { text: "Tout le plan Starter, plus :", icon: CheckCircle2 },
-        { text: "Haute visibilité (Top 5 des recherches)", icon: Eye },
-        { text: "Mise en avant dans les pages de catégories", icon: Search },
-        { text: "Statistiques avancées (vues, clics, conversions)", icon: TrendingUp },
-        { text: "Badge 'Pro Actif' sur votre profil", icon: Award },
-      ]
+        'Tous les avantages du plan Gratuit',
+        'Visibilité nettement supérieure',
+        'Mise en avant ciblée dans votre catégorie',
+        'Exposition renforcée sur pages stratégiques',
+        'Positionnement prioritaire dans les recherches'
+      ],
+      highlight: false,
+      color: 'border-emerald-200 dark:border-emerald-800',
+      btnColor: 'bg-emerald-600 hover:bg-emerald-700'
     },
     {
-      name: "Premium",
-      semesterPrice: 150000,
-      annualPrice: 250000, // 150000 × 2 × 0.83 = 249 000 → arrondi
-      icon: Crown,
-      color: "from-amber-500 to-orange-600",
-      borderColor: "border-amber-200 dark:border-amber-800",
-      btnColor: "bg-amber-600 hover:bg-amber-700",
-      highlight: true,
+      name: 'Business',
+      monthlyPrice: 3500,
+      annualPrice: 37800, // 42 000 - 10%
+      description: "Le plan recommandé pour les professionnels actifs qui veulent consolider leur activité.",
+      features: [
+        'Tous les avantages du plan Starter',
+        'Mise en avant supérieure et emplacements privilégiés',
+        'Positionnement dans le haut du classement (Top)',
+        'Visibilité renforcée sur les pages les plus consultées',
+        'Présence prioritaire dans la marketplace'
+      ],
+      highlight: true, // ✅ Plan recommandé
+      color: 'border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-900/10',
+      btnColor: 'bg-blue-600 hover:bg-blue-700'
+    },
+    {
+      name: 'Premium',
+      monthlyPrice: 7500,
+      annualPrice: 81000, // 90 000 - 10%
       description: "La visibilité maximale pour dominer votre marché local.",
       features: [
-        { text: "Tout le plan Business, plus :", icon: CheckCircle2 },
-        { text: "Visibilité MAXIMALE (Top 1 garanti dans votre zone)", icon: Eye },
-        { text: "Présence en page d'accueil (section 'À la une')", icon: HomeIcon },
-        { text: "Notification prioritaire pour les nouvelles demandes", icon: MessageSquare },
-        { text: "🎁 Participation automatique au programme partenaire Ideenwerk Technologies (-20% sur tous leurs traitements)", icon: Star },
-      ]
+        'Tous les avantages du plan Business',
+        'Visibilité maximale et mise en avant prioritaire absolue',
+        'Présence exclusive en page d\'accueil',
+        'Notifications prioritaires pour les nouvelles demandes',
+        '🎁 Accès au Programme Partenaire Ideenwerk (-20%)'
+      ],
+      highlight: false,
+      color: 'border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-900/10',
+      btnColor: 'bg-amber-600 hover:bg-amber-700'
     }
   ]
 
+  // 3. Fonction de formatage des prix
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR').format(price)
   }
 
+  // 4. Gestion du clic sur un plan (SÉCURISÉE)
+  const handleSubscribe = async (planName: string) => {
+    const planKey = planName.toLowerCase()
+    
+    if (!isLoggedIn) {
+      // Redirection vers l'inscription avec le plan pré-sélectionné
+      router.push(`/register?role=pro&plan=${planKey}`)
+      return
+    }
+
+    if (currentPlan === planKey) {
+      alert("Vous êtes déjà abonné à ce plan !")
+      return
+    }
+
+    // Si l'utilisateur veut passer au plan gratuit, on le redirige vers son dashboard
+    if (planKey === 'gratuit') {
+      router.push('/dashboard/pro')
+      return
+    }
+
+    setProcessingPlan(planKey)
+    try {
+      // 🚨 SÉCURITÉ : On n'envoie PAS le montant. On envoie le billingCycle.
+      // Le backend (/api/checkout) recalculera le montant de manière sécurisée.
+      const session = await supabase.auth.getSession()
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: session.data.session?.user.id,
+          planName: planName,
+          billingCycle: billingCycle, // ← C'EST LA CLÉ : le backend utilisera ceci pour appliquer les -10%
+          userEmail: session.data.session?.user.email
+        })
+      })
+      
+      const data = await res.json()
+      
+      if (data.success) {
+        window.location.href = data.checkoutUrl
+      } else {
+        alert('Erreur: ' + (data.message || 'Impossible de créer le paiement'))
+      }
+    } catch (error) {
+      console.error("Erreur de paiement:", error)
+      alert("Une erreur est survenue lors de l'initialisation du paiement.")
+    } finally {
+      setProcessingPlan(null)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div className="bg-linear-to-br from-indigo-600 to-purple-700 text-white py-16 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-20 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)] bg-[size:30px_30px]"></div>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <Link href="/" className="inline-flex items-center gap-2 text-indigo-100 hover:text-white transition-colors mb-6 group">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
             Retour à l'accueil
           </Link>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6">
             Investissez dans votre <span className="text-amber-300">visibilité</span>
           </h1>
-          <p className="text-lg text-indigo-100 max-w-2xl mx-auto">
-            Chez JobConnect, vous payez uniquement pour être vu par plus de clients. 
-            0% de commission sur vos prestations, services illimités sur tous les plans.
+          <p className="text-lg md:text-xl text-indigo-100 max-w-3xl mx-auto leading-relaxed">
+            Chez JobConnect, vous ne payez pas pour des fonctionnalités limitées. 
+            Tous les plans incluent des services illimités et <strong className="text-white">0% de commission</strong> sur vos prestations.
           </p>
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 -mt-8 relative z-20">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-8 relative z-20">
         
-        {/* Toggle Semestriel / Annuel */}
+        {/* Toggle Mensuel / Annuel */}
         <div className="flex justify-center mb-12">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-slate-700 inline-flex gap-1">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-slate-800 inline-flex gap-1">
             <button
-              onClick={() => setBillingCycle('semester')}
+              onClick={() => setBillingCycle('monthly')}
               className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 ${
-                billingCycle === 'semester' 
+                billingCycle === 'monthly' 
                   ? 'bg-indigo-600 text-white shadow-md' 
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              <Clock className="w-4 h-4" />
-              Semestriel (6 mois)
+              Facturation mensuelle
             </button>
             <button
               onClick={() => setBillingCycle('annual')}
@@ -115,237 +216,146 @@ export default function PricingPage() {
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              <Star className="w-4 h-4" />
-              Annuel
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                -17%
+              Facturation annuelle
+              <span className="absolute -top-2.5 -right-3 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+                -10%
               </span>
             </button>
           </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        {/* Grille des Tarifs */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {plans.map((plan, idx) => {
-            const Icon = plan.icon
-            const currentPrice = billingCycle === 'semester' ? plan.semesterPrice : plan.annualPrice
-            const period = billingCycle === 'semester' ? '/6 mois' : '/an'
-            const monthlyEquiv = Math.round(currentPrice / (billingCycle === 'semester' ? 6 : 12))
+            const currentPrice = billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice
+            const period = billingCycle === 'monthly' ? '/mois' : '/an'
+            const monthlyEquiv = billingCycle === 'annual' && plan.monthlyPrice > 0 ? Math.round(currentPrice / 12) : plan.monthlyPrice
+            const savings = plan.monthlyPrice > 0 ? (plan.monthlyPrice * 12) - plan.annualPrice : 0
             
+            const isCurrent = currentPlan === plan.name.toLowerCase()
+
             return (
               <div 
                 key={idx} 
                 className={`relative flex flex-col p-6 rounded-3xl border-2 transition-all duration-300 ${
                   plan.highlight 
-                    ? 'bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-400 dark:border-amber-600 shadow-2xl shadow-amber-200/50 dark:shadow-amber-900/30 scale-105 z-10' 
-                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-xl'
-                }`}
+                    ? 'border-blue-500 dark:border-blue-400 shadow-2xl shadow-blue-500/20 scale-105 z-10' 
+                    : `${plan.color} hover:shadow-xl`
+                } bg-white dark:bg-slate-900`}
               >
                 {plan.highlight && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500 text-white shadow-lg flex items-center gap-1.5">
-                    <Crown className="w-3 h-3 fill-white" />
-                    Meilleure offre
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-blue-600 text-white shadow-lg flex items-center gap-1.5">
+                    <Star className="w-3 h-3 fill-white" />
+                    Recommandé
                   </div>
                 )}
                 
                 <div className="mb-6">
-                  <div className={`w-14 h-14 rounded-2xl bg-linear-to-br ${plan.color} flex items-center justify-center mb-4 shadow-lg`}>
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className={`text-2xl font-black mb-2 ${plan.highlight ? 'text-slate-900 dark:text-white' : 'text-slate-900 dark:text-white'}`}>
+                  <h3 className={`text-2xl font-black mb-2 ${plan.highlight ? 'text-blue-600 dark:text-blue-400' : 'text-slate-900 dark:text-white'}`}>
                     {plan.name}
                   </h3>
-                  <p className={`text-sm mb-4 ${plan.highlight ? 'text-slate-600 dark:text-slate-300' : 'text-slate-500 dark:text-slate-400'}`}>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 min-h-[40px]">
                     {plan.description}
                   </p>
                   
                   <div className="flex items-baseline gap-1 mb-1">
-                    <span className={`text-4xl font-black ${plan.highlight ? 'text-amber-600 dark:text-amber-400' : 'text-slate-900 dark:text-white'}`}>
+                    <span className={`text-4xl font-black ${plan.highlight ? 'text-blue-600 dark:text-blue-400' : 'text-slate-900 dark:text-white'}`}>
                       {formatPrice(currentPrice)}
                     </span>
                     <span className="text-sm text-slate-500 dark:text-slate-400">FCFA{period}</span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    ≈ {formatPrice(monthlyEquiv)} FCFA/mois
-                  </p>
                   
-                  {billingCycle === 'annual' && (
-                    <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-md text-xs font-bold">
+                  {billingCycle === 'annual' && plan.monthlyPrice > 0 && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                      Soit ~{formatPrice(monthlyEquiv)} FCFA/mois
+                    </p>
+                  )}
+
+                  {billingCycle === 'annual' && savings > 0 && (
+                    <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-md text-xs font-bold">
                       <TrendingUp className="w-3 h-3" />
-                      Économisez {formatPrice((plan.semesterPrice * 2) - plan.annualPrice)} FCFA/an
+                      Économisez {formatPrice(savings)} FCFA/an
                     </div>
                   )}
                 </div>
 
                 <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((feature, fIdx) => {
-                    const FeatureIcon = feature.icon
-                    return (
-                      <li key={fIdx} className="flex items-start gap-2.5 text-sm">
-                        <FeatureIcon className={`w-4 h-4 shrink-0 mt-0.5 ${plan.highlight ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-500'}`} />
-                        <span className={`${plan.highlight ? 'text-slate-700 dark:text-slate-200' : 'text-slate-600 dark:text-slate-400'}`}>
-                          {feature.text}
-                        </span>
-                      </li>
-                    )
-                  })}
+                  {plan.features.map((feature, fIdx) => (
+                    <li key={fIdx} className="flex items-start gap-2.5 text-sm">
+                      <Check className={`w-4 h-4 shrink-0 mt-0.5 ${plan.highlight ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-500'}`} />
+                      <span className="text-slate-600 dark:text-slate-300">{feature}</span>
+                    </li>
+                  ))}
                 </ul>
 
-                <Link 
-                  href="/register?role=pro"
-                  className={`block text-center py-3.5 rounded-xl font-bold text-sm transition-all ${
-                    plan.highlight 
-                      ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl' 
-                      : 'bg-slate-900 dark:bg-white dark:text-slate-900 text-white hover:bg-slate-800 dark:hover:bg-slate-100'
+                <button 
+                  onClick={() => handleSubscribe(plan.name)}
+                  disabled={isCurrent || processingPlan === plan.name.toLowerCase()}
+                  className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${
+                    isCurrent 
+                      ? 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-default' 
+                      : `${plan.btnColor} text-white shadow-md hover:shadow-lg`
                   }`}
                 >
-                  Choisir {plan.name}
-                </Link>
+                  {isCurrent ? (
+                    <>
+                      <ShieldCheck className="w-4 h-4" /> Plan Actuel
+                    </>
+                  ) : processingPlan === plan.name.toLowerCase() ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      {plan.name === 'Gratuit' ? 'S\'inscrire' : 'Mettre à jour'} <CreditCard className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
               </div>
             )
           })}
         </div>
 
-        {/* Section Vérification */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-blue-200 dark:border-blue-800 p-8 md:p-12 mb-16 shadow-lg">
-          <div className="flex flex-col md:flex-row gap-8 items-start">
-            <div className="w-full md:w-1/3">
-              <div className="w-20 h-20 bg-linear-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4">
-                <ShieldCheck className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">
-                Vérification de profil
-              </h3>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-black text-blue-600 dark:text-blue-400">5 000</span>
-                <span className="text-sm text-slate-500 dark:text-slate-400">FCFA/an</span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Frais uniques annuels</p>
-            </div>
-            
-            <div className="flex-1 space-y-4">
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                <strong className="text-slate-900 dark:text-white">Disponible pour tous les professionnels</strong>, 
-                qu'ils soient sur le plan Gratuit ou un forfait payant. La vérification est indépendante de votre abonnement de visibilité.
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-3">
-                {[
-                  { icon: Shield, text: "Badge bleu 'Vérifié' sur votre profil" },
-                  { icon: TrendingUp, text: "Priorité dans les résultats de recherche" },
-                  { icon: CheckCircle2, text: "Confiance accrue des clients (3x plus de contacts)" },
-                  { icon: Clock, text: "Validité du badge : 1 an renouvelable" },
-                ].map((item, i) => {
-                  const ItemIcon = item.icon
-                  return (
-                    <div key={i} className="flex items-start gap-2.5 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl">
-                      <ItemIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                      <span className="text-sm text-slate-700 dark:text-slate-300">{item.text}</span>
-                    </div>
-                  )
-                })}
-              </div>
-
-              <div className="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800">
-                <h4 className="font-bold text-amber-900 dark:text-amber-300 mb-2 flex items-center gap-2">
-                  <Info className="w-4 h-4" />
-                  Processus de vérification
-                </h4>
-                <ol className="text-sm text-amber-800 dark:text-amber-200 space-y-1.5 list-decimal list-inside">
-                  <li>Paiement des frais de vérification (5 000 FCFA)</li>
-                  <li>Soumission des documents requis (CNI, casier judiciaire, justificatif de qualification)</li>
-                  <li>Examen par notre équipe sous 24-48h ouvrées</li>
-                  <li>Attribution automatique du badge "Vérifié" si documents valides</li>
-                </ol>
-              </div>
-
-              <Link 
-                href="/verification"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-md"
-              >
-                <ShieldCheck className="w-5 h-5" />
-                Lancer ma vérification
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Partenariat Ideenwerk */}
-        <div className="bg-linear-to-r from-slate-900 to-slate-800 rounded-3xl p-8 md:p-12 mb-16 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl"></div>
+        {/* Section Partenaire Ideenwerk */}
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-black dark:to-slate-900 rounded-3xl p-8 md:p-12 mb-16 text-white relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-            <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
+            <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
               <Building2 className="w-10 h-10 text-amber-400" />
             </div>
             <div className="flex-1 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-xs font-black uppercase tracking-wider mb-3">
                 <Star className="w-3 h-3 fill-amber-300" />
-                Avantage exclusif Premium
+                Exclusivité Premium
               </div>
               <h2 className="text-2xl md:text-3xl font-black mb-3">
                 Programme Partenaire Ideenwerk Technologies
               </h2>
-              <p className="text-slate-300 leading-relaxed max-w-2xl">
+              <p className="text-slate-300 leading-relaxed max-w-3xl">
                 En souscrivant au plan <strong className="text-white">Premium</strong>, vous devenez automatiquement 
-                membre du programme partenaire <strong className="text-amber-300">Ideenwerk Technologies</strong>. 
-                Bénéficiez d'une <strong className="text-white">réduction de 20%</strong> sur l'ensemble de leurs 
-                prestations et traitements technologiques.
+                membre du programme partenaire. Bénéficiez d'une <strong className="text-amber-300">réduction de 20%</strong> sur l'ensemble des prestations numériques éligibles d'Ideenwerk Technologies (création de site web, application mobile, logiciel personnalisé, etc.).
               </p>
+              <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/10 inline-block">
+                <p className="text-sm text-slate-300">
+                  <span className="text-white font-bold">Exemple :</span> Un projet à 500 000 FCFA vous revient à 
+                  <span className="text-amber-300 font-black text-lg ml-2">400 000 FCFA</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Transparence */}
-        <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-6 mb-8 flex items-start gap-4">
-          <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-          <div>
-            <h3 className="font-bold text-blue-900 dark:text-blue-300 mb-2">Notre engagement de transparence</h3>
-            <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1.5 list-disc list-inside">
-              <li><strong>0% de commission :</strong> Vous gardez 100% de vos gains. Le client vous paie directement.</li>
-              <li><strong>Services illimités :</strong> Publiez autant de services que vous le souhaitez, sur tous les plans.</li>
-              <li><strong>Visibilité uniquement :</strong> Votre abonnement influence uniquement votre position dans les résultats de recherche.</li>
-              <li><strong>Vérification indépendante :</strong> Le badge "Vérifié" est un processus séparé, accessible à tous les professionnels.</li>
-              <li><strong>Sans engagement :</strong> Vous pouvez changer ou annuler votre forfait à tout moment.</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* FAQ */}
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6 text-center">Questions fréquentes</h2>
-          <div className="space-y-4">
-            {[
-              {
-                q: "Que se passe-t-il à la fin de ma période semestrielle ou annuelle ?",
-                a: "Votre abonnement se renouvelle automatiquement sauf si vous l'annulez avant la date d'échéance. Vous recevrez un rappel 7 jours avant."
-              },
-              {
-                q: "Puis-je passer d'un plan à un autre en cours de période ?",
-                a: "Oui, vous pouvez upgrader à tout moment. La différence sera calculée au prorata. Pour un downgrade, il prendra effet à la prochaine échéance."
-              },
-              {
-                q: "Le badge 'Vérifié' est-il inclus dans les forfaits payants ?",
-                a: "Non. La vérification est un processus indépendant (5 000 FCFA/an) accessible à tous les professionnels, qu'ils soient sur le plan Gratuit ou un forfait payant."
-              },
-              {
-                q: "Comment fonctionne la réduction de 20% chez Ideenwerk Technologies ?",
-                a: "Une fois abonné au plan Premium, vous recevez un code partenaire unique par email. Présentez-le lors de votre rendez-vous chez Ideenwerk pour bénéficier immédiatement de la réduction."
-              },
-              {
-                q: "Quels documents sont nécessaires pour la vérification ?",
-                a: "Pièce d'identité valide (CNI ou passeport), casier judiciaire vierge (moins de 3 mois), et justificatif de qualification (diplôme, attestation d'expérience, etc.)."
-              }
-            ].map((faq, idx) => (
-              <div key={idx} className="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-start gap-2">
-                  <span className="text-indigo-600 dark:text-indigo-400 font-black">Q:</span> 
-                  {faq.q}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 pl-6">
-                  <span className="text-indigo-600 dark:text-indigo-400 font-bold">R:</span> {faq.a}
-                </p>
-              </div>
-            ))}
+        {/* Section Transparence & FAQ Rapide */}
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="bg-blue-50 dark:bg-blue-950/30 border-2 border-blue-200 dark:border-blue-800 rounded-2xl p-6 md:p-8 flex items-start gap-4">
+            <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 shrink-0 mt-1" />
+            <div>
+              <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-3 text-lg">Notre engagement de transparence</h3>
+              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-2 list-disc list-inside">
+                <li><strong className="text-blue-950 dark:text-blue-50">0% de commission :</strong> Vous gardez 100% de vos gains. Le client vous paie directement.</li>
+                <li><strong className="text-blue-950 dark:text-blue-50">Services illimités :</strong> Publiez autant de services que vous le souhaitez, sur tous les plans.</li>
+                <li><strong className="text-blue-950 dark:text-blue-50">Visibilité uniquement :</strong> Votre abonnement influence uniquement votre position dans les résultats de recherche.</li>
+                <li><strong className="text-blue-950 dark:text-blue-50">Vérification indépendante :</strong> Le badge "Pro Vérifié" est un processus de contrôle d'identité séparé (5 000 FCFA/an), accessible à tous les professionnels, quel que soit leur forfait.</li>
+              </ul>
+            </div>
           </div>
         </div>
 

@@ -18,7 +18,7 @@ import {
   Lock
 } from 'lucide-react'
 
-// Icônes SVG inline pour les réseaux sociaux
+// Icônes SVG inline pour les réseaux sociaux (UNIQUEMENT FB, IG, X)
 const FacebookIcon = ({ className }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -37,22 +37,12 @@ const InstagramIcon = ({ className }) => (
   </svg>
 )
 
-const LinkedinIcon = ({ className }) => (
-  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-  </svg>
-)
-
-const YoutubeIcon = ({ className }) => (
-  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-  </svg>
-)
-
 export default function Footer() {
   const pathname = usePathname()
   const { lang, setLang, t } = useLanguage()
 
+  // Le footer ne s'affiche que sur la landing page grâce à ConditionalFooter, 
+  // mais on garde cette sécurité au cas où.
   if (pathname === '/login' || pathname === '/register') {
     return null
   }
@@ -61,73 +51,87 @@ export default function Footer() {
 
   const footerSections = [
     {
-      title: t('footer.company'),
+      title: t('footer.company') || 'Entreprise',
       icon: Building2,
       links: [
-        { label: t('footer.about'), href: "/about" },
-        { label: t('footer.company_page'), href: "/company" },
-        { label: t('footer.careers'), href: "/careers" },
-        { label: t('footer.contact'), href: "/contact" },
-        { label: t('footer.press'), href: "/press" },
-        { label: t('footer.partner'), href: "/partners" },
+        { label: t('footer.about') || 'À propos', href: "/about" },
+        { label: t('footer.company_page') || 'Notre Entreprise', href: "/company" },
+        { label: t('footer.careers') || 'Carrières', href: "/careers" },
+        { label: t('footer.contact') || 'Contact', href: "/contact" },
+        { label: t('footer.press') || 'Presse', href: "/press" },
+        { label: t('footer.partner') || 'Devenir Partenaire', href: "/partners" },
       ]
     },
     {
-      title: t('footer.legal'),
+      title: t('footer.legal') || 'Légal',
       icon: Shield,
       links: [
-        { label: t('footer.privacy'), href: "/privacy" },
-        { label: t('footer.terms'), href: "/terms" },
-        { label: t('footer.legal_notice'), href: "/legal" },
-        { label: t('footer.cookies'), href: "/cookies" },
-        { label: t('footer.refund'), href: "/refund" },
+        { label: t('footer.privacy') || 'Confidentialité', href: "/privacy" },
+        { label: t('footer.terms') || 'Conditions', href: "/terms" },
+        { label: t('footer.legal_notice') || 'Mentions légales', href: "/legal" },
+        { label: t('footer.cookies') || 'Cookies', href: "/cookies" },
+        { label: t('footer.refund') || 'Remboursement', href: "/refund" },
       ]
     },
     {
-      title: t('footer.security'),
+      title: t('footer.security') || 'Sécurité',
       icon: Shield,
       links: [
-        { label: t('footer.security_center'), href: "/security" },
-        { label: t('footer.report'), href: "/report" },
-        { label: t('footer.verification'), href: "/verification" },
-        { label: t('footer.data_protection'), href: "/data-protection" },
+        { label: t('footer.security_center') || 'Centre de sécurité', href: "/security" },
+        { label: t('footer.report') || 'Signaler', href: "/report" },
+        { label: t('footer.verification') || 'Vérification', href: "/verification" },
+        { label: t('footer.data_protection') || 'Protection des données', href: "/data-protection" },
       ]
     },
     {
-      title: t('footer.pros'),
+      title: t('footer.pros') || 'Professionnels',
       icon: Briefcase,
       links: [
-        { label: t('footer.pricing'), href: "/pricing" },
-        { label: t('footer.how_it_works_pro'), href: "/pro/how-it-works" },
-        { label: t('footer.resources'), href: "/pro/resources" },
+        { label: t('footer.pricing') || 'Tarifs', href: "/pricing" },
+        { label: t('footer.how_it_works_pro') || 'Comment ça marche (Pro)', href: "/pro/how-it-works" },
+        { label: t('footer.resources') || 'Ressources', href: "/pro/resources" },
       ]
     },
     {
-      title: t('footer.clients'),
+      title: t('footer.clients') || 'Clients',
       icon: User,
       links: [
-        { label: t('footer.find_pro'), href: "/marketplace" },
-        { label: t('footer.how_it_works_client'), href: "/client/how-it-works" },
-        { label: t('footer.categories'), href: "/categories" },
-        { label: t('footer.client_protection'), href: "/client-protection" },
+        { label: t('footer.find_pro') || 'Trouver un pro', href: "/marketplace" },
+        { label: t('footer.how_it_works_client') || 'Comment ça marche (Client)', href: "/client/how-it-works" },
+        { label: t('footer.categories') || 'Catégories', href: "/categories" },
+        { label: t('footer.client_protection') || 'Protection client', href: "/client-protection" },
       ]
     },
     {
-      title: t('footer.help'),
+      title: t('footer.help') || 'Aide',
       icon: HelpCircle,
       links: [
-        { label: t('footer.faq'), href: "/faq" },
-        { label: t('footer.contact_us'), href: "/contact" },
+        { label: t('footer.faq') || 'FAQ', href: "/faq" },
+        { label: t('footer.contact_us') || 'Nous contacter', href: "/contact" },
       ]
     },
   ]
 
+  // ✅ RÉSEAUX SOCIAUX MIS À JOUR (Facebook, Instagram, X uniquement)
   const socialLinks = [
-    { name: "Facebook", icon: FacebookIcon, href: "#", color: "hover:text-blue-600" },
-    { name: "LinkedIn", icon: LinkedinIcon, href: "#", color: "hover:text-blue-700" },
-    { name: "Instagram", icon: InstagramIcon, href: "#", color: "hover:text-pink-600" },
-    { name: "X (Twitter)", icon: TwitterIcon, href: "#", color: "hover:text-slate-900" },
-    { name: "YouTube", icon: YoutubeIcon, href: "#", color: "hover:text-red-600" },
+    { 
+      name: "Facebook", 
+      icon: FacebookIcon, 
+      href: "https://www.facebook.com/profile.php?id=61593667670576", 
+      color: "hover:text-blue-600" 
+    },
+    { 
+      name: "Instagram", 
+      icon: InstagramIcon, 
+      href: "https://www.instagram.com/jobconnectafrica/", 
+      color: "hover:text-pink-600" 
+    },
+    { 
+      name: "X (Twitter)", 
+      icon: TwitterIcon, 
+      href: "https://x.com/JobConnectAfric", 
+      color: "hover:text-white" // Blanc pour être visible sur fond sombre
+    },
   ]
 
   return (
@@ -145,7 +149,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-slate-400 mb-6 leading-relaxed">
-              {t('footer.tagline')}
+              {t('footer.tagline') || "La marketplace N°1 au Togo pour connecter les professionnels qualifiés avec des clients exigeants."}
             </p>
             
             <div className="space-y-3">
@@ -167,21 +171,21 @@ export default function Footer() {
           </div>
 
           <div className="lg:col-span-4 lg:col-start-9">
-            <h3 className="text-white font-bold text-lg mb-4">{t('footer.stay_informed')}</h3>
+            <h3 className="text-white font-bold text-lg mb-4">{t('footer.stay_informed') || 'Restez informé'}</h3>
             <p className="text-slate-400 text-sm mb-4">
-              {t('footer.newsletter_desc')}
+              {t('footer.newsletter_desc') || 'Recevez nos actualités et offres exclusives directement dans votre boîte mail.'}
             </p>
             <form className="space-y-3">
               <input
                 type="email"
-                placeholder={t('footer.email_placeholder')}
+                placeholder={t('footer.email_placeholder') || 'Votre adresse email'}
                 className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500"
               />
               <button 
                 type="submit"
                 className="w-full py-3 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-300"
               >
-                {t('footer.subscribe')}
+                {t('footer.subscribe') || 'S\'abonner'}
               </button>
             </form>
           </div>
@@ -219,7 +223,7 @@ export default function Footer() {
         <div className="border-t border-slate-800 pt-8 mb-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-white font-semibold mb-3">{t('footer.follow_us')}</h3>
+              <h3 className="text-white font-semibold mb-3">{t('footer.follow_us') || 'Suivez-nous'}</h3>
               <div className="flex items-center gap-3">
                 {socialLinks.map((social, index) => {
                   const Icon = social.icon
@@ -240,7 +244,7 @@ export default function Footer() {
             </div>
 
             <div className="flex items-center gap-4">
-              {/* ✅ SÉLECTEUR DE LANGUE CORRIGÉ */}
+              {/* Sélecteur de langue */}
               <div className="flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg border border-slate-700">
                 <Globe className="w-4 h-4 text-indigo-400" />
                 <select 
@@ -254,7 +258,7 @@ export default function Footer() {
                 </select>
               </div>
               
-              {/* ✅ SÉLECTEUR DE PAYS CORRIGÉ */}
+              {/* Sélecteur de pays */}
               <div className="flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg border border-slate-700">
                 <span className="text-lg">🇹🇬</span>
                 <select 
@@ -273,10 +277,10 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-slate-800 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-            <p>© {currentYear} JobConnect Togo. {t('footer.rights_reserved')}</p>
+            <p>© {currentYear} JobConnect Togo. {t('footer.rights_reserved') || 'Tous droits réservés.'}</p>
             <div className="flex items-center gap-2">
               <Lock className="w-4 h-4" />
-              <span>{t('footer.data_protected')}</span>
+              <span>{t('footer.data_protected') || 'Vos données sont protégées et sécurisées.'}</span>
             </div>
           </div>
         </div>

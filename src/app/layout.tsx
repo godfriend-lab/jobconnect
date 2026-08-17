@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import Chatbot from "@/components/Chatbot"
-import Footer from "@/components/Footer"
-import { LanguageProvider } from "@/contexts/LanguageContext" // ← 1. IMPORT DU PROVIDER
+import ConditionalFooter from "@/components/ConditionalFooter" // ← MODIFICATION ICI
+import { LanguageProvider } from "@/contexts/LanguageContext"
 
 export const metadata: Metadata = {
   title: "JOBCONNECT - La Marketplace N°1 des Services au Togo",
@@ -31,14 +31,15 @@ export default function RootLayout({
       </head>
       <body className="antialiased font-sans flex flex-col min-h-screen">
         
-        {/* ← 2. ENVELOPPE TOUT LE CONTENU AVEC LE LANGUAGE PROVIDER */}
+        {/* ← ENVELOPPE TOUT LE CONTENU AVEC LE LANGUAGE PROVIDER */}
         <LanguageProvider>
           
           <main className="flex-grow">
             {children}
           </main>
           
-          <Footer />
+          {/* ← MODIFICATION ICI : Le footer ne s'affichera que si pathname === '/' */}
+          <ConditionalFooter />
           <Chatbot /> 
           
         </LanguageProvider>
