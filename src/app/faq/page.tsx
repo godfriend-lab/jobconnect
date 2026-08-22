@@ -17,8 +17,8 @@ export default function FAQPage() {
       icon: HelpCircle,
       questions: [
         {
-          q: "Qu'est-ce que JobConnect Togo ?",
-          a: "JobConnect est la première marketplace numérique au Togo qui met en relation directe les clients avec des professionnels qualifiés et vérifiés (artisans, prestataires de services, etc.) dans leur localité."
+          q: "Qu'est-ce que ProKorb Togo ?",
+          a: "ProKorb est la première marketplace numérique au Togo qui met en relation directe les clients avec des professionnels qualifiés et vérifiés (artisans, prestataires de services, etc.) dans leur localité."
         },
         {
           q: "L'inscription est-elle gratuite ?",
@@ -64,7 +64,7 @@ export default function FAQPage() {
       questions: [
         {
           q: "Comment se passe le paiement ?",
-          a: "JobConnect est une plateforme de mise en relation. Le paiement du service se fait directement entre vous et le professionnel (espèces, T-Money, Flooz) une fois le travail convenu ou terminé."
+          a: "ProKorb est une plateforme de mise en relation. Le paiement du service se fait directement entre vous et le professionnel (espèces, T-Money, Flooz) une fois le travail convenu ou terminé."
         },
         {
           q: "Que faire en cas de problème avec un professionnel ?",
@@ -92,7 +92,7 @@ export default function FAQPage() {
             </div>
             <div>
               <h1 className="text-3xl md:text-4xl font-black tracking-tight">Foire Aux Questions</h1>
-              <p className="text-indigo-200 mt-1">Tout ce que vous devez savoir sur JobConnect</p>
+              <p className="text-indigo-200 mt-1">Tout ce que vous devez savoir sur ProKorb</p>
             </div>
           </div>
         </div>

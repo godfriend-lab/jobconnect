@@ -6,20 +6,22 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { 
   Home, Crown, Award, Zap, CheckCircle, CheckCircle2, 
-  Loader2, CreditCard, Info, TrendingUp, Star, ExternalLink, ShieldCheck
+  Loader2, CreditCard, Info, TrendingUp, Star, ExternalLink, ShieldCheck, X
 } from 'lucide-react'
 
-export default function SubscriptionView({ profile, initiatePayment }: any) {
+import PaymentRedirect from '@/components/PaymentRedirect'
+
+export default function SubscriptionView({ profile }: any) {
   const router = useRouter()
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly')
-  const [uploading, setUploading] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [selectedPayment, setSelectedPayment] = useState<any>(null)
   
   const currentPlan = profile?.plan?.toLowerCase() || 'gratuit'
   const cardBg = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
   const textPrimary = "text-slate-900 dark:text-white"
   const textSecondary = "text-slate-600 dark:text-slate-400"
 
-  // ✅ MÊMES PRIX QUE pricing/page.tsx (synchronisation temps réel)
   const plans = [
     { 
       name: 'Gratuit', 
@@ -40,7 +42,7 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
     { 
       name: 'Starter', 
       monthlyPrice: 2000, 
-      annualPrice: 21600, // 24000 - 10%
+      annualPrice: 21600,
       description: "L'accélérateur pour obtenir une première augmentation de visibilité.",
       features: [
         'Tous les avantages du plan Gratuit',
@@ -56,7 +58,7 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
     { 
       name: 'Business', 
       monthlyPrice: 3500, 
-      annualPrice: 37800, // 42000 - 10%
+      annualPrice: 37800,
       description: "Le plan recommandé pour les professionnels actifs.",
       features: [
         'Tous les avantages du plan Starter',
@@ -73,7 +75,7 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
     { 
       name: 'Premium', 
       monthlyPrice: 7500, 
-      annualPrice: 81000, // 90000 - 10%
+      annualPrice: 81000,
       description: "La visibilité maximale pour dominer votre marché local.",
       features: [
         'Tous les avantages du plan Business',
@@ -90,8 +92,7 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
 
   const formatPrice = (price: number) => new Intl.NumberFormat('fr-FR').format(price)
 
-  // ✅ FONCTION DE PAIEMENT SÉCURISÉE
-  const handlePayment = async (planName: string, displayedAmount: number) => {
+  const handlePayment = (planName: string, displayedAmount: number) => {
     const planKey = planName.toLowerCase()
     
     if (currentPlan === planKey) {
@@ -99,36 +100,26 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
       return
     }
 
-    setUploading(true)
-    
-    try {
-      // 🚨 SÉCURITÉ : On n'envoie PAS le montant au backend. 
-      // On envoie uniquement le plan et le cycle. Le backend recalculera le montant de manière sécurisée.
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: profile.id,
-          planName: planName,
-          billingCycle: billingCycle, // ← C'EST LA CLÉ : le backend utilisera ceci pour appliquer les -10%
-          userEmail: profile.email
-        })
-      })
-      
-      const data = await res.json()
-      
-      if (data.success) {
-        // Redirection vers la page de paiement sécurisée (KKiaPay)
-        window.location.href = data.checkoutUrl
-      } else {
-        alert('Erreur: ' + (data.message || 'Impossible de créer le paiement'))
-      }
-    } catch (error) {
-      console.error("Erreur de paiement:", error)
-      alert('Erreur de connexion au serveur de paiement')
-    } finally {
-      setUploading(false)
+    if (!profile?.phone) {
+      alert("⚠️ Veuillez d'abord ajouter un numéro de téléphone dans votre profil avant de souscrire.")
+      router.push('/dashboard/pro?view=profile')
+      return
     }
+
+    setSelectedPayment({
+      amount: displayedAmount,
+      phone: profile.phone,
+      reason: `ProKorb - Abonnement ${planName} (${billingCycle === 'monthly' ? 'Mensuel' : 'Annuel'})`,
+      planName: planName
+    })
+    setShowPaymentModal(true)
+  }
+
+  const handlePaymentSuccess = (response: any) => {
+    console.log("✅ Paiement KKiaPay réussi :", response)
+    setShowPaymentModal(false)
+    alert("🎉 Paiement réussi ! Votre abonnement est en cours d'activation.")
+    window.location.reload()
   }
 
   const currentPlanData = plans.find(p => p.name.toLowerCase() === currentPlan) || plans[0]
@@ -137,7 +128,6 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className={`text-2xl font-bold ${textPrimary}`}>Mon Abonnement</h1>
@@ -159,7 +149,6 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
         </div>
       </div>
 
-      {/* Current Plan Card */}
       <div className={`${cardBg} rounded-2xl p-6 shadow-sm border-l-4 ${
         currentPlan === 'premium' ? 'border-l-amber-500' : 
         currentPlan === 'business' ? 'border-l-blue-500' : 
@@ -182,7 +171,7 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
             <p className={`text-sm ${textSecondary} mt-2`}>{currentPlanData.description}</p>
           </div>
           <div className="text-right">
-            <p className={`text-sm ${textSecondary}`}>Prochaine échéance</p>
+            <p className={`text-sm ${textSecondary}`}>Prochaine échéance estimée</p>
             <p className={`text-lg font-bold ${textPrimary}`}>
               {currentPlan === 'premium' ? '81 000 FCFA/an' : 
                currentPlan === 'business' ? '37 800 FCFA/an' : 
@@ -192,7 +181,6 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
         </div>
       </div>
 
-      {/* Billing Cycle Toggle */}
       <div className="flex justify-center">
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-1.5 shadow-md border border-slate-200 dark:border-slate-700 inline-flex gap-1">
           <button 
@@ -219,7 +207,6 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
         </div>
       </div>
 
-      {/* Pricing Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan: any, idx: number) => {
           const price = billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice
@@ -266,7 +253,7 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
               
               <button 
                 onClick={() => !plan.disabled && handlePayment(plan.name, price)} 
-                disabled={plan.disabled || uploading} 
+                disabled={plan.disabled} 
                 className={`w-full py-3 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm ${
                   plan.disabled ? 'bg-slate-400 cursor-not-allowed' : plan.btnColor
                 }`}
@@ -275,8 +262,6 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
                   <>
                     <ShieldCheck className="w-4 h-4" /> Plan Actif
                   </>
-                ) : uploading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
                     {plan.name === 'Gratuit' ? 'Passer au gratuit' : 'Mettre à jour'} <CreditCard className="w-4 h-4" />
@@ -288,7 +273,6 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
         })}
       </div>
 
-      {/* Programme Partenaire Ideenwerk (uniquement si pas Premium) */}
       {currentPlan !== 'premium' && (
         <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-black dark:to-slate-900 rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-lg">
           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl"></div>
@@ -310,7 +294,6 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
         </div>
       )}
       
-      {/* ✅ CARTE TRANSPARENCE (Contraste parfait) */}
       <div className="bg-blue-50 dark:bg-blue-950/40 border-2 border-blue-200 dark:border-blue-800 rounded-2xl p-6 flex items-start gap-4">
         <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
         <div>
@@ -334,6 +317,68 @@ export default function SubscriptionView({ profile, initiatePayment }: any) {
           </ul>
         </div>
       </div>
+
+      {showPaymentModal && selectedPayment && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowPaymentModal(false)}
+          />
+
+          <div className="relative bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 w-full max-w-md overflow-hidden animate-fade-in-up">
+            
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white flex justify-between items-start">
+              <div>
+                <h3 className="text-xl font-bold mb-1">Paiement Sécurisé</h3>
+                <p className="text-indigo-100 text-sm">Via KKiaPay - Mobile Money</p>
+              </div>
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-slate-400 text-sm">Forfait</span>
+                  <span className="text-white font-semibold">{selectedPayment.planName}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-slate-400 text-sm">Période</span>
+                  <span className="text-white font-semibold">
+                    {billingCycle === 'annual' ? 'Annuel' : 'Mensuel'}
+                  </span>
+                </div>
+                <div className="border-t border-slate-700 my-2"></div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm font-semibold">Total à payer</span>
+                  <span className="text-2xl font-black text-emerald-400">
+                    {formatPrice(selectedPayment.amount)} FCFA
+                  </span>
+                </div>
+              </div>
+
+              <PaymentRedirect 
+                amount={selectedPayment.amount}
+                phone={selectedPayment.phone}
+                reason={selectedPayment.reason}
+                userId={profile?.id}
+                planName={selectedPayment.planName}
+                billingCycle={billingCycle}
+                onSuccess={handlePaymentSuccess}
+              />
+
+              <p className="text-xs text-slate-500 text-center flex items-center justify-center gap-1">
+                <ShieldCheck className="w-3 h-3" />
+                Transaction chiffrée et sécurisée par KKiaPay
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

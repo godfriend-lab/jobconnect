@@ -19,12 +19,12 @@ export default function SettingsPage() {
   // État global des paramètres
   const [settings, setSettings] = useState({
     // Général
-    site_name: "JobConnect",
+    site_name: "ProKorb",
     site_tagline: "La marketplace des professionnels au Togo",
     site_description: "Plateforme de mise en relation entre professionnels qualifiés et clients",
-    site_url: "https://jobconnect.tg",
-    support_email: "support@jobconnect.tg",
-    contact_email: "contact@jobconnect.tg",
+    site_url: "https://ProKorb.tg",
+    support_email: "support@ProKorb.tg",
+    contact_email: "contact@ProKorb.tg",
     contact_phone: "+228 90 00 00 00",
     address: "Lomé, Togo",
     currency: "FCFA",
@@ -145,7 +145,7 @@ export default function SettingsPage() {
             .from("app_settings")
             .insert({ 
               id: 1, 
-              site_name: 'JobConnect', 
+              site_name: 'ProKorb', 
               site_tagline: 'La marketplace des professionnels au Togo',
               starter_price: 5000,
               business_price: 12000,
@@ -257,7 +257,7 @@ export default function SettingsPage() {
             <Settings2 className="w-8 h-8 text-indigo-600" />
             Paramètres
           </h1>
-          <p className="text-slate-600 mt-1">Configuration complète de la plateforme JobConnect</p>
+          <p className="text-slate-600 mt-1">Configuration complète de la plateforme ProKorb</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
@@ -630,7 +630,7 @@ export default function SettingsPage() {
                   <p className="font-semibold text-emerald-900">Business Model : 0% Commission</p>
                   <p className="text-sm text-emerald-700 mt-1">
                     Les clients paient directement les pros (T-Money, Flooz, espèces). 
-                    JobConnect génère des revenus uniquement via les abonnements et les boosts.
+                    ProKorb génère des revenus uniquement via les abonnements et les boosts.
                   </p>
                 </div>
               </div>
@@ -701,7 +701,7 @@ export default function SettingsPage() {
                 <div className="flex items-start gap-3 mb-4">
                   <Sparkles className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-bold text-indigo-900">Modèle de revenus JobConnect</h3>
+                    <h3 className="font-bold text-indigo-900">Modèle de revenus ProKorb</h3>
                     <p className="text-sm text-indigo-700 mt-1">
                       Nous ne prenons aucune commission sur les transactions entre clients et pros.
                     </p>

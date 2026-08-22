@@ -32,7 +32,7 @@ export default function ContactPage() {
               <ul className="space-y-4 text-sm">
                 <li>
                   <span className="block font-semibold text-slate-900 dark:text-white">Support Général</span>
-                  <a href="mailto:support@jobconnect.tg" className="text-indigo-600 hover:underline">support@jobconnect.tg</a>
+                  <a href="mailto:support@proKorb.tg" className="text-indigo-600 hover:underline">support@proKorb.tg</a>
                 </li>
                 <li>
                   <span className="block font-semibold text-slate-900 dark:text-white">Confidentialité & Données (DPO)</span>

@@ -15,7 +15,7 @@ export default function CareersPage() {
           </Link>
           <h1 className="text-4xl md:text-5xl font-black mb-4">Rejoignez l'avenir du travail au Togo</h1>
           <p className="text-xl text-indigo-100">
-            Chez Ideenwerk Technologies, nous construisons JobConnect avec une obsession : l'excellence technologique et la sécurité absolue.
+            Chez Ideenwerk Technologies, nous construisons ProKorb avec une obsession : l'excellence technologique et la sécurité absolue.
           </p>
         </div>
       </div>

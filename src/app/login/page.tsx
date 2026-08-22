@@ -5,10 +5,9 @@ import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { Logo } from '@/components/Logo'
 import { 
   Mail, Lock, Eye, EyeOff, ArrowRight, 
-  Briefcase, User, Loader2, AlertCircle, CheckCircle2 // ✅ CheckCircle2 ajouté ici
+  Briefcase, User, Loader2, AlertCircle, CheckCircle2
 } from 'lucide-react'
 
 // ✅ Composant interne qui utilise useSearchParams en toute sécurité
@@ -93,7 +92,7 @@ function LoginFormContent() {
       }, 300)
 
     } catch (err) {
-      console.error('❌ Erreur inattendue:', err)
+      console.error(' Erreur inattendue:', err)
       setError('Une erreur inattendue est survenue. Veuillez réessayer.')
     } finally {
       setLoading(false)
@@ -105,13 +104,20 @@ function LoginFormContent() {
       {/* HEADER */}
       <header className="py-6 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
+          
+          {/* ✅ TON VRAI LOGO ICI */}
           <Link href="/" className="flex items-center gap-3 group">
-            <Logo className="w-10 h-10 group-hover:scale-110 transition-transform" />
-            <span className="text-2xl font-black">
-              <span className="text-indigo-600">JOB</span>
-              <span className="text-slate-900">CONNECT</span>
+            <img 
+              src="/logo.png" 
+              alt="Logo ProKorb" 
+              className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            />
+            <span className="text-2xl font-black hidden sm:block">
+              <span className="text-indigo-600">PRO</span>
+              <span className="text-slate-900">KORB</span>
             </span>
           </Link>
+          
           <Link 
             href="/register" 
             className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition"
@@ -302,7 +308,7 @@ function LoginFormContent() {
       {/* FOOTER */}
       <footer className="py-6 px-4 text-center">
         <p className="text-sm text-slate-500">
-          © {new Date().getFullYear()} JOBCONNECT. Tous droits réservés.
+          © {new Date().getFullYear()} PROKORB. Tous droits réservés.
         </p>
       </footer>
     </div>

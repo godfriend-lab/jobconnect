@@ -85,7 +85,7 @@ export default function AIAssistantPage() {
     
     setTimeout(() => {
       const analysis = `🎯 1. ANALYSE GLOBALE
-La plateforme JobConnect compte actuellement ${context.totalUsers} utilisateurs dont ${context.totalProfessionals} professionnels actifs. ${context.totalOrders > 0 ? `Avec ${context.totalOrders} commandes traitées, JobConnect se positionne comme un acteur clé du marché togolais des services.` : 'La plateforme est en phase de lancement.'}
+La plateforme prokorb compte actuellement ${context.totalUsers} utilisateurs dont ${context.totalProfessionals} professionnels actifs. ${context.totalOrders > 0 ? `Avec ${context.totalOrders} commandes traitées, prokorb se positionne comme un acteur clé du marché togolais des services.` : 'La plateforme est en phase de lancement.'}
 
 ✅ 2. POINTS FORTS IDENTIFIÉS
 • ${context.newUsersToday} nouveau(x) utilisateur(s) aujourd'hui (croissance active)
@@ -118,7 +118,7 @@ ${context.pendingMessages > 0 ? '⚡ Automatiser les réponses FAQ pour réduire
 • Contribution à la formalisation du secteur informel togolais
 • Opportunité : Programme de formation pour jeunes entrepreneurs
 
-— JOBCONNECT AI, votre partenaire stratégique · ${new Date().toLocaleString('fr-FR')}`
+— PROKORB AI, votre partenaire stratégique · ${new Date().toLocaleString('fr-FR')}`
 
       setSummary(analysis)
       setGeneratingSummary(false)
@@ -144,12 +144,12 @@ ${context.pendingMessages > 0 ? '⚡ Automatiser les réponses FAQ pour réduire
 
     // ========== WEBINAIRES & CONFÉRENCES ==========
     if (q.includes("webinaire") || q.includes("conférence") || q.includes("événement") || q.includes("event")) {
-      return `🎬 **PLAN DE WEBINAIRE JOBCONNECT**
+      return `🎬 **PLAN DE WEBINAIRE PROKORB**
 
 📋 **Sujet suggéré** : "Les métiers qui recrutent au Togo en 2026"
 
 🗓️ **Structure (60 min)** :
-1. **Introduction (5 min)** - Bienvenue + présentation JobConnect
+1. **Introduction (5 min)** - Bienvenue + présentation prokorb
 2. **État du marché (15 min)** - Données : ${context.totalProfessionals} pros actifs, ${context.totalOrders} commandes traitées
 3. **Métiers porteurs (20 min)** - Plomberie, électricité, IT, services
 4. **Témoignages (10 min)** - Inviter 2 pros vérifiés
@@ -170,10 +170,10 @@ ${context.pendingMessages > 0 ? '⚡ Automatiser les réponses FAQ pour réduire
     }
 
     if (q.includes("script") || q.includes("slides") || q.includes("présentation")) {
-      return `📝 **SCRIPT DE PRÉSENTATION JOBCONNECT**
+      return `📝 **SCRIPT DE PRÉSENTATION PROKORB**
 
 **Slide 1 - Titre**
-"JobConnect : Connecter les talents togolais aux opportunités"
+"ProKorb : Connecter les talents togolais aux opportunités"
 Sous-titre : La première marketplace de services au Togo
 
 **Slide 2 - Le Problème**
@@ -182,7 +182,7 @@ Sous-titre : La première marketplace de services au Togo
 • Pas de système de paiement sécurisé pour les services
 
 **Slide 3 - Notre Solution**
-JobConnect = Plateforme qui connecte clients et pros vérifiés
+ProKorb = Plateforme qui connecte clients et pros vérifiés
 ✅ Pros vérifiés (pièces d'identité, diplômes)
 ✅ Paiement sécurisé Mobile Money
 ✅ Système de notation transparent
@@ -205,7 +205,7 @@ JobConnect = Plateforme qui connecte clients et pros vérifiés
 • 10 000 utilisateurs actifs
 • Expansion au Bénin et Ghana
 • Programme de formation pour 1000 jeunes
-• Label "Pro Vérifié JobConnect" reconnu nationalement
+• Label "Pro Vérifié ProKorb" reconnu nationalement
 
 **Slide 7 - Call to Action**
 "Rejoignez la révolution des services au Togo"
@@ -214,7 +214,7 @@ JobConnect = Plateforme qui connecte clients et pros vérifiés
 
     // ========== STRATÉGIE BUSINESS ==========
     if (q.includes("stratégie") || q.includes("croissance") || q.includes("expansion")) {
-      return `🚀 **STRATÉGIE DE CROISSANCE JOBCONNECT 2026**
+      return `🚀 **STRATÉGIE DE CROISSANCE PROKORB 2026**
 
 📊 **Situation actuelle** :
 • ${context.totalUsers} utilisateurs (${context.newUsersToday} aujourd'hui)
@@ -233,9 +233,9 @@ JobConnect = Plateforme qui connecte clients et pros vérifiés
 
 **PHASE 2 - Q4 2026 (Expansion nationale)**
 📍 Couvrir toutes les régions du Togo
-✅ Campagne nationale "JobConnect Togo"
+✅ Campagne nationale "ProKorb Togo"
 ✅ 5 événements locaux (ateliers pros)
-✅ Programme certification "Pro JobConnect"
+✅ Programme certification "Pro ProKorb"
 ✅ Intégration Wave, Moov Money, MTN
 
 **PHASE 3 - 2027 (International)**
@@ -252,7 +252,7 @@ JobConnect = Plateforme qui connecte clients et pros vérifiés
     }
 
     if (q.includes("marketing") || q.includes("campagne") || q.includes("publicité")) {
-      return `📢 **PLAN MARKETING JOBCONNECT - 3 MOIS**
+      return `📢 **PLAN MARKETING PROKORB - 3 MOIS**
 
 🎯 **Objectif** : +500 utilisateurs actifs
 
@@ -300,15 +300,15 @@ JobConnect = Plateforme qui connecte clients et pros vérifiés
 
     // ========== RSE & IMPACT SOCIAL ==========
     if (q.includes("rse") || q.includes("social") || q.includes("impact") || q.includes("bien-être") || q.includes("société")) {
-      return `🌍 **STRATÉGIE RSE JOBCONNECT - Impact Social & Environnemental**
+      return `🌍 **STRATÉGIE RSE PROKORB - Impact Social & Environnemental**
 
 💚 **NOTRE MISSION SOCIALE**
-JobConnect n'est pas qu'une entreprise, c'est un **moteur de transformation sociale** pour le Togo.
+ProKorb n'est pas qu'une entreprise, c'est un **moteur de transformation sociale** pour le Togo.
 
 🎯 **PILIER 1 - INCLUSION ÉCONOMIQUE**
 ✅ **Programme "Artisans Demain"**
 • Formation gratuite pour 500 jeunes artisans/an
-• Certification JobConnect reconnue
+• Certification ProKorb reconnue
 • Micro-crédits via partenaires bancaires
 • Objectif : 70% de femmes participantes
 
@@ -318,7 +318,7 @@ JobConnect n'est pas qu'une entreprise, c'est un **moteur de transformation soci
 • Stages rémunérés pour étudiants
 
 🎯 **PILIER 2 - ÉDUCATION & FORMATION**
-📚 **JobConnect Academy** (lancement Q1 2027)
+📚 **ProKorb Academy** (lancement Q1 2027)
 • Formation en ligne gratuite : métier + gestion + digital
 • 50 modules certifiants
 • Mentorat par des pros expérimentés
@@ -333,7 +333,7 @@ JobConnect n'est pas qu'une entreprise, c'est un **moteur de transformation soci
 
 🎯 **PILIER 4 - COMMUNAUTÉ**
 🤝 **Actions locales**
-• 1 journée bénévolat/mois (équipe JobConnect)
+• 1 journée bénévolat/mois (équipe ProKorb)
 • Sponsoring d'événements communautaires
 • Don de 1% du CA à des associations
 • Programme "Un pro, un quartier"
@@ -352,11 +352,11 @@ JobConnect n'est pas qu'une entreprise, c'est un **moteur de transformation soci
 4. Chercher des partenaires (ONU Femmes, GIZ, PNUD)
 5. Publier un rapport d'impact annuel
 
-*JobConnect : Plus qu'une plateforme, un mouvement pour un Togo meilleur* 🇹🇬`
+*ProKorb : Plus qu'une plateforme, un mouvement pour un Togo meilleur* 🇹🇬`
     }
 
     if (q.includes("formation") || q.includes("académie") || q.includes("academy")) {
-      return `🎓 **JOBCONNECT ACADEMY - Programme de Formation**
+      return `🎓 **PROKORB ACADEMY - Programme de Formation**
 
 📚 **VISION**
 Devenir la **première école en ligne** des métiers de service au Togo
@@ -368,7 +368,7 @@ Devenir la **première école en ligne** des métiers de service au Togo
 • Module 2 : Gérer son entreprise (comptabilité, fiscalité)
 • Module 3 : Marketing digital (réseaux sociaux, Google)
 • Module 4 : Relation client (communication, fidélisation)
-• Certification : "Artisan Pro JobConnect"
+• Certification : "Artisan Pro ProKorb"
 
 **2. PARCOURS ENTREPRENEUR (6 mois)**
 • Business plan
@@ -418,7 +418,7 @@ Devenir la **première école en ligne** des métiers de service au Togo
 
     // ========== CONSEILS BUSINESS ==========
     if (q.includes("conseil") || q.includes("améliorer") || q.includes("optimiser")) {
-      return `💡 **10 CONSEILS STRATÉGIQUES POUR JOBCONNECT**
+      return `💡 **10 CONSEILS STRATÉGIQUES POUR PROKORB**
 
 📊 **Basés sur vos données actuelles** :
 • ${context.totalUsers} utilisateurs
@@ -439,7 +439,7 @@ Problème : Seulement ${context.totalReviews} avis
 Solution : Email J+3 après service + 500 FCFA de réduction
 
 **4. 🔄 FIDÉLISATION CLIENTS**
-Programme "JobConnect Club" :
+Programme "ProKorb Club" :
 • 5 commandes = 1 gratuite
 • Accès prioritaire aux promos
 • Support VIP
@@ -455,7 +455,7 @@ Chatbot pour 70% des questions
 Réduction temps de réponse de 2h à 5min
 
 **7. 🏆 CERTIFIER LES PROS**
-Badge "Vérifié JobConnect" = +30% de commandes
+Badge "Vérifié ProKorb" = +30% de commandes
 Processus : Pièces + Test pratique + Formation
 
 **8. 📈 DIVERSIFIER LES REVENUS**
@@ -474,13 +474,13 @@ Processus : Pièces + Test pratique + Formation
 • Événements mensuels (ateliers pros)
 • Forum en ligne
 • Newsletter "Success Stories"
-• Ambassadeurs JobConnect
+• Ambassadeurs ProKorb
 
 **Prochaine action** : Choisissez 2 priorités et on établit un plan d'action détaillé ! 🚀`
     }
 
     if (q.includes("financement") || q.includes("investissement") || q.includes("levée") || q.includes("fund")) {
-      return `💰 **GUIDE DE LEVÉE DE FONDS POUR JOBCONNECT**
+      return `💰 **GUIDE DE LEVÉE DE FONDS POUR PROKORB**
 
 📊 **VALORISATION ACTUELLE ESTIMÉE**
 • Traction : ${context.totalUsers} users, ${formatAmount(context.totalRevenue)} CA
@@ -547,7 +547,7 @@ Processus : Pièces + Test pratique + Formation
 
     // ========== ÉQUIPE & RH ==========
     if (q.includes("équipe") || q.includes("recrutement") || q.includes("rh") || q.includes("embauche")) {
-      return `👥 **PLAN DE RECRUTEMENT JOBCONNECT 2026**
+      return `👥 **PLAN DE RECRUTEMENT PROKORB 2026**
 
 📊 **ÉQUIPE ACTUELLE RECOMMANDÉE** (Phase Seed)
 1. CEO/Founder (vous !)
@@ -575,7 +575,7 @@ Processus : Pièces + Test pratique + Formation
 
 **3. 🌍 COUNTRY MANAGER BÉNIN**
 • Profil : Expérience marché béninois
-• Mission : Lancer JobConnect Bénin
+• Mission : Lancer ProKorb Bénin
 • Salaire : 1M FCFA + bonus
 • Où chercher : Réseau local, AIESEC
 
@@ -623,7 +623,7 @@ Besoin d'aide pour rédiger une fiche de poste spécifique ? 📝`
 
     // ========== QUESTIONS MÉTIERS ==========
     if (q.includes("utilisateurs") || q.includes("users")) {
-      return `📊 **Analyse des utilisateurs JobConnect**
+      return `📊 **Analyse des utilisateurs ProKorb**
 
 Actuellement, la plateforme compte **${context.totalUsers} utilisateurs** dont **${context.totalProfessionals} professionnels**.
 
@@ -638,7 +638,7 @@ Aujourd'hui : **${context.newUsersToday} nouveau(x) utilisateur(s)** ont rejoint
     }
 
     if (q.includes("revenu") || q.includes("argent") || q.includes("fcfa") || q.includes("ca")) {
-      return `💰 **Analyse financière JobConnect**
+      return `💰 **Analyse financière ProKorb**
 
 📊 **Chiffres actuels** :
 • Revenus aujourd'hui : **${formatAmount(context.revenueToday)}**
@@ -658,7 +658,7 @@ Aujourd'hui : **${context.newUsersToday} nouveau(x) utilisateur(s)** ont rejoint
     }
 
     if (q.includes("commande")) {
-      return `📦 **Analyse des commandes JobConnect**
+      return `📦 **Analyse des commandes ProKorb**
 
 📊 **État actuel** :
 • Total : **${context.totalOrders} commandes**
@@ -675,7 +675,7 @@ Aujourd'hui : **${context.newUsersToday} nouveau(x) utilisateur(s)** ont rejoint
     }
 
     if (q.includes("litige") || q.includes("problème") || q.includes("conflit")) {
-      return `⚠️ **Analyse des litiges JobConnect**
+      return `⚠️ **Analyse des litiges ProKorb**
 
 📊 **État actuel** :
 • Litiges ouverts : **${context.openDisputes}**
@@ -693,7 +693,7 @@ ${context.openDisputes > 0 ? `🚨 **Action urgente** : Traiter les ${context.hi
     }
 
     if (q.includes("message") || q.includes("conversation") || q.includes("support")) {
-      return `💬 **Analyse du support client JobConnect**
+      return `💬 **Analyse du support client ProKorb**
 
 📊 **État actuel** :
 • Conversations totales : **${context.totalConversations}**
@@ -711,7 +711,7 @@ ${context.pendingMessages > 0 ? `⚠️ **${context.pendingMessages} message(s) 
     }
 
     if (q.includes("note") || q.includes("avis") || q.includes("étoile") || q.includes("review")) {
-      return `⭐ **Analyse de la satisfaction JobConnect**
+      return `⭐ **Analyse de la satisfaction ProKorb**
 
 📊 **Métriques** :
 • Note moyenne : **${context.averageRating.toFixed(1)}/5**
@@ -729,7 +729,7 @@ ${context.averageRating >= 4.5 ? '🏆 **Excellent !** Réputation premium' : co
     }
 
     if (q.includes("professionnel") || q.includes("pro") || q.includes("artisan")) {
-      return `👷 **Analyse des professionnels JobConnect**
+      return `👷 **Analyse des professionnels ProKorb**
 
 📊 **État actuel** :
 • Total pros : **${context.totalProfessionals}**
@@ -742,8 +742,8 @@ ${context.averageRating >= 4.5 ? '🏆 **Excellent !** Réputation premium' : co
 • À améliorer (note <3.5) : ~20%
 
 💡 **Programme de développement pros** :
-1. **Certification JobConnect** (badge or/argent/bronze)
-2. **Formation continue** (JobConnect Academy)
+1. **Certification ProKorb** (badge or/argent/bronze)
+2. **Formation continue** (ProKorb Academy)
 3. **Outils de gestion** (CRM, facturation)
 4. **Accès financement** (micro-crédits partenaires)
 5. **Communauté** (événements, forum, mentorat)
@@ -797,7 +797,7 @@ ${context.averageRating >= 4.5 ? '🏆 **Excellent !** Réputation premium' : co
     }
 
     // ========== RÉPONSE PAR DÉFAUT ==========
-    return `🤖 **Je suis JOBCONNECT AI, votre partenaire stratégique complet**
+    return `🤖 **Je suis PROKORB AI, votre partenaire stratégique complet**
 
 Je peux vous aider sur **tous les aspects** de votre entreprise :
 
@@ -816,7 +816,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
 • Stratégie événementielle
 
 🎓 **FORMATION & RH**
-• JobConnect Academy
+• ProKorb Academy
 • Recrutement, onboarding
 • Culture d'entreprise
 
@@ -864,7 +864,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
     ],
     rse: [
       "Stratégie RSE et impact social",
-      "Programme de formation JobConnect Academy",
+      "Programme de formation ProKorb Academy",
       "Comment aider les jeunes entrepreneurs ?",
       "Initiatives environnementales à lancer"
     ],
@@ -886,7 +886,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
             </div>
             <div className="absolute inset-0 w-24 h-24 bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] rounded-3xl animate-ping opacity-20"></div>
           </div>
-          <p className="text-gray-800 font-bold text-xl mt-6">JOBCONNECT AI</p>
+          <p className="text-gray-800 font-bold text-xl mt-6">PROKORB AI</p>
           <p className="text-gray-500">Votre partenaire stratégique s'initialise...</p>
         </div>
       </div>
@@ -906,7 +906,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              JOBCONNECT AI
+              PROKORB AI
               <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full">
                 PARTENAIRE STRATÉGIQUE
               </span>
@@ -1022,7 +1022,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
                   <BrainCircuit className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-bold text-purple-900">JOBCONNECT AI</p>
+                  <p className="font-bold text-purple-900">PROKORB AI</p>
                   <p className="text-xs text-purple-600">Analyse stratégique complète</p>
                 </div>
               </div>
@@ -1034,7 +1034,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
                   if (line.startsWith('•') || line.startsWith('-')) {
                     return <p key={i} className="text-gray-700 ml-4 my-1.5">{line}</p>
                   }
-                  if (line.includes('— JOBCONNECT AI')) {
+                  if (line.includes('— PROKORB AI')) {
                     return <p key={i} className="text-purple-700 italic mt-4 text-right font-medium">{line}</p>
                   }
                   return <p key={i} className="text-gray-700 my-1.5 leading-relaxed">{line}</p>
@@ -1060,7 +1060,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Coach JOBCONNECT AI</h2>
+              <h2 className="text-xl font-bold text-gray-900">Coach PROKORB AI</h2>
               <p className="text-sm text-gray-500 flex items-center gap-1">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                 En ligne · Prêt à vous accompagner
@@ -1076,7 +1076,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
                   <BrainCircuit className="w-10 h-10 text-white" />
                 </div>
                 <p className="font-bold text-gray-900 mb-1 text-lg">Bonjour ! Je suis votre coach</p>
-                <p className="text-gray-500 text-sm mb-6">Je vous accompagne dans tous les aspects de JobConnect</p>
+                <p className="text-gray-500 text-sm mb-6">Je vous accompagne dans tous les aspects de ProKorb</p>
                 <div className="space-y-2 text-left">
                   <p className="text-sm font-semibold text-gray-700 mb-3 text-center">
                     Questions suggérées ({categories.find(c => c.id === activeCategory)?.label}) :
@@ -1106,7 +1106,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
                           <BrainCircuit className="w-4 h-4 text-white" />
                         </div>
                         <span className="text-xs font-bold bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] bg-clip-text text-transparent">
-                          JOBCONNECT AI
+                          PROKORB AI
                         </span>
                       </div>
                     )}
@@ -1120,7 +1120,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
                 <div className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-2xl px-5 py-4 shadow-md">
                   <div className="flex items-center gap-3">
                     <Loader2 className="w-5 h-5 animate-spin text-[#4F46E5]" />
-                    <span className="text-sm text-gray-600 font-medium">JOBCONNECT AI réfléchit...</span>
+                    <span className="text-sm text-gray-600 font-medium">PROKORB AI réfléchit...</span>
                   </div>
                 </div>
               </div>
@@ -1210,7 +1210,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
             <p className="text-xs text-gray-500 mt-1">Impact social & environnemental</p>
           </button>
           <button 
-            onClick={() => setInputMessage("Comment lever des fonds pour JobConnect ?")}
+            onClick={() => setInputMessage("Comment lever des fonds pour ProKorb ?")}
             className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 rounded-xl border border-yellow-200 text-left transition-all"
           >
             <DollarSign className="w-6 h-6 text-yellow-600 mb-2" />
@@ -1223,7 +1223,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
           >
             <GraduationCap className="w-6 h-6 text-blue-600 mb-2" />
             <p className="font-semibold text-gray-900 text-sm">Former les pros</p>
-            <p className="text-xs text-gray-500 mt-1">JobConnect Academy</p>
+            <p className="text-xs text-gray-500 mt-1">ProKorb Academy</p>
           </button>
         </div>
       </div>
@@ -1232,7 +1232,7 @@ Je peux vous aider sur **tous les aspects** de votre entreprise :
       <div className="text-center">
         <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
           <Sparkles className="w-4 h-4 text-purple-500" />
-          Propulsé par <span className="font-bold bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] bg-clip-text text-transparent">JOBCONNECT AI</span> · Votre partenaire stratégique complet
+          Propulsé par <span className="font-bold bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] bg-clip-text text-transparent">PROKORB AI</span> · Votre partenaire stratégique complet
         </p>
       </div>
     </div>

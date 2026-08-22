@@ -222,7 +222,7 @@ export function useClientDashboard() {
       else if (phone.startsWith('9') || phone.startsWith('7')) phone = '+228' + phone
     }
 
-    const message = encodeURIComponent(`Bonjour ${pro.full_name}, je suis intéressé(e) par votre service "${service.title}" (${service.price} FCFA) sur JobConnect. Pouvez-vous me donner plus d'informations ?`)
+    const message = encodeURIComponent(`Bonjour ${pro.full_name}, je suis intéressé(e) par votre service "${service.title}" (${service.price} FCFA) sur ProKorb. Pouvez-vous me donner plus d'informations ?`)
 
     if (profile) {
       try {

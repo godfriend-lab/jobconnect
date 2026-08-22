@@ -17,8 +17,8 @@ export default function Navbar() {
             <Logo className="w-10 h-10" />
             <div>
               <h1 className="text-xl font-black leading-tight">
-                <span className="text-indigo-600">JOB</span>
-                <span className="text-slate-900">CONNECT</span>
+                <span className="text-indigo-600">PRO</span>
+                <span className="text-slate-900">KORB</span>
               </h1>
               <p className="text-xs text-gray-500 -mt-1 hidden sm:block">La Marketplace des Pros</p>
             </div>

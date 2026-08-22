@@ -39,7 +39,7 @@ export default function LoginPage() {
             <Lock className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Panel</h1>
-          <p className="text-gray-600">JOBCONNECT Administration</p>
+          <p className="text-gray-600">PROKORB Administration</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -52,7 +52,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4F46E5] bg-white text-gray-900"
-                placeholder="admin@jobconnect.tg"
+                placeholder="admin@proKorb.tg"
                 required
               />
             </div>

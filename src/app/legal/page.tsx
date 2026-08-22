@@ -12,7 +12,7 @@ export default function LegalNoticePage() {
           </Link>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Mentions légales</h1>
           <p className="text-lg text-indigo-100 max-w-2xl">
-            Informations légales relatives à la plateforme JobConnect Togo.
+            Informations légales relatives à la plateforme ProKorb Togo.
           </p>
         </div>
       </div>
@@ -28,9 +28,9 @@ export default function LegalNoticePage() {
               <h2 className="text-2xl font-bold text-slate-900">1. Éditeur du site</h2>
             </div>
             <div className="pl-0 md:pl-14 space-y-3 text-slate-600">
-              <p>Le site <strong className="text-slate-900">JobConnect</strong> (jobconnect.tg) est édité par :</p>
+              <p>Le site <strong className="text-slate-900">ProKorb</strong> (ProKorb.tg) est édité par :</p>
               <ul className="list-disc list-inside ml-4 space-y-1">
-                <li><strong>Raison sociale :</strong> JobConnect Togo SARL</li>
+                <li><strong>Raison sociale :</strong> ProKorb Togo SARL</li>
                 <li><strong>Siège social :</strong> Lomé, Togo</li>
                 <li><strong>Capital social :</strong> [À compléter]</li>
                 <li><strong>RCCM :</strong> [À compléter]</li>
@@ -49,7 +49,7 @@ export default function LegalNoticePage() {
             <div className="pl-0 md:pl-14 space-y-2 text-slate-600">
               <p>Pour toute question relative au site ou à son utilisation :</p>
               <ul className="space-y-1 ml-4">
-                <li className="flex items-center gap-2"><Mail className="w-4 h-4 text-indigo-600" /> <a href="mailto:contact@jobconnect.tg" className="text-indigo-600 hover:underline">contact@jobconnect.tg</a></li>
+                <li className="flex items-center gap-2"><Mail className="w-4 h-4 text-indigo-600" /> <a href="mailto:contact@ProKorb.tg" className="text-indigo-600 hover:underline">contact@ProKorb.tg</a></li>
                 <li className="flex items-center gap-2"><Phone className="w-4 h-4 text-indigo-600" /> +228 70 88 86 99 / +228 79 94 07 93</li>
                 <li className="flex items-center gap-2">📍 Lomé, Togo</li>
               </ul>
@@ -82,7 +82,7 @@ export default function LegalNoticePage() {
             </div>
             <div className="pl-0 md:pl-14 text-slate-600 space-y-3">
               <p>
-                L'ensemble du contenu du site JobConnect (textes, images, logos, icônes, code source, base de données) est la propriété exclusive de JobConnect Togo SARL ou de ses partenaires.
+                L'ensemble du contenu du site ProKorb (textes, images, logos, icônes, code source, base de données) est la propriété exclusive de ProKorb Togo SARL ou de ses partenaires.
               </p>
               <p>
                 Toute reproduction, distribution, modification ou utilisation non autorisée de ces éléments est strictement interdite et peut faire l'objet de poursuites judiciaires conformément au <strong className="text-slate-900">Code de la propriété intellectuelle du Togo</strong>.
@@ -116,7 +116,7 @@ export default function LegalNoticePage() {
             </div>
             <div className="pl-0 md:pl-14 text-slate-600 space-y-3">
               <p>
-                JobConnect s'engage à protéger les données personnelles de ses utilisateurs conformément à la <strong className="text-slate-900">Loi n° 2019-024 du 24 octobre 2019 portant protection des données à caractère personnel en République Togolaise</strong>.
+                ProKorb s'engage à protéger les données personnelles de ses utilisateurs conformément à la <strong className="text-slate-900">Loi n° 2019-024 du 24 octobre 2019 portant protection des données à caractère personnel en République Togolaise</strong>.
               </p>
               <p>
                 Pour plus d'informations, consultez notre <Link href="/privacy" className="text-indigo-600 hover:underline font-semibold">Politique de confidentialité</Link>.

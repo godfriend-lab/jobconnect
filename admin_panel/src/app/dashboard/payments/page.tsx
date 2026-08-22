@@ -551,7 +551,7 @@ export default function PaymentsPage() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-2xl font-bold text-gray-900">JOBCONNECT/FCFA</h2>
+              <h2 className="text-2xl font-bold text-gray-900">PROKORB/FCFA</h2>
               {isLive && (
                 <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full animate-pulse">
                   ● LIVE

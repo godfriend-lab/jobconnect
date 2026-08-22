@@ -1,45 +1,16 @@
 // @ts-nocheck
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { 
-  Check, Zap, TrendingUp, Crown, ShieldCheck, Info, 
-  ArrowRight, Loader2, CreditCard, Star, Building2 
+  CheckCircle2, Star, Crown, Zap, ShieldCheck, 
+  ArrowRight, TrendingUp, Info
 } from 'lucide-react'
 
 export default function PricingPage() {
-  const router = useRouter()
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly')
-  const [currentPlan, setCurrentPlan] = useState<string>('gratuit')
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [processingPlan, setProcessingPlan] = useState<string | null>(null)
 
-  // 1. Récupérer le statut de l'utilisateur au chargement
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        setIsLoggedIn(true)
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('plan')
-          .eq('id', session.user.id)
-          .single()
-        
-        if (profile) {
-          setCurrentPlan(profile.plan?.toLowerCase() || 'gratuit')
-        }
-      }
-      setLoading(false)
-    }
-    checkUser()
-  }, [])
-
-  // 2. Données des plans (Prix annuels = Prix mensuel * 12 * 0.90)
   const plans = [
     {
       name: 'Gratuit',
@@ -51,228 +22,201 @@ export default function PricingPage() {
         'Publication de services illimitée',
         'Présence sur la marketplace',
         'Recherches et classement standards',
-        'Réception de demandes et avis clients'
+        'Réception de demandes et avis clients',
+        'Messagerie avec les clients'
       ],
-      highlight: false,
-      color: 'border-slate-200 dark:border-slate-700',
-      btnColor: 'bg-slate-600 hover:bg-slate-700'
+      color: 'border-slate-700',
+      btnColor: 'bg-slate-700 hover:bg-slate-600',
+      icon: CheckCircle2,
+      iconColor: 'text-slate-400'
     },
     {
       name: 'Starter',
       monthlyPrice: 2000,
-      annualPrice: 21600, // 24 000 - 10%
+      annualPrice: 21600,
       description: "L'accélérateur pour obtenir une première augmentation de visibilité.",
       features: [
         'Tous les avantages du plan Gratuit',
         'Visibilité nettement supérieure',
         'Mise en avant ciblée dans votre catégorie',
         'Exposition renforcée sur pages stratégiques',
-        'Positionnement prioritaire dans les recherches'
+        'Positionnement prioritaire dans les recherches',
+        'Support email prioritaire'
       ],
-      highlight: false,
-      color: 'border-emerald-200 dark:border-emerald-800',
-      btnColor: 'bg-emerald-600 hover:bg-emerald-700'
+      color: 'border-emerald-700',
+      btnColor: 'bg-emerald-600 hover:bg-emerald-700',
+      icon: Zap,
+      iconColor: 'text-emerald-400'
     },
     {
       name: 'Business',
       monthlyPrice: 3500,
-      annualPrice: 37800, // 42 000 - 10%
-      description: "Le plan recommandé pour les professionnels actifs qui veulent consolider leur activité.",
+      annualPrice: 37800,
+      description: "Le plan recommandé pour les professionnels actifs.",
       features: [
         'Tous les avantages du plan Starter',
         'Mise en avant supérieure et emplacements privilégiés',
-        'Positionnement dans le haut du classement (Top)',
+        'Positionnement dans le haut du classement (Top 5)',
         'Visibilité renforcée sur les pages les plus consultées',
-        'Présence prioritaire dans la marketplace'
+        'Présence prioritaire dans la marketplace',
+        'Badge "Pro Actif" visible',
+        'Statistiques avancées (vues, clics)'
       ],
-      highlight: true, // ✅ Plan recommandé
-      color: 'border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-900/10',
-      btnColor: 'bg-blue-600 hover:bg-blue-700'
+      color: 'border-blue-700 bg-blue-950/20',
+      btnColor: 'bg-blue-600 hover:bg-blue-700',
+      icon: Star,
+      iconColor: 'text-blue-400',
+      recommended: true
     },
     {
       name: 'Premium',
       monthlyPrice: 7500,
-      annualPrice: 81000, // 90 000 - 10%
+      annualPrice: 81000,
       description: "La visibilité maximale pour dominer votre marché local.",
       features: [
         'Tous les avantages du plan Business',
         'Visibilité maximale et mise en avant prioritaire absolue',
         'Présence exclusive en page d\'accueil',
         'Notifications prioritaires pour les nouvelles demandes',
-        '🎁 Accès au Programme Partenaire Ideenwerk (-20%)'
+        'Badge Premium exclusif',
+        'Support dédié avec temps de réponse < 2h',
+        '🎁 -20% sur toutes les prestations Ideenwerk Technologies'
       ],
-      highlight: false,
-      color: 'border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-900/10',
-      btnColor: 'bg-amber-600 hover:bg-amber-700'
+      color: 'border-amber-700 bg-amber-950/20',
+      btnColor: 'bg-amber-600 hover:bg-amber-700',
+      icon: Crown,
+      iconColor: 'text-amber-400'
     }
   ]
 
-  // 3. Fonction de formatage des prix
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fr-FR').format(price)
-  }
-
-  // 4. Gestion du clic sur un plan (SÉCURISÉE)
-  const handleSubscribe = async (planName: string) => {
-    const planKey = planName.toLowerCase()
-    
-    if (!isLoggedIn) {
-      // Redirection vers l'inscription avec le plan pré-sélectionné
-      router.push(`/register?role=pro&plan=${planKey}`)
-      return
-    }
-
-    if (currentPlan === planKey) {
-      alert("Vous êtes déjà abonné à ce plan !")
-      return
-    }
-
-    // Si l'utilisateur veut passer au plan gratuit, on le redirige vers son dashboard
-    if (planKey === 'gratuit') {
-      router.push('/dashboard/pro')
-      return
-    }
-
-    setProcessingPlan(planKey)
-    try {
-      // 🚨 SÉCURITÉ : On n'envoie PAS le montant. On envoie le billingCycle.
-      // Le backend (/api/checkout) recalculera le montant de manière sécurisée.
-      const session = await supabase.auth.getSession()
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: session.data.session?.user.id,
-          planName: planName,
-          billingCycle: billingCycle, // ← C'EST LA CLÉ : le backend utilisera ceci pour appliquer les -10%
-          userEmail: session.data.session?.user.email
-        })
-      })
-      
-      const data = await res.json()
-      
-      if (data.success) {
-        window.location.href = data.checkoutUrl
-      } else {
-        alert('Erreur: ' + (data.message || 'Impossible de créer le paiement'))
-      }
-    } catch (error) {
-      console.error("Erreur de paiement:", error)
-      alert("Une erreur est survenue lors de l'initialisation du paiement.")
-    } finally {
-      setProcessingPlan(null)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
-      </div>
-    )
-  }
+  const formatPrice = (price: number) => new Intl.NumberFormat('fr-FR').format(price)
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-      
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-20 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)] bg-[size:30px_30px]"></div>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <Link href="/" className="inline-flex items-center gap-2 text-indigo-100 hover:text-white transition-colors mb-6 group">
-            <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
-            Retour à l'accueil
+    <div className="min-h-screen bg-slate-950 text-slate-300">
+      {/* Header */}
+      <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 group">
+            <img 
+              src="/logo.png" 
+              alt="Logo ProKorb" 
+              className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            />
+            <span className="font-black text-xl tracking-tight hidden sm:block">
+              <span className="text-indigo-400">PRO</span>
+              <span className="text-white">KORB</span>
+            </span>
           </Link>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6">
-            Investissez dans votre <span className="text-amber-300">visibilité</span>
-          </h1>
-          <p className="text-lg md:text-xl text-indigo-100 max-w-3xl mx-auto leading-relaxed">
-            Chez JobConnect, vous ne payez pas pour des fonctionnalités limitées. 
-            Tous les plans incluent des services illimités et <strong className="text-white">0% de commission</strong> sur vos prestations.
-          </p>
+          <div className="flex items-center gap-3">
+            <Link 
+              href="/login" 
+              className="text-sm font-semibold text-slate-400 hover:text-white transition-colors"
+            >
+              Connexion
+            </Link>
+            <Link 
+              href="/register" 
+              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            >
+              Inscription
+            </Link>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-8 relative z-20">
-        
-        {/* Toggle Mensuel / Annuel */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-slate-800 inline-flex gap-1">
+      {/* Hero Section */}
+      <section className="py-16 px-4 text-center">
+        <div className="max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-900/30 border border-indigo-700/50 text-indigo-300 text-sm font-semibold mb-6">
+            <Star className="w-4 h-4 fill-indigo-400 text-indigo-400" />
+            <span>Tarifs transparents et sans surprise</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
+            Choisissez le plan qui <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              correspond à vos ambitions
+            </span>
+          </h1>
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
+            Des forfaits adaptés à chaque étape de votre croissance. 
+            <span className="text-white font-bold"> 0% de commission</span> sur vos prestations, quoi qu'il arrive.
+          </p>
+
+          {/* Toggle Mensuel/Annuel */}
+          <div className="inline-flex bg-slate-900 rounded-2xl p-1.5 border border-slate-800">
             <button
               onClick={() => setBillingCycle('monthly')}
-              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 ${
-                billingCycle === 'monthly' 
-                  ? 'bg-indigo-600 text-white shadow-md' 
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all ${
+                billingCycle === 'monthly'
+                  ? 'bg-indigo-600 text-white shadow-lg'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              Facturation mensuelle
+              Mensuel
             </button>
             <button
               onClick={() => setBillingCycle('annual')}
               className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 relative ${
-                billingCycle === 'annual' 
-                  ? 'bg-amber-500 text-white shadow-md' 
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                billingCycle === 'annual'
+                  ? 'bg-amber-500 text-white shadow-lg'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              Facturation annuelle
-              <span className="absolute -top-2.5 -right-3 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+              Annuel
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                 -10%
               </span>
             </button>
           </div>
         </div>
+      </section>
 
-        {/* Grille des Tarifs */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+      {/* Grille des Tarifs */}
+      <section className="max-w-7xl mx-auto px-4 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {plans.map((plan, idx) => {
-            const currentPrice = billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice
+            const Icon = plan.icon
+            const price = billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice
             const period = billingCycle === 'monthly' ? '/mois' : '/an'
-            const monthlyEquiv = billingCycle === 'annual' && plan.monthlyPrice > 0 ? Math.round(currentPrice / 12) : plan.monthlyPrice
-            const savings = plan.monthlyPrice > 0 ? (plan.monthlyPrice * 12) - plan.annualPrice : 0
-            
-            const isCurrent = currentPlan === plan.name.toLowerCase()
+            const monthlyEquiv = billingCycle === 'annual' && plan.monthlyPrice > 0 
+              ? Math.round(plan.annualPrice / 12) 
+              : plan.monthlyPrice
+            const savings = plan.monthlyPrice > 0 
+              ? (plan.monthlyPrice * 12) - plan.annualPrice 
+              : 0
 
             return (
-              <div 
-                key={idx} 
-                className={`relative flex flex-col p-6 rounded-3xl border-2 transition-all duration-300 ${
-                  plan.highlight 
-                    ? 'border-blue-500 dark:border-blue-400 shadow-2xl shadow-blue-500/20 scale-105 z-10' 
-                    : `${plan.color} hover:shadow-xl`
-                } bg-white dark:bg-slate-900`}
+              <div
+                key={idx}
+                className={`relative bg-slate-900 rounded-2xl border-2 ${plan.color} p-6 shadow-lg flex flex-col transition-all hover:shadow-2xl hover:-translate-y-1`}
               >
-                {plan.highlight && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-blue-600 text-white shadow-lg flex items-center gap-1.5">
-                    <Star className="w-3 h-3 fill-white" />
-                    Recommandé
+                {plan.recommended && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-white" /> Recommandé
                   </div>
                 )}
-                
+
+                <div className={`w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center mb-4`}>
+                  <Icon className={`w-7 h-7 ${plan.iconColor}`} />
+                </div>
+
+                <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                <p className="text-sm text-slate-400 mb-6 min-h-[40px]">{plan.description}</p>
+
                 <div className="mb-6">
-                  <h3 className={`text-2xl font-black mb-2 ${plan.highlight ? 'text-blue-600 dark:text-blue-400' : 'text-slate-900 dark:text-white'}`}>
-                    {plan.name}
-                  </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 min-h-[40px]">
-                    {plan.description}
-                  </p>
-                  
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span className={`text-4xl font-black ${plan.highlight ? 'text-blue-600 dark:text-blue-400' : 'text-slate-900 dark:text-white'}`}>
-                      {formatPrice(currentPrice)}
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-black text-white">
+                      {formatPrice(price)}
                     </span>
-                    <span className="text-sm text-slate-500 dark:text-slate-400">FCFA{period}</span>
+                    <span className="text-slate-400">FCFA{period}</span>
                   </div>
-                  
                   {billingCycle === 'annual' && plan.monthlyPrice > 0 && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                    <p className="text-xs text-slate-500 mt-1">
                       Soit ~{formatPrice(monthlyEquiv)} FCFA/mois
                     </p>
                   )}
-
                   {billingCycle === 'annual' && savings > 0 && (
-                    <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-md text-xs font-bold">
+                    <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-emerald-900/30 text-emerald-400 rounded-md text-xs font-bold">
                       <TrendingUp className="w-3 h-3" />
                       Économisez {formatPrice(savings)} FCFA/an
                     </div>
@@ -280,86 +224,134 @@ export default function PricingPage() {
                 </div>
 
                 <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((feature, fIdx) => (
-                    <li key={fIdx} className="flex items-start gap-2.5 text-sm">
-                      <Check className={`w-4 h-4 shrink-0 mt-0.5 ${plan.highlight ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-500'}`} />
-                      <span className="text-slate-600 dark:text-slate-300">{feature}</span>
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                <button 
-                  onClick={() => handleSubscribe(plan.name)}
-                  disabled={isCurrent || processingPlan === plan.name.toLowerCase()}
-                  className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${
-                    isCurrent 
-                      ? 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-default' 
-                      : `${plan.btnColor} text-white shadow-md hover:shadow-lg`
-                  }`}
+                <Link
+                  href={plan.name === 'Gratuit' ? '/register?role=pro' : '/login'}
+                  className={`w-full py-3 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 ${plan.btnColor}`}
                 >
-                  {isCurrent ? (
-                    <>
-                      <ShieldCheck className="w-4 h-4" /> Plan Actuel
-                    </>
-                  ) : processingPlan === plan.name.toLowerCase() ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      {plan.name === 'Gratuit' ? 'S\'inscrire' : 'Mettre à jour'} <CreditCard className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
+                  {plan.name === 'Gratuit' ? 'Commencer gratuitement' : 'Choisir ce plan'}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             )
           })}
         </div>
+      </section>
 
-        {/* Section Partenaire Ideenwerk */}
-        <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-black dark:to-slate-900 rounded-3xl p-8 md:p-12 mb-16 text-white relative overflow-hidden shadow-2xl">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-            <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
-              <Building2 className="w-10 h-10 text-amber-400" />
+      {/* Section Badge Vérifié */}
+      <section className="max-w-4xl mx-auto px-4 pb-16">
+        <div className="bg-gradient-to-br from-blue-900/30 to-indigo-900/30 rounded-2xl border border-blue-700/50 p-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="w-20 h-20 bg-blue-600/20 rounded-2xl flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-10 h-10 text-blue-400" />
             </div>
             <div className="flex-1 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-xs font-black uppercase tracking-wider mb-3">
-                <Star className="w-3 h-3 fill-amber-300" />
-                Exclusivité Premium
-              </div>
-              <h2 className="text-2xl md:text-3xl font-black mb-3">
-                Programme Partenaire Ideenwerk Technologies
-              </h2>
-              <p className="text-slate-300 leading-relaxed max-w-3xl">
-                En souscrivant au plan <strong className="text-white">Premium</strong>, vous devenez automatiquement 
-                membre du programme partenaire. Bénéficiez d'une <strong className="text-amber-300">réduction de 20%</strong> sur l'ensemble des prestations numériques éligibles d'Ideenwerk Technologies (création de site web, application mobile, logiciel personnalisé, etc.).
+              <h3 className="text-2xl font-bold text-white mb-2">
+                Badge Vérifié — 5 000 FCFA/an
+              </h3>
+              <p className="text-slate-300 mb-4">
+                Indépendant de votre forfait, le Badge Vérifié augmente votre taux de contact de <strong className="text-blue-400">+300%</strong>.
+                Il prouve aux clients que votre identité, vos qualifications et votre casier judiciaire ont été validés par notre équipe.
               </p>
-              <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/10 inline-block">
-                <p className="text-sm text-slate-300">
-                  <span className="text-white font-bold">Exemple :</span> Un projet à 500 000 FCFA vous revient à 
-                  <span className="text-amber-300 font-black text-lg ml-2">400 000 FCFA</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Section Transparence & FAQ Rapide */}
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="bg-blue-50 dark:bg-blue-950/30 border-2 border-blue-200 dark:border-blue-800 rounded-2xl p-6 md:p-8 flex items-start gap-4">
-            <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 shrink-0 mt-1" />
-            <div>
-              <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-3 text-lg">Notre engagement de transparence</h3>
-              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-2 list-disc list-inside">
-                <li><strong className="text-blue-950 dark:text-blue-50">0% de commission :</strong> Vous gardez 100% de vos gains. Le client vous paie directement.</li>
-                <li><strong className="text-blue-950 dark:text-blue-50">Services illimités :</strong> Publiez autant de services que vous le souhaitez, sur tous les plans.</li>
-                <li><strong className="text-blue-950 dark:text-blue-50">Visibilité uniquement :</strong> Votre abonnement influence uniquement votre position dans les résultats de recherche.</li>
-                <li><strong className="text-blue-950 dark:text-blue-50">Vérification indépendante :</strong> Le badge "Pro Vérifié" est un processus de contrôle d'identité séparé (5 000 FCFA/an), accessible à tous les professionnels, quel que soit leur forfait.</li>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-slate-300">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                  Vérification d'identité (CNI/Passeport)
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                  Casier judiciaire de moins de 3 mois
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                  Justificatif de qualification
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                  Badge bleu visible sur votre profil
+                </li>
               </ul>
             </div>
           </div>
         </div>
+      </section>
 
-      </main>
+      {/* Section Transparence */}
+      <section className="max-w-4xl mx-auto px-4 pb-16">
+        <div className="bg-slate-900 rounded-2xl border border-slate-800 p-8">
+          <div className="flex items-start gap-4">
+            <Info className="w-8 h-8 text-indigo-400 flex-shrink-0" />
+            <div>
+              <h3 className="text-xl font-bold text-white mb-4">Notre engagement de transparence</h3>
+              <ul className="space-y-3 text-slate-300">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-white">0% de commission</strong> sur toutes vos prestations, quel que soit votre plan. Vous gardez 100% de vos revenus.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-white">Sans engagement</strong> : changez ou annulez votre forfait à tout moment.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-white">Services illimités</strong> : publiez autant de services que vous le souhaitez sur tous les plans.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-white">Paiement direct</strong> : le client vous paie directement via T-Money, Flooz ou espèces.
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="max-w-4xl mx-auto px-4 pb-20 text-center">
+        <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
+          Prêt à développer votre activité ?
+        </h2>
+        <p className="text-lg text-slate-400 mb-8">
+          Rejoignez des centaines de professionnels qui font confiance à ProKorb.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/register?role=pro"
+            className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl hover:scale-105 inline-flex items-center justify-center gap-2"
+          >
+            Créer mon compte gratuitement
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+          <Link
+            href="/marketplace"
+            className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all border border-slate-700 inline-flex items-center justify-center gap-2"
+          >
+            Explorer la marketplace
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer simple */}
+      <footer className="bg-slate-900 border-t border-slate-800 py-8">
+        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">
+          <p>© {new Date().getFullYear()} ProKorb Togo. Tous droits réservés.</p>
+        </div>
+      </footer>
     </div>
   )
 }

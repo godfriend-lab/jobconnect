@@ -46,7 +46,7 @@ export default function VerificationPage() {
           </Link>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Vérification des professionnels</h1>
           <p className="text-lg text-indigo-100 max-w-2xl">
-            Notre processus rigoureux de vérification garantit que seuls les professionnels qualifiés et dignes de confiance rejoignent JobConnect.
+            Notre processus rigoureux de vérification garantit que seuls les professionnels qualifiés et dignes de confiance rejoignent ProKorb.
           </p>
         </div>
       </div>
@@ -127,7 +127,7 @@ export default function VerificationPage() {
             <Shield className="w-16 h-16 mx-auto mb-4 opacity-80" />
             <h3 className="text-2xl font-bold mb-3">Vous êtes professionnel ?</h3>
             <p className="text-indigo-100 mb-6 max-w-xl mx-auto">
-              Rejoignez JobConnect et obtenez votre badge de vérification pour booster votre activité.
+              Rejoignez ProKorb et obtenez votre badge de vérification pour booster votre activité.
             </p>
             <Link href="/register?role=pro" className="inline-block bg-white text-indigo-600 font-bold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors">
               Devenir professionnel vérifié

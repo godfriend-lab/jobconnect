@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "JOBCONNECT - Panel Admin",
-  description: "Tableau de bord d'administration JobConnect",
+  title: "PROKORB- Panel Admin",
+  description: "Tableau de bord d'administration ProKorb",
   icons: {
     icon: '/favicon.svg',
     apple: '/favicon.svg',

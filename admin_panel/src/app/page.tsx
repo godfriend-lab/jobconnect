@@ -30,7 +30,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-2">
             <Shield className="w-8 h-8 text-indigo-600" />
             <h1 className="text-2xl font-black text-slate-900">
-              JOB<span className="text-indigo-600">CONNECT</span>
+              PRO<span className="text-indigo-600">KORB</span>
             </h1>
             <span className="ml-3 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
               Admin Panel
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
             Bonjour, Administrateur 👋
           </h2>
           <p className="text-slate-600">
-            Voici un aperçu de l'activité de JobConnect aujourd'hui
+            Voici un aperçu de l'activité de ProKorb aujourd'hui
           </p>
         </div>
 

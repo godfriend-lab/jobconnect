@@ -2,15 +2,15 @@
 'use client'
 
 import Link from 'next/link'
-import { Globe, Shield, Target, Users, TrendingUp, Award } from 'lucide-react'
+import { Globe, Shield, Target, Users, Award } from 'lucide-react'
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Hero Section */}
-      <div className="bg-linear-to-br from-indigo-600 to-purple-700 text-white py-20">
+      <div className="bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black mb-6">À Propos de JobConnect</h1>
+          <h1 className="text-4xl md:text-5xl font-black mb-6">À Propos de ProKorb</h1>
           <p className="text-xl text-indigo-100 max-w-3xl mx-auto">
             La plateforme leader au Togo connectant des professionnels qualifiés avec des clients exigeants
           </p>
@@ -27,7 +27,7 @@ export default function AboutPage() {
             </div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Notre Mission</h2>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-              JobConnect a pour mission de transformer le marché des services au Togo en créant un écosystème 
+              ProKorb a pour mission de transformer le marché des services au Togo en créant un écosystème 
               numérique de confiance où les professionnels talentueux peuvent développer leur activité et les 
               clients trouver facilement des prestataires qualifiés et vérifiés.
             </p>
@@ -68,29 +68,11 @@ export default function AboutPage() {
               }
             ].map((value, idx) => (
               <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-lg border border-slate-200 dark:border-slate-800 text-center">
-                <div className="w-16 h-16 bg-linear-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <value.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{value.title}</h3>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{value.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Chiffres Clés */}
-        <section className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-3xl p-12 text-white">
-          <h2 className="text-3xl font-bold text-center mb-12">JobConnect en Chiffres</h2>
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            {[
-              { number: "500+", label: "Professionnels vérifiés" },
-              { number: "2000+", label: "Clients satisfaits" },
-              { number: "50+", label: "Métiers disponibles" },
-              { number: "98%", label: "Taux de satisfaction" }
-            ].map((stat, idx) => (
-              <div key={idx}>
-                <div className="text-4xl md:text-5xl font-black mb-2">{stat.number}</div>
-                <div className="text-indigo-100">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -102,7 +84,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Notre Engagement Qualité</h2>
             <div className="space-y-6 text-slate-600 dark:text-slate-300">
               <p className="leading-relaxed">
-                Chez JobConnect, nous nous engageons à maintenir les plus hauts standards de qualité et de 
+                Chez ProKorb, nous nous engageons à maintenir les plus hauts standards de qualité et de 
                 professionnalisme. Chaque professionnel inscrit sur notre plateforme passe par un processus 
                 de vérification rigoureux incluant la validation de son identité, de ses qualifications 
                 professionnelles et de son casier judiciaire.
@@ -119,10 +101,10 @@ export default function AboutPage() {
         {/* CTA */}
         <section className="text-center">
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">
-            Rejoignez la révolution JobConnect
+            Rejoignez la révolution ProKorb
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-            Que vous soyez professionnel ou client, JobConnect vous offre les outils pour réussir.
+            Que vous soyez professionnel ou client, ProKorb vous offre les outils pour réussir.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/register?role=pro" className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all shadow-lg">

@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
       title: "6. Utilisation des Cookies",
       content: (
         <p className="text-slate-600 leading-relaxed">
-          JobConnect utilise des cookies pour assurer le bon fonctionnement de l'application (comme le maintien de votre session de connexion) et pour analyser de manière anonyme comment l'application est utilisée afin de l'améliorer continuellement. Vous pouvez gérer les cookies via les paramètres de votre navigateur.
+          ProKorb utilise des cookies pour assurer le bon fonctionnement de l'application (comme le maintien de votre session de connexion) et pour analyser de manière anonyme comment l'application est utilisée afin de l'améliorer continuellement. Vous pouvez gérer les cookies via les paramètres de votre navigateur.
         </p>
       )
     }
@@ -138,7 +138,7 @@ export default function PrivacyPolicyPage() {
             </div>
           </div>
           <p className="text-lg text-indigo-100 max-w-2xl leading-relaxed">
-            Chez JobConnect Togo, votre vie privée est notre priorité absolue. Cette page explique de manière transparente comment nous protégeons vos informations.
+            Chez ProKorb Togo, votre vie privée est notre priorité absolue. Cette page explique de manière transparente comment nous protégeons vos informations.
           </p>
         </div>
       </div>
@@ -150,7 +150,7 @@ export default function PrivacyPolicyPage() {
           {/* Introduction */}
           <div className="prose prose-slate max-w-none">
             <p className="text-lg text-slate-700 leading-relaxed">
-              Bienvenue sur <strong className="text-slate-900">JobConnect Togo</strong>. Nous accordons une importance capitale à la protection de votre vie privée et à la sécurité de vos données personnelles. Cette politique a pour objectif de vous expliquer clairement comment nous collectons, utilisons, protégeons et partageons vos informations.
+              Bienvenue sur <strong className="text-slate-900">ProKorb Togo</strong>. Nous accordons une importance capitale à la protection de votre vie privée et à la sécurité de vos données personnelles. Cette politique a pour objectif de vous expliquer clairement comment nous collectons, utilisons, protégeons et partageons vos informations.
             </p>
           </div>
 

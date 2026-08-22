@@ -33,7 +33,7 @@ export default function ReportPage() {
               <div>
                 <h3 className="font-bold text-amber-900 mb-1">Signalement urgent ?</h3>
                 <p className="text-sm text-amber-800">
-                  Si vous êtes en danger immédiat, contactez les autorités locales. Pour les urgences sur la plateforme, écrivez-nous à <a href="mailto:urgence@jobconnect.tg" className="underline font-semibold">urgence@jobconnect.tg</a>
+                  Si vous êtes en danger immédiat, contactez les autorités locales. Pour les urgences sur la plateforme, écrivez-nous à <a href="mailto:urgence@ProKorb.tg" className="underline font-semibold">urgence@ProKorb.tg</a>
                 </p>
               </div>
             </div>

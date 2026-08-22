@@ -38,7 +38,7 @@ export default function SecurityCenterPage() {
   const tips = [
     "Vérifiez toujours que le professionnel possède le badge 'Vérifié'",
     "Lisez les avis des précédents clients avant de réserver",
-    "Communiquez uniquement via la messagerie sécurisée de JobConnect",
+    "Communiquez uniquement via la messagerie sécurisée de ProKorb",
     "Ne partagez jamais vos informations de paiement en dehors de la plateforme",
     "Signalez immédiatement tout comportement suspect",
     "Conservez toujours les preuves de vos échanges (messages, devis, photos)",

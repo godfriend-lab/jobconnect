@@ -41,8 +41,6 @@ export default function Footer() {
   const pathname = usePathname()
   const { lang, setLang, t } = useLanguage()
 
-  // Le footer ne s'affiche que sur la landing page grâce à ConditionalFooter, 
-  // mais on garde cette sécurité au cas où.
   if (pathname === '/login' || pathname === '/register') {
     return null
   }
@@ -112,59 +110,63 @@ export default function Footer() {
     },
   ]
 
-  // ✅ RÉSEAUX SOCIAUX MIS À JOUR (Facebook, Instagram, X uniquement)
   const socialLinks = [
     { 
       name: "Facebook", 
       icon: FacebookIcon, 
       href: "https://www.facebook.com/profile.php?id=61593667670576", 
-      color: "hover:text-blue-600" 
+      color: "hover:text-blue-500" 
     },
     { 
       name: "Instagram", 
       icon: InstagramIcon, 
-      href: "https://www.instagram.com/jobconnectafrica/", 
-      color: "hover:text-pink-600" 
+      href: "https://www.instagram.com/ProKorbafrica/", 
+      color: "hover:text-pink-500" 
     },
     { 
       name: "X (Twitter)", 
       icon: TwitterIcon, 
-      href: "https://x.com/JobConnectAfric", 
-      color: "hover:text-white" // Blanc pour être visible sur fond sombre
+      href: "https://x.com/ProKorbAfric", 
+      color: "hover:text-white" 
     },
   ]
 
   return (
     <footer className="bg-slate-900 text-slate-300 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Logo et Newsletter */}
+        
+        {/* ✅ LOGO ET NEWSLETTER MIS À JOUR */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 pb-8 border-b border-slate-800">
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">JC</span>
-              </div>
-              <span className="font-black text-2xl text-white">
-                JOB<span className="text-indigo-400">CONNECT</span>
+            {/* REMPLACEMENT DU "PK" PAR TON VRAI LOGO */}
+            <Link href="/" className="flex items-center gap-3 mb-4 group">
+              <img 
+                src="/logo.png" 
+                alt="Logo ProKorb" 
+                className="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+              <span className="font-black text-2xl text-white hidden sm:block">
+                PRO<span className="text-indigo-400">KORB</span>
               </span>
-            </div>
+            </Link>
+            
             <p className="text-slate-400 mb-6 leading-relaxed">
               {t('footer.tagline') || "La marketplace N°1 au Togo pour connecter les professionnels qualifiés avec des clients exigeants."}
             </p>
             
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm">
-                <Mail className="w-4 h-4 text-indigo-400" />
-                <a href="mailto:contact@jobconnect.tg" className="hover:text-white transition-colors">
-                  contact@jobconnect.tg
+                <Mail className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                <a href="mailto:contact@prokorb.tg" className="hover:text-white transition-colors">
+                  contact@prokorb.tg
                 </a>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Phone className="w-4 h-4 text-indigo-400" />
+                <Phone className="w-4 h-4 text-indigo-400 flex-shrink-0" />
                 <span>+228 70 88 86 99 / 79 94 07 93</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <MapPin className="w-4 h-4 text-indigo-400" />
+                <MapPin className="w-4 h-4 text-indigo-400 flex-shrink-0" />
                 <span>Lomé, Togo</span>
               </div>
             </div>
@@ -183,7 +185,7 @@ export default function Footer() {
               />
               <button 
                 type="submit"
-                className="w-full py-3 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-300"
+                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-300"
               >
                 {t('footer.subscribe') || 'S\'abonner'}
               </button>
@@ -277,7 +279,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-slate-800 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-            <p>© {currentYear} JobConnect Togo. {t('footer.rights_reserved') || 'Tous droits réservés.'}</p>
+            <p>© {currentYear} ProKorb . {t('footer.rights_reserved') || 'Tous droits réservés.'}</p>
             <div className="flex items-center gap-2">
               <Lock className="w-4 h-4" />
               <span>{t('footer.data_protected') || 'Vos données sont protégées et sécurisées.'}</span>

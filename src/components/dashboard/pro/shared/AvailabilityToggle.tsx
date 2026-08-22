@@ -1,58 +1,111 @@
 // @ts-nocheck
-import { Loader2, Pause, CheckCircle } from 'lucide-react'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { CheckCircle2, Pause, Loader2 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 interface AvailabilityToggleProps {
-  isAvailable: boolean
-  onToggle: () => void
-  loading?: boolean
+  userId: string
+  currentStatus?: boolean
+  onStatusChange?: (newStatus: boolean) => void
 }
 
-export default function AvailabilityToggle({ isAvailable, onToggle, loading }: AvailabilityToggleProps) {
+export default function AvailabilityToggle({ 
+  userId, 
+  currentStatus,
+  onStatusChange 
+}: AvailabilityToggleProps) {
+  const [isAvailable, setIsAvailable] = useState<boolean>(currentStatus ?? true)
+  const [updating, setUpdating] = useState(false)
+
+  // Synchroniser avec le statut externe si fourni
+  useEffect(() => {
+    if (currentStatus !== undefined) {
+      setIsAvailable(currentStatus)
+    }
+  }, [currentStatus])
+
+  const toggleAvailability = async () => {
+    if (!userId) {
+      console.error('❌ UserId manquant pour toggle availability')
+      return
+    }
+
+    setUpdating(true)
+    const newStatus = !isAvailable
+    
+    // Mise à jour optimiste de l'UI
+    setIsAvailable(newStatus)
+
+    try {
+      // Mise à jour dans Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          is_available: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId)
+
+      if (error) {
+        console.error('❌ Erreur update availability:', error)
+        // Rollback en cas d'erreur
+        setIsAvailable(!newStatus)
+        alert('❌ Erreur lors de la mise à jour du statut')
+        return
+      }
+
+      // Notification au parent si callback fourni
+      if (onStatusChange) {
+        onStatusChange(newStatus)
+      }
+
+      console.log('✅ Disponibilité mise à jour:', newStatus ? 'Disponible' : 'Indisponible')
+      
+    } catch (error) {
+      console.error('❌ Erreur critique toggle availability:', error)
+      // Rollback
+      setIsAvailable(!newStatus)
+      alert('❌ Une erreur est survenue')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   return (
-    <div className="bg-slate-900 rounded-2xl shadow-lg border border-slate-800 p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-            isAvailable 
-              ? 'bg-emerald-900/30 border border-emerald-700/50' 
-              : 'bg-slate-800 border border-slate-700'
-          }`}>
-            {isAvailable ? (
-              <CheckCircle className="w-6 h-6 text-emerald-400" />
-            ) : (
-              <Pause className="w-6 h-6 text-slate-400" />
-            )}
-          </div>
-          <div>
-            <h3 className="font-bold text-white text-lg">
-              {isAvailable ? 'Disponible' : 'Indisponible'}
-            </h3>
-            <p className="text-sm text-slate-400 mt-0.5">
-              {isAvailable 
-                ? 'Vous êtes visible sur la marketplace et pouvez recevoir des demandes' 
-                : 'Vous êtes masqué de la marketplace'}
-            </p>
-          </div>
-        </div>
+    <div className="relative">
+      <button
+        type="button"
+        onClick={toggleAvailability}
+        disabled={updating}
+        className={`
+          inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold 
+          transition-all duration-300 shadow-sm border
+          disabled:opacity-60 disabled:cursor-not-allowed
+          ${isAvailable 
+            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:shadow-md hover:shadow-emerald-500/20 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/30' 
+            : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:shadow-md hover:shadow-amber-500/20 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 dark:hover:bg-amber-900/30'
+          }
+        `}
+      >
+        {updating ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : isAvailable ? (
+          <CheckCircle2 className="w-5 h-5" />
+        ) : (
+          <Pause className="w-5 h-5" />
+        )}
         
-        <button
-          onClick={onToggle}
-          disabled={loading}
-          className={`relative w-16 h-8 rounded-full transition-all duration-300 ${
-            isAvailable 
-              ? 'bg-emerald-500 hover:bg-emerald-600' 
-              : 'bg-slate-700 hover:bg-slate-600'
-          } ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-        >
-          <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300 ${
-            isAvailable ? 'translate-x-9' : 'translate-x-1'
-          }`}>
-            {loading && (
-              <Loader2 className="w-4 h-4 animate-spin text-slate-600 absolute top-1 left-1" />
-            )}
-          </div>
-        </button>
-      </div>
+        <span className="font-medium">
+          {updating 
+            ? 'Mise à jour...' 
+            : isAvailable 
+              ? 'Disponible' 
+              : 'Indisponible'
+          }
+        </span>
+      </button>
     </div>
   )
 }

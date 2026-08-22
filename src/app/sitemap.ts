@@ -3,43 +3,43 @@
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: 'https://jobconnect.tg',
+      url: 'https://ProKorb.tg',
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
     },
     {
-      url: 'https://jobconnect.tg/pricing',
+      url: 'https://ProKorb.tg/pricing',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
-      url: 'https://jobconnect.tg/register',
+      url: 'https://ProKorb.tg/register',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: 'https://jobconnect.tg/login',
+      url: 'https://ProKorb.tg/login',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: 'https://jobconnect.tg/privacy',
+      url: 'https://ProKorb.tg/privacy',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: 'https://jobconnect.tg/terms',
+      url: 'https://ProKorb.tg/terms',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: 'https://jobconnect.tg/cgu',
+      url: 'https://ProKorb.tg/cgu',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,

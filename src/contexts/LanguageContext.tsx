@@ -132,7 +132,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Charger la langue depuis localStorage au démarrage
-    const saved = localStorage.getItem('jobconnect_lang') as Language
+    const saved = localStorage.getItem('ProKorb_lang') as Language
     if (saved && (saved === 'fr' || saved === 'en')) {
       setLangState(saved)
     }
@@ -140,7 +140,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLang = (newLang: Language) => {
     setLangState(newLang)
-    localStorage.setItem('jobconnect_lang', newLang)
+    localStorage.setItem('ProKorb_lang', newLang)
     // Recharger la page pour appliquer la traduction partout
     window.location.reload()
   }

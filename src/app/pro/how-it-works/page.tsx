@@ -98,7 +98,7 @@ export default function ProHowItWorksPage() {
           </Link>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Comment ça marche ?</h1>
           <p className="text-lg text-indigo-100 max-w-2xl">
-            Le guide complet pour lancer votre activité professionnelle sur JobConnect et attirer vos premiers clients.
+            Le guide complet pour lancer votre activité professionnelle sur ProKorb et attirer vos premiers clients.
           </p>
         </div>
       </div>
@@ -134,7 +134,7 @@ export default function ProHowItWorksPage() {
 
           {/* Benefits */}
           <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-12">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8">Pourquoi choisir JobConnect ?</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-8">Pourquoi choisir ProKorb ?</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {benefits.map((benefit, idx) => {
                 const Icon = benefit.icon
@@ -203,7 +203,7 @@ export default function ProHowItWorksPage() {
               {[
                 { q: "Combien de temps prend la vérification ?", a: "En moyenne 24 à 48 heures ouvrées après réception de tous les documents requis." },
                 { q: "Puis-je changer de forfait à tout moment ?", a: "Oui, vous pouvez upgrader ou downgrader votre forfait à tout moment depuis votre tableau de bord." },
-                { q: "Comment sont gérés les paiements clients ?", a: "Les paiements se font directement entre vous et le client (T-Money, Flooz, espèces). JobConnect ne prend aucune commission." },
+                { q: "Comment sont gérés les paiements clients ?", a: "Les paiements se font directement entre vous et le client (T-Money, Flooz, espèces). ProKorb ne prend aucune commission." },
                 { q: "Que se passe-t-il si un client ne paie pas ?", a: "Notre équipe de médiation intervient pour résoudre le litige. Nous vous accompagnons dans la résolution." },
               ].map((faq, idx) => (
                 <div key={idx} className="p-5 bg-slate-50 rounded-2xl border border-slate-200">
@@ -218,7 +218,7 @@ export default function ProHowItWorksPage() {
           <div className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-3xl p-10 text-center text-white">
             <h3 className="text-3xl font-black mb-4">Prêt à développer votre activité ?</h3>
             <p className="text-indigo-100 mb-8 max-w-xl mx-auto">
-              Rejoignez des centaines de professionnels qui ont déjà choisi JobConnect pour booster leur chiffre d'affaires.
+              Rejoignez des centaines de professionnels qui ont déjà choisi ProKorb pour booster leur chiffre d'affaires.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link href="/register?role=pro" className="inline-block bg-white text-indigo-600 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition-colors">

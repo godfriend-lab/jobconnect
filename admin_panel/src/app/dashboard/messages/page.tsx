@@ -192,7 +192,7 @@ export default function MessagesPage() {
         .insert({
           conversation_id: selectedConversation.id,
           sender_id: "admin",
-          sender_name: "Support JobConnect",
+          sender_name: "Support ProKorb",
           sender_role: "admin",
           content: replyText,
           is_read: false,

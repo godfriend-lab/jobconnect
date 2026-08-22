@@ -106,7 +106,7 @@ export default function ClientProtectionPage() {
           </Link>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Protection des clients</h1>
           <p className="text-lg text-indigo-100 max-w-2xl">
-            Votre sécurité et votre satisfaction sont notre priorité. Découvrez comment JobConnect vous protège à chaque étape.
+            Votre sécurité et votre satisfaction sont notre priorité. Découvrez comment ProKorb vous protège à chaque étape.
           </p>
         </div>
       </div>
@@ -200,9 +200,9 @@ export default function ClientProtectionPage() {
                   Si vous rencontrez un problème avec un professionnel (travail non conforme, comportement inapproprié, demande de paiement suspect), contactez-nous immédiatement.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <a href="mailto:litiges@jobconnect.tg" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors">
+                  <a href="mailto:litiges@proKorb.tg" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors">
                     <Mail className="w-5 h-5" />
-                    litiges@jobconnect.tg
+                    litiges@ProKorb.tg
                   </a>
                   <a href="tel:+22870888699" className="inline-flex items-center gap-2 bg-white border-2 border-red-600 text-red-600 hover:bg-red-50 font-bold px-6 py-3 rounded-xl transition-colors">
                     <Phone className="w-5 h-5" />

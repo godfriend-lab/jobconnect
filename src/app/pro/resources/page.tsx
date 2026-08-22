@@ -10,7 +10,7 @@ export default function ProResourcesPage() {
     {
       icon: BookOpen,
       title: "Guide du professionnel débutant",
-      desc: "Tout ce qu'il faut savoir pour bien démarrer sur JobConnect : optimisation du profil, fixation des prix, gestion des clients.",
+      desc: "Tout ce qu'il faut savoir pour bien démarrer sur ProKorb : optimisation du profil, fixation des prix, gestion des clients.",
       type: "PDF",
       pages: "24 pages"
     },
@@ -93,7 +93,7 @@ export default function ProResourcesPage() {
           </Link>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Ressources pour professionnels</h1>
           <p className="text-lg text-indigo-100 max-w-2xl">
-            Guides, tutoriels, outils et articles pour vous aider à développer votre activité sur JobConnect.
+            Guides, tutoriels, outils et articles pour vous aider à développer votre activité sur ProKorb.
           </p>
         </div>
       </div>
@@ -184,7 +184,7 @@ export default function ProResourcesPage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-6">Témoignages de professionnels</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { name: "Koffi A.", job: "Plombier", city: "Lomé", quote: "Grâce à JobConnect, j'ai doublé mon chiffre d'affaires en 3 mois. La visibilité est incroyable !", rating: 5 },
+                { name: "Koffi A.", job: "Plombier", city: "Lomé", quote: "Grâce à ProKorb, j'ai doublé mon chiffre d'affaires en 3 mois. La visibilité est incroyable !", rating: 5 },
                 { name: "Amina K.", job: "Couturière", city: "Sokodé", quote: "J'ai trouvé plus de 50 nouvelles clientes en 6 mois. Le badge vérifié fait toute la différence.", rating: 5 },
                 { name: "Jean-Marc T.", job: "Électricien", city: "Kara", quote: "Plateforme sérieuse et clients de qualité. Je recommande à tous les artisans du Togo.", rating: 5 },
               ].map((story, idx) => (

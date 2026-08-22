@@ -51,7 +51,7 @@ export default function ClientHowItWorksPage() {
   ]
 
   const benefits = [
-    { icon: Shield, title: "0% de commission", desc: "JobConnect est gratuit pour les clients. Vous payez uniquement le professionnel." },
+    { icon: Shield, title: "0% de commission", desc: "ProKorb est gratuit pour les clients. Vous payez uniquement le professionnel." },
     { icon: TrendingUp, title: "Professionnels vérifiés", desc: "Tous nos pros sont contrôlés : identité, casier judiciaire et qualifications vérifiées." },
     { icon: Zap, title: "Mise en relation rapide", desc: "Trouvez un professionnel disponible en moins de 24h dans votre localité." },
     { icon: Award, title: "Satisfaction garantie", desc: "Si le travail n'est pas conforme, nous intervenons pour médiation sous 7 jours." },
@@ -60,7 +60,7 @@ export default function ClientHowItWorksPage() {
   const faqs = [
     {
       q: "L'inscription est-elle gratuite ?",
-      a: "Oui, créer un compte client sur JobConnect est 100% gratuit. Vous ne payez que le professionnel pour le service rendu."
+      a: "Oui, créer un compte client sur ProKorb est 100% gratuit. Vous ne payez que le professionnel pour le service rendu."
     },
     {
       q: "Comment sont sélectionnés les professionnels ?",
@@ -72,7 +72,7 @@ export default function ClientHowItWorksPage() {
     },
     {
       q: "Que faire en cas de problème ?",
-      a: "Contactez-nous immédiatement à litiges@jobconnect.tg ou au +228 70 88 86 99. Nous intervenons sous 24h pour trouver une solution."
+      a: "Contactez-nous immédiatement à litiges@ProKorb.tg ou au +228 70 88 86 99. Nous intervenons sous 24h pour trouver une solution."
     },
   ]
 
@@ -87,7 +87,7 @@ export default function ClientHowItWorksPage() {
           </Link>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Comment ça marche ?</h1>
           <p className="text-lg text-indigo-100 max-w-2xl">
-            Le guide complet pour trouver et engager le professionnel idéal en toute sécurité sur JobConnect.
+            Le guide complet pour trouver et engager le professionnel idéal en toute sécurité sur ProKorb.
           </p>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function ClientHowItWorksPage() {
 
           {/* Benefits */}
           <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-12">
-            <h2 className="text-3xl font-black text-slate-900 mb-8">Pourquoi choisir JobConnect ?</h2>
+            <h2 className="text-3xl font-black text-slate-900 mb-8">Pourquoi choisir ProKorb ?</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {benefits.map((benefit, idx) => {
                 const Icon = benefit.icon
@@ -161,7 +161,7 @@ export default function ClientHowItWorksPage() {
           <div className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-3xl p-10 text-center text-white">
             <h3 className="text-3xl font-black mb-4">Prêt à trouver votre professionnel ?</h3>
             <p className="text-indigo-100 mb-8 max-w-xl mx-auto">
-              Rejoignez des milliers de clients satisfaits qui ont déjà trouvé leur professionnel de confiance sur JobConnect.
+              Rejoignez des milliers de clients satisfaits qui ont déjà trouvé leur professionnel de confiance sur ProKorb.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link href="/marketplace" className="inline-block bg-white text-indigo-600 font-bold px-8 py-4 rounded-xl hover:bg-indigo-50 transition-colors">

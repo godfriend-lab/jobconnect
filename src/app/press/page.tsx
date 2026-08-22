@@ -27,7 +27,7 @@ export default function PressPage() {
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">Kit Média Officiel</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { title: "Logos & Charte Graphique", desc: "Fichiers SVG/PNG haute résolution de JobConnect et Ideenwerk Technologies.", icon: FileText },
+              { title: "Logos & Charte Graphique", desc: "Fichiers SVG/PNG haute résolution de ProKorb et Ideenwerk Technologies.", icon: FileText },
               { title: "Fiches Techniques", desc: "Données chiffrées sur l'impact, l'architecture sécurisée et la croissance de la plateforme.", icon: Shield },
               { title: "Photos HD", desc: "Portraits officiels et photos des bureaux de Lomé (libres de droits pour usage éditorial).", icon: Download }
             ].map((item, idx) => (
@@ -54,7 +54,7 @@ export default function PressPage() {
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">Godfriend Agbevivi</h3>
               <p className="text-indigo-600 font-semibold mb-3">Fondateur & CEO, Ideenwerk Technologies</p>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                Visionnaire technologique basé au Togo, Godfriend Agbevivi dirige le développement de JobConnect 
+                Visionnaire technologique basé au Togo, Godfriend Agbevivi dirige le développement de ProKorb 
                 avec un engagement ferme envers l'innovation éthique, la sécurité des données et l'inclusion 
                 économique en Afrique de l'Ouest.
               </p>

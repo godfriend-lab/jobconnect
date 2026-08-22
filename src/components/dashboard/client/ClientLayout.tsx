@@ -4,7 +4,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Search, MapPin, Home, Clock, Heart, Settings, LogOut, Loader2, ChevronDown } from 'lucide-react'
-import { Logo } from '@/components/Logo'
 
 export default function ClientLayout({ 
   children, activeView, setActiveView, profile, handleLogout,
@@ -44,14 +43,18 @@ export default function ClientLayout({
       {/* Header */}
       <header className="glass-effect border-b border-slate-800/60 sticky top-0 z-50 shadow-lg transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+          
+          {/* ✅ VOTRE LOGO PERSONNALISÉ ICI */}
           <Link href="/dashboard/client" className="flex items-center gap-3 flex-shrink-0 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-60 group-hover:opacity-80 transition-opacity rounded-full"></div>
-              <Logo className="w-10 h-10 relative z-10 group-hover:scale-110 transition-transform duration-300" />
-            </div>
+            {/* ⚠️ ASSUREZ-VOUS QUE VOTRE FICHIER S'APPELLE BIEN 'logo.png' (ou .svg / .jpg) DANS LE DOSSIER 'public' */}
+            <img 
+              src="/logo.png" 
+              alt="Logo ProKorb" 
+              className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            />
             <span className="font-black text-xl hidden sm:block tracking-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">JOB</span>
-              <span className="text-white">CONNECT</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">PRO</span>
+              <span className="text-white">KORB</span>
             </span>
           </Link>
           

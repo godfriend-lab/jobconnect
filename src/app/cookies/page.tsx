@@ -53,7 +53,7 @@ export default function CookiesPolicyPage() {
           </Link>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Politique relative aux cookies</h1>
           <p className="text-lg text-indigo-100 max-w-2xl">
-            Tout savoir sur les cookies utilisés par JobConnect et comment les gérer.
+            Tout savoir sur les cookies utilisés par ProKorb et comment les gérer.
           </p>
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function CookiesPolicyPage() {
               <div className="p-2 bg-indigo-50 rounded-xl">
                 <Info className="w-6 h-6 text-indigo-600" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-900">2. Cookies utilisés par JobConnect</h2>
+              <h2 className="text-2xl font-bold text-slate-900">2. Cookies utilisés par ProKorb</h2>
             </div>
             <div className="pl-0 md:pl-14 space-y-4">
               {cookieTypes.map((cookie, idx) => (
@@ -105,7 +105,7 @@ export default function CookiesPolicyPage() {
               <h2 className="text-2xl font-bold text-slate-900">3. Durée de conservation</h2>
             </div>
             <div className="pl-0 md:pl-14 text-slate-600 space-y-3">
-              <p>Les cookies déposés par JobConnect ont une durée de vie maximale de <strong className="text-slate-900">13 mois</strong>, conformément aux recommandations de la CNIL et à la législation togolaise en vigueur.</p>
+              <p>Les cookies déposés par ProKorb ont une durée de vie maximale de <strong className="text-slate-900">13 mois</strong>, conformément aux recommandations de la CNIL et à la législation togolaise en vigueur.</p>
               <p>Au-delà de cette période, votre consentement vous sera à nouveau demandé.</p>
             </div>
           </div>
@@ -121,7 +121,7 @@ export default function CookiesPolicyPage() {
               <p>Vous pouvez à tout moment modifier vos préférences en matière de cookies :</p>
               <ul className="list-disc list-inside ml-4 space-y-2">
                 <li><strong>Dans votre navigateur :</strong> Chaque navigateur (Chrome, Firefox, Safari, Edge) propose des options pour accepter, refuser ou supprimer les cookies.</li>
-                <li><strong>Sur JobConnect :</strong> Vous pouvez gérer vos préférences via notre panneau de gestion des cookies accessible à tout moment en bas de page.</li>
+                <li><strong>Sur ProKorb :</strong> Vous pouvez gérer vos préférences via notre panneau de gestion des cookies accessible à tout moment en bas de page.</li>
               </ul>
               <p className="text-sm text-slate-500 italic">
                 Note : Le refus des cookies essentiels peut affecter le bon fonctionnement du site.
@@ -156,7 +156,7 @@ export default function CookiesPolicyPage() {
             <div className="pl-0 md:pl-14 text-slate-600 space-y-3">
               <p>Pour toute question relative à notre politique de cookies :</p>
               <ul className="space-y-1 ml-4">
-                <li>📧 <a href="mailto:contact@jobconnect.tg" className="text-indigo-600 hover:underline">contact@jobconnect.tg</a></li>
+                <li>📧 <a href="mailto:contact@ProKorb.tg" className="text-indigo-600 hover:underline">contact@ProKorb.tg</a></li>
                 <li>📞 +228 70 88 86 99</li>
               </ul>
             </div>

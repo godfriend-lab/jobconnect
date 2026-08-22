@@ -167,8 +167,8 @@ export default function MessagesPage() {
             <Logo className="w-10 h-10" />
             <div>
               <h1 className="font-black text-xl">
-                <span className="text-indigo-600">JOB</span>
-                <span className="text-slate-900">CONNECT</span>
+                <span className="text-indigo-600">PRO</span>
+                <span className="text-slate-900">KORB</span>
               </h1>
               <p className="text-xs text-slate-500">Messagerie</p>
             </div>

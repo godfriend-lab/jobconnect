@@ -124,7 +124,7 @@ export default function DataProtectionPage() {
             </p>
             <div className="space-y-3">
               <p className="flex items-center gap-2">
-                <span className="font-semibold">Email :</span> dpo@jobconnect.tg
+                <span className="font-semibold">Email :</span> dpo@ProKorb.tg
               </p>
               <p className="flex items-center gap-2">
                 <span className="font-semibold">Téléphone :</span> +228 70 88 86 99

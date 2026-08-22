@@ -31,7 +31,7 @@ const menuItems = [
   { name: "Avis", href: "/dashboard/reviews", icon: Star },
   { name: "Litiges", href: "/dashboard/disputes", icon: AlertTriangle },
   { name: "Paramètres", href: "/dashboard/settings", icon: Settings },
-  { name: "JOBCONNECT AI", href: "/dashboard/ai-assistant", icon: Bot },
+  { name: "PROKORB AI", href: "/dashboard/ai-assistant", icon: Bot },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -66,7 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Logo className="w-10 h-10 flex-shrink-0" />
             <div>
               <h1 className="text-lg font-bold text-[#4F46E5] leading-tight">
-                JOB<span className="text-slate-900">CONNECT</span>
+                PRO<span className="text-slate-900">KORB</span>
               </h1>
               <p className="text-xs text-gray-500">Panel Admin</p>
             </div>
@@ -130,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           
           <div className="flex items-center gap-3 lg:hidden">
             <Logo className="w-8 h-8" />
-            <h2 className="font-bold text-[#4F46E5]">JOBCONNECT</h2>
+            <h2 className="font-bold text-[#4F46E5]">PROKORB</h2>
           </div>
           
           <h2 className="text-lg font-semibold text-gray-800 hidden lg:block">

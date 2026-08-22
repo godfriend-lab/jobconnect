@@ -9,7 +9,7 @@ export default function RefundPolicyPage() {
   ]
 
   const steps = [
-    { num: "01", title: "Contactez le support", desc: "Envoyez un email à contact@jobconnect.tg avec les détails de votre demande." },
+    { num: "01", title: "Contactez le support", desc: "Envoyez un email à contact@ProKorb.tg avec les détails de votre demande." },
     { num: "02", title: "Fournissez les preuves", desc: "Joignez captures d'écran, devis, photos ou tout document justificatif." },
     { num: "03", title: "Étude du dossier", desc: "Notre équipe analyse votre demande sous 5 jours ouvrés." },
     { num: "04", title: "Décision et remboursement", desc: "Si accepté, le remboursement est effectué sous 15 jours via T-Money, Flooz ou virement." },
@@ -42,10 +42,10 @@ export default function RefundPolicyPage() {
             </div>
             <div className="pl-0 md:pl-14 text-slate-600 leading-relaxed space-y-3">
               <p>
-                JobConnect est une plateforme de <strong className="text-slate-900">mise en relation</strong> entre clients et professionnels. Les paiements se font directement entre les deux parties (T-Money, Flooz, espèces).
+                ProKorb est une plateforme de <strong className="text-slate-900">mise en relation</strong> entre clients et professionnels. Les paiements se font directement entre les deux parties (T-Money, Flooz, espèces).
               </p>
               <p>
-                JobConnect ne perçoit pas de commission sur les prestations. En cas de litige, nous intervenons en tant que <strong className="text-slate-900">médiateur</strong> pour trouver une solution équitable.
+                ProKorb ne perçoit pas de commission sur les prestations. En cas de litige, nous intervenons en tant que <strong className="text-slate-900">médiateur</strong> pour trouver une solution équitable.
               </p>
             </div>
           </div>
@@ -139,7 +139,7 @@ export default function RefundPolicyPage() {
             <div className="pl-0 md:pl-14 text-slate-600 space-y-3">
               <p>Pour toute demande de remboursement ou litige :</p>
               <ul className="space-y-1 ml-4">
-                <li> <a href="mailto:litiges@jobconnect.tg" className="text-indigo-600 hover:underline">litiges@jobconnect.tg</a></li>
+                <li> <a href="mailto:litiges@ProKorb.tg" className="text-indigo-600 hover:underline">litiges@ProKorb.tg</a></li>
                 <li>📞 +228 70 88 86 99</li>
                 <li>📍 Lomé, Togo</li>
               </ul>

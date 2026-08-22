@@ -16,7 +16,7 @@ export default function CompanyPage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-black mb-6">Notre Entreprise</h1>
           <p className="text-xl text-indigo-100 max-w-3xl mx-auto">
-            JobConnect est un produit phare d'Ideenwerk Technologies, entreprise technologique innovante basée au Togo
+            ProKorb est un produit phare d'Ideenwerk Technologies, entreprise technologique innovante basée au Togo
           </p>
         </div>
       </div>
@@ -41,7 +41,7 @@ export default function CompanyPage() {
                   quotidienne et stimulent le développement économique.
                 </p>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                  JobConnect représente notre engagement à créer des plateformes qui connectent les talents aux 
+                  ProKorb représente notre engagement à créer des plateformes qui connectent les talents aux 
                   opportunités, tout en respectant les plus hauts standards de qualité, de sécurité et de conformité 
                   légale.
                 </p>
@@ -64,7 +64,7 @@ export default function CompanyPage() {
                   Visionnaire technologique et entrepreneur passionné, Godfriend Agbevivi a fondé Ideenwerk 
                   Technologies avec la conviction que l'innovation technologique peut transformer positivement 
                   les sociétés africaines. Son leadership et sa vision stratégique guident le développement 
-                  de JobConnect et de tous nos produits.
+                  de ProKorb et de tous nos produits.
                 </p>
                 <p className="text-slate-300 leading-relaxed">
                   Sous sa direction, notre entreprise s'engage à respecter les normes internationales tout en 
@@ -130,7 +130,7 @@ export default function CompanyPage() {
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">Raison Sociale</h3>
                 <p>Ideenwerk Technologies</p>
-                <p className="mt-2">Produit: JobConnect</p>
+                <p className="mt-2">Produit: ProKorb</p>
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">Siège Social</h3>
@@ -143,7 +143,7 @@ export default function CompanyPage() {
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">Contact</h3>
-                <p>Email: contact@jobconnect.tg</p>
+                <p>Email: contact@proKorb.tg</p>
                 <p>Tél: +228 70 88 86 99 / 79 94 07 93</p>
               </div>
             </div>
@@ -159,7 +159,7 @@ export default function CompanyPage() {
             </h2>
             <div className="space-y-4 text-emerald-800 dark:text-emerald-200">
               <p className="leading-relaxed">
-                JobConnect s'engage à maintenir les plus hauts standards de qualité et de sécurité. Notre plateforme 
+                ProKorb s'engage à maintenir les plus hauts standards de qualité et de sécurité. Notre plateforme 
                 est développée dans le respect des réglementations suivantes:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">

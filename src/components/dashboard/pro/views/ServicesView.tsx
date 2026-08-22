@@ -1,111 +1,409 @@
 // @ts-nocheck
 'use client'
-import { useState } from 'react'
-import { Plus, Briefcase, Edit3, Save, Loader2, CheckCircle2, Settings } from 'lucide-react'
-import { categoriesMetiers } from '@/lib/constants'
+
+import { useState, useEffect } from 'react'
+import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, Package, TrendingUp } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+
+interface Service {
+  id: string
+  title: string
+  description: string
+  category: string
+  price: string
+  is_active: boolean
+  created_at: string
+}
 
 export default function ServicesView({ services, uploading, publishService, updateService }: any) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editingServiceId, setEditingServiceId] = useState<string | null>(null)
-  
-  const [serviceTitle, setServiceTitle] = useState('')
-  const [serviceDesc, setServiceDesc] = useState('')
-  const [servicePrice, setServicePrice] = useState('')
-  const [serviceCategory, setServiceCategory] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
+  const [editingService, setEditingService] = useState<Service | null>(null)
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: '',
+    price: '',
+    priceType: 'fixed' as 'fixed' | 'from' | 'quote'
+  })
+  const [customCategory, setCustomCategory] = useState('')
+  const [showCustomCategory, setShowCustomCategory] = useState(false)
 
-  const handlePublish = async () => {
-    if (!serviceTitle || !serviceDesc || !servicePrice || !serviceCategory) return alert('Veuillez remplir tous les champs')
-    const success = await publishService({ title: serviceTitle, description: serviceDesc, price: servicePrice, category: serviceCategory, city: 'Lomé' })
-    if (success) {
-      setServiceTitle(''); setServiceDesc(''); setServicePrice(''); setServiceCategory('')
-      alert('✅ Service publié avec succès !')
+  const categories = [
+    'Développeur Full Stack',
+    'Plomberie',
+    'Électricité',
+    'Maçonnerie',
+    'Peinture',
+    'Couture',
+    'Mécanique',
+    'Informatique',
+    'Médecine',
+    'Autre'
+  ]
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      category: '',
+      price: '',
+      priceType: 'from'
+    })
+    setCustomCategory('')
+    setShowCustomCategory(false)
+    setIsCreating(false)
+    setEditingService(null)
+  }
+
+  const handleCreate = () => {
+    resetForm()
+    setIsCreating(true)
+  }
+
+  const handleEdit = (service: Service) => {
+    // Déterminer le type de prix
+    let priceType: 'fixed' | 'from' | 'quote' = 'fixed'
+    let cleanPrice = service.price
+
+    if (service.price.toLowerCase().includes('devis')) {
+      priceType = 'quote'
+      cleanPrice = ''
+    } else if (service.price.toLowerCase().includes('à partir de') || service.price.toLowerCase().includes('apartir de')) {
+      priceType = 'from'
+      cleanPrice = service.price.replace(/à partir de|apartir de/gi, '').replace(/fcfa/gi, '').trim()
+    }
+
+    setFormData({
+      title: service.title,
+      description: service.description,
+      category: service.category,
+      price: cleanPrice,
+      priceType
+    })
+    setEditingService(service)
+    setIsCreating(true)
+  }
+
+  const handleSave = async () => {
+    // Validation
+    if (!formData.title.trim() || !formData.description.trim() || !formData.category) {
+      alert('Veuillez remplir tous les champs obligatoires')
+      return
+    }
+
+    if (formData.priceType !== 'quote' && (!formData.price || isNaN(Number(formData.price)))) {
+      alert('Veuillez entrer un prix valide')
+      return
+    }
+
+    // Formater le prix selon le type
+    let formattedPrice = ''
+    if (formData.priceType === 'quote') {
+      formattedPrice = 'Sur devis'
+    } else if (formData.priceType === 'from') {
+      formattedPrice = `À partir de ${Number(formData.price).toLocaleString('fr-FR')} FCFA`
     } else {
-      alert('❌ Erreur lors de la publication')
+      formattedPrice = `${Number(formData.price).toLocaleString('fr-FR')} FCFA`
+    }
+
+    const serviceData = {
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      category: formData.category === 'Autre' ? customCategory : formData.category,
+      price: formattedPrice,
+      is_active: true
+    }
+
+    try {
+      if (editingService) {
+        await updateService(editingService.id, serviceData)
+      } else {
+        await publishService(serviceData)
+      }
+      resetForm()
+    } catch (error) {
+      console.error('Erreur:', error)
+      alert('Erreur lors de l\'enregistrement du service')
     }
   }
 
-  const handleUpdate = async () => {
-    if (!serviceTitle || !serviceDesc || !servicePrice || !serviceCategory || !editingServiceId) return alert('Veuillez remplir tous les champs')
-    const success = await updateService(editingServiceId, { title: serviceTitle, description: serviceDesc, price: servicePrice, category: serviceCategory, city: 'Lomé' })
-    if (success) {
-      setIsEditing(false); setEditingServiceId(null)
-      setServiceTitle(''); setServiceDesc(''); setServicePrice(''); setServiceCategory('')
-      alert('✅ Service mis à jour avec succès !')
+  const handleCancel = () => {
+    resetForm()
+  }
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce service ?')) {
+      try {
+        const { error } = await supabase
+          .from('services')
+          .delete()
+          .eq('id', id)
+        
+        if (error) throw error
+        alert('Service supprimé avec succès')
+      } catch (error) {
+        console.error('Erreur suppression:', error)
+        alert('Erreur lors de la suppression')
+      }
     }
   }
-
-  const startEdit = (service: any) => {
-    setIsEditing(true)
-    setEditingServiceId(service.id)
-    setServiceTitle(service.title)
-    setServiceDesc(service.description)
-    setServicePrice(service.price)
-    setServiceCategory(service.category)
-  }
-
-  const cardBg = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
-  const textPrimary = "text-slate-900 dark:text-white"
-  const textSecondary = "text-slate-600 dark:text-slate-400"
-  const inputBg = "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400"
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className={`text-2xl font-bold ${textPrimary}`}>Mon Service</h1>
-        <p className={`text-sm ${textSecondary}`}>{services.length > 0 ? "Vous avez déjà publié votre service. Vous pouvez le modifier ci-dessous." : "Publiez votre premier service pour être visible sur la marketplace."}</p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-1">Mes Services</h2>
+          <p className="text-slate-400 text-sm">Gérez vos offres de services</p>
+        </div>
+        <button
+          onClick={handleCreate}
+          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-indigo-500/30"
+        >
+          <Plus className="w-5 h-5" />
+          Nouveau Service
+        </button>
       </div>
 
-      {services.length === 0 ? (
-        <div className={`${cardBg} rounded-2xl p-6 shadow-sm`}>
-          <h2 className={`text-lg font-semibold ${textPrimary} mb-6 flex items-center gap-2`}><Plus className="w-5 h-5 text-indigo-500" /> Publier mon service</h2>
-          <div className="space-y-4">
-            <div><label className={`block text-sm font-medium ${textSecondary} mb-2`}>Titre du service *</label><input type="text" value={serviceTitle} onChange={(e) => setServiceTitle(e.target.value)} placeholder="Ex: Installation électrique complète" className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} /></div>
-            <div><label className={`block text-sm font-medium ${textSecondary} mb-2`}>Description détaillée *</label><textarea value={serviceDesc} onChange={(e) => setServiceDesc(e.target.value)} placeholder="Décrivez votre service..." rows={4} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} /></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className={`block text-sm font-medium ${textSecondary} mb-2`}>Prix (FCFA) *</label><input type="text" value={servicePrice} onChange={(e) => setServicePrice(e.target.value)} placeholder="Ex: 50000" className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} /></div>
-              <div><label className={`block text-sm font-medium ${textSecondary} mb-2`}>Catégorie *</label><input list="categories-metiers" value={serviceCategory} onChange={(e) => setServiceCategory(e.target.value)} placeholder="Tapez ou sélectionnez..." className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} /><datalist id="categories-metiers">{[...new Set(categoriesMetiers)].map((cat) => (<option key={cat} value={cat} />))}</datalist></div>
+      {/* Formulaire de création/édition */}
+      {isCreating && (
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 animate-fade-in">
+          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <Edit2 className="w-5 h-5 text-indigo-400" />
+            {editingService ? 'Modifier mon service' : 'Créer un nouveau service'}
+          </h3>
+
+          <div className="space-y-5">
+            {/* Titre */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Titre du service *
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Ex: Développement Full Stack"
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
             </div>
-            <button onClick={handlePublish} disabled={uploading || !serviceTitle || !serviceDesc || !servicePrice || !serviceCategory} className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-              {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />} Publier le service
-            </button>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Description détaillée *
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Décrivez votre service en détail..."
+                rows={4}
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+              />
+            </div>
+
+            {/* Catégorie */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Catégorie *
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => {
+                  if (e.target.value === 'Autre') {
+                    setShowCustomCategory(true)
+                  } else {
+                    setShowCustomCategory(false)
+                  }
+                  setFormData({ ...formData, category: e.target.value })
+                }}
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="">Sélectionnez une catégorie</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+
+              {showCustomCategory && (
+                <input
+                  type="text"
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  placeholder="Précisez votre catégorie"
+                  className="mt-3 w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+              )}
+            </div>
+
+            {/* Type de prix */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Type de tarification *
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, priceType: 'from' })}
+                  className={`px-4 py-3 rounded-xl border-2 font-semibold transition-all flex items-center justify-center gap-2 ${
+                    formData.priceType === 'from'
+                      ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400'
+                      : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
+                  }`}
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  À partir de
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, priceType: 'fixed' })}
+                  className={`px-4 py-3 rounded-xl border-2 font-semibold transition-all flex items-center justify-center gap-2 ${
+                    formData.priceType === 'fixed'
+                      ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400'
+                      : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
+                  }`}
+                >
+                  <Package className="w-4 h-4" />
+                  Prix fixe
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, priceType: 'quote' })}
+                  className={`px-4 py-3 rounded-xl border-2 font-semibold transition-all flex items-center justify-center gap-2 ${
+                    formData.priceType === 'quote'
+                      ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400'
+                      : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
+                  }`}
+                >
+                  Sur devis
+                </button>
+              </div>
+            </div>
+
+            {/* Prix (seulement si pas "Sur devis") */}
+            {formData.priceType !== 'quote' && (
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Prix minimum (FCFA) *
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">
+                    {formData.priceType === 'from' ? 'À partir de ' : ''}
+                  </span>
+                  <input
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    placeholder="5000"
+                    min="0"
+                    className="w-full pl-32 pr-20 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">
+                    FCFA
+                  </span>
+                </div>
+                <p className="mt-2 text-xs text-slate-500">
+                  {formData.priceType === 'from' 
+                    ? 'Affichera: "À partir de X FCFA"' 
+                    : 'Affichera: "X FCFA"'}
+                </p>
+              </div>
+            )}
+
+            {/* Boutons d'action */}
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={handleSave}
+                disabled={uploading}
+                className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Enregistrement...
+                  </>
+                ) : (
+                  <>
+                    <Edit2 className="w-5 h-5" />
+                    {editingService ? 'Mettre à jour' : 'Publier le service'}
+                  </>
+                )}
+              </button>
+              <button
+                onClick={handleCancel}
+                className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl transition-all border border-slate-700"
+              >
+                Annuler
+              </button>
+            </div>
           </div>
         </div>
-      ) : (
-        <div className="space-y-6">
-          {!isEditing ? (
-            <div className={`${cardBg} rounded-2xl p-6 shadow-sm`}>
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
-                <div>
-                  <div className="flex items-center gap-3 mb-2"><Briefcase className="w-6 h-6 text-indigo-500" /><h3 className={`text-2xl font-bold ${textPrimary}`}>{services[0].title}</h3></div>
-                  <span className="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-semibold capitalize">{services[0].category}</span>
-                </div>
-                <div className="text-right"><span className="text-3xl font-black text-emerald-600">{services[0].price} <span className="text-lg font-medium text-slate-500">FCFA</span></span></div>
-              </div>
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 mb-6"><p className={`${textSecondary} whitespace-pre-wrap leading-relaxed`}>{services[0].description}</p></div>
-              <div className="flex flex-wrap gap-3">
-                <button onClick={() => startEdit(services[0])} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all flex items-center gap-2 shadow-md hover:shadow-lg"><Edit3 className="w-5 h-5" /> Modifier le service</button>
-                <span className="px-4 py-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-xl font-medium flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> Service actif et visible</span>
-              </div>
-            </div>
-          ) : (
-            <div className={`${cardBg} rounded-2xl p-6 shadow-sm`}>
-              <h2 className={`text-lg font-semibold ${textPrimary} mb-6 flex items-center gap-2`}><Settings className="w-5 h-5 text-indigo-500" /> Modifier mon service</h2>
-              <div className="space-y-4">
-                <div><label className={`block text-sm font-medium ${textSecondary} mb-2`}>Titre du service *</label><input type="text" value={serviceTitle} onChange={(e) => setServiceTitle(e.target.value)} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} /></div>
-                <div><label className={`block text-sm font-medium ${textSecondary} mb-2`}>Description détaillée *</label><textarea value={serviceDesc} onChange={(e) => setServiceDesc(e.target.value)} rows={4} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} /></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><label className={`block text-sm font-medium ${textSecondary} mb-2`}>Prix (FCFA) *</label><input type="text" value={servicePrice} onChange={(e) => setServicePrice(e.target.value)} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} /></div>
-                  <div><label className={`block text-sm font-medium ${textSecondary} mb-2`}>Catégorie *</label><input list="categories-metiers" value={serviceCategory} onChange={(e) => setServiceCategory(e.target.value)} className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${inputBg}`} /><datalist id="categories-metiers">{[...new Set(categoriesMetiers)].map((cat) => (<option key={cat} value={cat} />))}</datalist></div>
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button onClick={handleUpdate} disabled={uploading} className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50">{uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} Enregistrer</button>
-                  <button onClick={() => { setIsEditing(false); setEditingServiceId(null); setServiceTitle(''); setServiceDesc(''); setServicePrice(''); setServiceCategory('') }} className="px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-xl transition-all">Annuler</button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
       )}
+
+      {/* Liste des services */}
+      <div className="grid gap-4">
+        {services?.map((service: Service) => (
+          <div
+            key={service.id}
+            className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/50 transition-all group"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="text-lg font-bold text-white">{service.title}</h3>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    service.is_active 
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                      : 'bg-slate-700 text-slate-400 border border-slate-600'
+                  }`}>
+                    {service.is_active ? 'Actif' : 'Inactif'}
+                  </span>
+                </div>
+                <p className="text-slate-400 text-sm mb-3 line-clamp-2">{service.description}</p>
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-slate-500">
+                    <span className="text-slate-400 font-semibold">Catégorie:</span> {service.category}
+                  </span>
+                  <span className="text-indigo-400 font-bold">
+                    {service.price}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleEdit(service)}
+                  className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all"
+                  title="Modifier"
+                >
+                  <Edit2 className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleDelete(service.id)}
+                  className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                  title="Supprimer"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {(!services || services.length === 0) && !isCreating && (
+          <div className="text-center py-16 bg-slate-900 border border-slate-800 rounded-2xl">
+            <Package className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">Aucun service publié</h3>
+            <p className="text-slate-400 mb-6">Commencez par créer votre premier service</p>
+            <button
+              onClick={handleCreate}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all"
+            >
+              <Plus className="w-5 h-5" />
+              Créer mon premier service
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

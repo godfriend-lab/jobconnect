@@ -194,7 +194,7 @@ export default function ProfessionalProfilePage() {
     }
 
     const message = encodeURIComponent(
-      `Bonjour ${pro.full_name}, je suis intéressé(e) par vos services sur JobConnect. Pouvez-vous me donner plus d'informations ?`
+      `Bonjour ${pro.full_name}, je suis intéressé(e) par vos services sur ProKorb. Pouvez-vous me donner plus d'informations ?`
     )
 
     window.open(`https://wa.me/${phone.replace('+', '')}?text=${message}`, '_blank')
@@ -232,8 +232,8 @@ export default function ProfessionalProfilePage() {
             <Logo className="w-10 h-10 group-hover:scale-105 transition-transform" />
             <div>
               <span className="font-black text-xl tracking-tight">
-                <span className="text-indigo-400">JOB</span>
-                <span className="text-white">CONNECT</span>
+                <span className="text-indigo-400">PRO</span>
+                <span className="text-white">KORB</span>
               </span>
             </div>
           </Link>
@@ -278,7 +278,7 @@ export default function ProfessionalProfilePage() {
                     <h1 className="text-3xl font-black text-white">{pro.full_name}</h1>
                     
                     {pro.is_verified && (
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-bold rounded-full shadow-md shadow-blue-500/30 border border-blue-400/50" title="Professionnel Vérifié par JobConnect">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-bold rounded-full shadow-md shadow-blue-500/30 border border-blue-400/50" title="Professionnel Vérifié par ProKorb">
                         <BadgeCheck className="w-4 h-4" />
                         <span>Vérifié</span>
                       </div>
@@ -298,7 +298,7 @@ export default function ProfessionalProfilePage() {
                       <MapPin className="w-4 h-4" /> {pro.city || 'Non renseigné'}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Briefcase className="w-4 h-4" /> {pro.experience_years || 0} ans d'expérience
+                      <Briefcase className="w-4 h-4" /> {pro.years_of_experience || 0} ans d'expérience {/* ✅ CORRIGÉ ICI */}
                     </span>
                   </div>
                 </div>
@@ -424,7 +424,7 @@ export default function ProfessionalProfilePage() {
                       <Award className="w-5 h-5 text-indigo-400" />
                       <span className="text-sm font-bold text-slate-200">Expérience</span>
                     </div>
-                    <p className="text-slate-300 font-medium">{pro.experience_years || 0} ans dans le métier</p>
+                    <p className="text-slate-300 font-medium">{pro.years_of_experience || 0} ans dans le métier</p> {/* ✅ CORRIGÉ ICI AUSSI */}
                   </div>
                 </div>
 
@@ -435,7 +435,7 @@ export default function ProfessionalProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-blue-300 text-lg flex items-center gap-2">
-                        Professionnel Vérifié par JobConnect
+                        Professionnel Vérifié par ProKorb
                       </h3>
                       <p className="text-sm text-blue-400 mt-1.5 leading-relaxed">
                         Ce professionnel a soumis ses documents d'identité et certifications. Ils ont été vérifiés avec succès par notre équipe pour garantir votre sécurité et la qualité des prestations.

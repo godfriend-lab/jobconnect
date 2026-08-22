@@ -2,7 +2,6 @@
 'use client'
 import Link from 'next/link'
 import { Home, Briefcase, Settings, ImageIcon, Star, Crown, Shield, Globe, LogOut, Sun, Moon, Menu, X } from 'lucide-react'
-import { Logo } from '@/components/Logo'
 
 const menuItems = [
   { id: 'dashboard', label: 'Tableau de bord', icon: Home },
@@ -22,15 +21,24 @@ export default function ProLayout({ children, activeView, setActiveView, darkMod
     <div className={`min-h-screen ${bg} transition-colors duration-300`}>
       <header className={`${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} border-b sticky top-0 z-40`}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          
+          {/* ✅ TON VRAI LOGO ICI */}
           <Link href="/dashboard/pro" className="flex items-center gap-3">
-            <Logo className="w-8 h-8" />
-            <div><span className="font-bold text-lg text-indigo-600">JOBCONNECT</span><span className={`text-xs ${textSecondary} block`}>Espace Pro</span></div>
+            <img 
+              src="/logo.png" 
+              alt="Logo ProKorb" 
+              className="h-8 w-auto object-contain"
+            />
+            <div>
+              <span className="font-bold text-lg text-indigo-600">PROKORB</span>
+              <span className={`text-xs ${textSecondary} block`}>Espace Pro</span>
+            </div>
           </Link>
+          
           <div className="flex items-center gap-3">
             <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-lg ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-100 text-slate-600'} hover:scale-105 transition-all`}>
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            {/* Mobile menu toggle would go here, simplified for brevity */}
           </div>
         </div>
       </header>

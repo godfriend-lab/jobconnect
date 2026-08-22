@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { Logo } from '@/components/Logo'
 import { 
   Mail, Lock, Eye, EyeOff, ArrowRight, 
   Briefcase, User, Loader2, AlertCircle, CheckCircle2,
@@ -187,7 +186,7 @@ export default function RegisterPage() {
           phone: cleanPhone,
           city: cleanCity,
           specialty: cleanSpecialty,
-          is_active: true, // Ou false, selon ta logique métier
+          is_active: true,
           is_verified: false,
           is_available: role === 'pro'
         })
@@ -225,11 +224,16 @@ export default function RegisterPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex flex-col">
         <header className="py-6 px-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <Logo className="w-10 h-10" />
-              <span className="text-2xl font-black">
-                <span className="text-indigo-600">JOB</span>
-                <span className="text-slate-900">CONNECT</span>
+            {/* ✅ TON VRAI LOGO ICI */}
+            <Link href="/" className="flex items-center gap-3 group">
+              <img 
+                src="/logo.png" 
+                alt="Logo ProKorb" 
+                className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+              <span className="text-2xl font-black hidden sm:block">
+                <span className="text-indigo-600">PRO</span>
+                <span className="text-slate-900">KORB</span>
               </span>
             </Link>
           </div>
@@ -246,7 +250,7 @@ export default function RegisterPage() {
               <strong className="text-slate-900">{formData.email}</strong>
             </p>
             <p className="text-sm text-slate-500 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
-              Cliquez sur le lien dans l'email pour activer votre compte JobConnect et accéder à votre espace.
+              Cliquez sur le lien dans l'email pour activer votre compte ProKorb et accéder à votre espace.
             </p>
             <Link
               href="/login"
@@ -267,17 +271,22 @@ export default function RegisterPage() {
     )
   }
 
-  // ... Le reste de ton JSX (Étapes 1, 2 et 3) reste EXACTEMENT le même que dans ton code original ...
+  // Le reste du JSX (Étapes 1, 2 et 3)
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex flex-col">
       {/* Header */}
       <header className="py-6 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <Logo className="w-10 h-10" />
-            <span className="text-2xl font-black">
-              <span className="text-indigo-600">JOB</span>
-              <span className="text-slate-900">CONNECT</span>
+          {/* ✅ TON VRAI LOGO ICI AUSSI */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <img 
+              src="/logo.png" 
+              alt="Logo ProKorb" 
+              className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            />
+            <span className="text-2xl font-black hidden sm:block">
+              <span className="text-indigo-600">PRO</span>
+              <span className="text-slate-900">KORB</span>
             </span>
           </Link>
           <Link 
@@ -289,12 +298,12 @@ export default function RegisterPage() {
         </div>
       </header>
 
-      {/* Contenu principal (Étapes 1, 2, 3 identiques à ton code) */}
+      {/* Contenu principal */}
       <main className="flex-1 flex items-center justify-center px-4 py-8 relative">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-black text-slate-900 mb-2">Créer un compte 🚀</h1>
-            <p className="text-slate-600">Rejoignez JobConnect en quelques étapes</p>
+            <p className="text-slate-600">Rejoignez ProKorb en quelques étapes</p>
             <div className="flex items-center justify-center gap-2 mt-6">
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex items-center gap-2">

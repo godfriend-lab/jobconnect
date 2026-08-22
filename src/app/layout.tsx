@@ -1,16 +1,20 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import "./globals.css"
 import Chatbot from "@/components/Chatbot"
-import ConditionalFooter from "@/components/ConditionalFooter" // ← MODIFICATION ICI
+import ConditionalFooter from "@/components/ConditionalFooter"
 import { LanguageProvider } from "@/contexts/LanguageContext"
 
+export const viewport: Viewport = {
+  themeColor: "#4f46e5", // Couleur Indigo de ProKorb
+}
+
 export const metadata: Metadata = {
-  title: "JOBCONNECT - La Marketplace N°1 des Services au Togo",
+  title: "ProKorb - La Marketplace N°1 des Services au Togo",
   description: "Trouvez les meilleurs professionnels vérifiés du Togo. Plombiers, électriciens, maçons et plus encore.",
-  keywords: ["services", "professionnels", "Togo", "Lomé", "marketplace"],
+  keywords: ["services", "professionnels", "Togo", "Lomé", "marketplace", "ProKorb"],
   icons: {
-    icon: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: '/favicon.png',
+    apple: '/favicon.png',
   },
 }
 
@@ -22,6 +26,10 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <head>
+        {/* ✅ BALISE DIRECTE : C'est ce qui force l'affichage sur tous les navigateurs */}
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
+        
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link 
@@ -29,19 +37,15 @@ export default function RootLayout({
           rel="stylesheet" 
         />
       </head>
-      <body className="antialiased font-sans flex flex-col min-h-screen">
+      <body className="antialiased font-sans flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
         
-        {/* ← ENVELOPPE TOUT LE CONTENU AVEC LE LANGUAGE PROVIDER */}
         <LanguageProvider>
-          
           <main className="flex-grow">
             {children}
           </main>
           
-          {/* ← MODIFICATION ICI : Le footer ne s'affichera que si pathname === '/' */}
           <ConditionalFooter />
           <Chatbot /> 
-          
         </LanguageProvider>
         
       </body>
