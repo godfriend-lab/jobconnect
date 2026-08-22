@@ -1,7 +1,6 @@
 // @ts-nocheck
 'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react' // ✅ Ajout de useEffect
 import { supabase } from '@/lib/supabase'
 import { Upload, CheckCircle, AlertCircle, Loader2, FileText } from 'lucide-react'
 
