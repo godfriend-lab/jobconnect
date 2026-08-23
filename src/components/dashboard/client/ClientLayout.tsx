@@ -54,115 +54,95 @@ export default function ClientLayout({
 
       {/* ✅ HEADER PRINCIPAL */}
       <header className="glass-effect border-b border-slate-800/60 sticky top-0 z-40 shadow-lg transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 py-3">
           
-          {/* Logo + Bouton Menu Mobile */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <button 
-              onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-lg hover:bg-slate-800 text-white transition-colors"
-              aria-label="Ouvrir le menu"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+          {/* LIGNE 1: Logo + Menu + Profil */}
+          <div className="flex items-center justify-between gap-4">
             
-            <Link href="/dashboard/client" className="flex items-center gap-3 group">
-              <img 
-                src="/logo.png" 
-                alt="Logo ProKorb" 
-                className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            {/* Logo + Bouton Menu Mobile */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <button 
+                onClick={() => setMobileMenuOpen(true)}
+                className="lg:hidden p-2 rounded-lg hover:bg-slate-800 text-white transition-colors"
+                aria-label="Ouvrir le menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+              
+              <Link href="/dashboard/client" className="flex items-center gap-3 group">
+                <img 
+                  src="/logo.png" 
+                  alt="Logo ProKorb" 
+                  className="h-8 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                />
+                <span className="font-black text-lg hidden sm:block tracking-tight">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">PRO</span>
+                  <span className="text-white">KORB</span>
+                </span>
+              </Link>
+            </div>
+
+            {/* Menu Profil Desktop */}
+            <div className="hidden md:block">
+              <div className="relative">
+                <button 
+                  onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                  className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-800 transition-colors group"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden ring-2 ring-slate-700 shadow-lg">
+                    {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : profile?.full_name?.charAt(0).toUpperCase() || 'C'}
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {profileMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-[40]" onClick={() => setProfileMenuOpen(false)} />
+                    <div className="absolute right-0 mt-2 w-56 bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 z-50 overflow-hidden animate-fade-in-up">
+                      <div className="p-3 border-b border-slate-700">
+                        <p className="font-bold text-white text-sm">{profile?.full_name || 'Client'}</p>
+                      </div>
+                      <div className="p-2">
+                        <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-900/30 text-red-400 text-sm">
+                          <LogOut className="w-4 h-4" />
+                          <span>Déconnexion</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* LIGNE 2: Barres de recherche (Desktop) */}
+          <div className="hidden md:flex items-center gap-3 mt-3">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Rechercher un service ou professionnel..." 
+                value={searchQuery} 
+                onChange={(e) => setSearchQuery(e.target.value)} 
+                className="w-full pl-9 pr-4 py-2 bg-slate-900 rounded-lg border border-slate-700 focus:outline-none focus:border-indigo-500 text-white text-sm placeholder-slate-500" 
               />
-              <span className="font-black text-xl hidden sm:block tracking-tight">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">PRO</span>
-                <span className="text-white">KORB</span>
-              </span>
-            </Link>
-          </div>
-          
-          {/* Barre de recherche (Desktop uniquement) */}
-          <div className="flex-1 max-w-2xl hidden md:block">
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl opacity-0 group-focus-within:opacity-50 blur transition duration-300"></div>
-              <div className="relative flex items-center bg-slate-900 rounded-xl border border-slate-700 group-focus-within:border-indigo-500 transition-colors">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-400 transition-colors" />
-                <input 
-                  type="text" 
-                  placeholder="Rechercher un service ou professionnel..." 
-                  value={searchQuery} 
-                  onChange={(e) => setSearchQuery(e.target.value)} 
-                  className="w-full pl-10 pr-4 py-2.5 bg-transparent rounded-xl focus:outline-none text-white placeholder-slate-500" 
-                />
-              </div>
             </div>
-          </div>
-
-          {/* Barre de localité (Desktop uniquement) */}
-          <div className="hidden md:block relative" style={{ zIndex: 50 }}>
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl opacity-0 group-focus-within:opacity-50 blur transition duration-300"></div>
-              <div className="relative flex items-center bg-slate-900 rounded-xl border border-slate-700 group-focus-within:border-emerald-500 transition-colors">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-400 transition-colors" />
-                <input 
-                  type="text" 
-                  placeholder="Localité..." 
-                  value={citySearchQuery} 
-                  onChange={(e) => { setCitySearchQuery(e.target.value); setShowCityDropdown(true); setSelectedCity('all'); }} 
-                  onFocus={() => setShowCityDropdown(true)} 
-                  className="w-40 pl-10 pr-4 py-2.5 bg-transparent rounded-xl focus:outline-none text-white placeholder-slate-500" 
-                />
-              </div>
+            <div className="relative w-48">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Localité..." 
+                value={citySearchQuery} 
+                onChange={(e) => { setCitySearchQuery(e.target.value); setShowCityDropdown(true); setSelectedCity('all'); }} 
+                onFocus={() => setShowCityDropdown(true)} 
+                className="w-full pl-9 pr-4 py-2 bg-slate-900 rounded-lg border border-slate-700 focus:outline-none focus:border-emerald-500 text-white text-sm placeholder-slate-500" 
+              />
             </div>
-            {showCityDropdown && (
-              <>
-                <div className="fixed inset-0 z-[9998]" onClick={() => setShowCityDropdown(false)} />
-                <div className="absolute top-full right-0 mt-2 w-72 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-[9999] max-h-80 overflow-y-auto animate-fade-in-up">
-                  <button onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }} className={`w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 transition-colors flex items-center gap-2 ${selectedCity === 'all' ? 'bg-emerald-900/30 text-emerald-400 font-semibold' : 'text-slate-300'}`}>
-                    <MapPin className="w-4 h-4" /> Toutes les localités
-                  </button>
-                  {filteredCities.map((city: string) => (
-                    <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }} className={`w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 transition-colors flex items-center gap-2 ${selectedCity === city ? 'bg-emerald-900/30 text-emerald-400 font-semibold' : 'text-slate-300'}`}>
-                      <MapPin className="w-4 h-4 text-slate-500" /> {city}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Menu Profil Dropdown */}
-          <div className="relative">
-            <button 
-              onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-              className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-800 transition-colors group"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden ring-2 ring-slate-700 shadow-lg group-hover:shadow-indigo-500/50 group-hover:scale-105 transition-all duration-300">
-                {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : profile?.full_name?.charAt(0).toUpperCase() || 'C'}
-              </div>
-              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {profileMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-[40]" onClick={() => setProfileMenuOpen(false)} />
-                <div className="absolute right-0 mt-2 w-64 bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 z-50 overflow-hidden animate-fade-in-up origin-top-right">
-                  <div className="p-4 border-b border-slate-700 bg-gradient-to-br from-indigo-900/30 to-purple-900/30">
-                    <p className="font-bold text-white">{profile?.full_name || 'Client'}</p>
-                    <p className="text-xs text-slate-400 truncate">{profile?.email || ''}</p>
-                  </div>
-                  <div className="p-2 border-t border-slate-700">
-                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-900/30 text-red-400 transition-all duration-200">
-                      <LogOut className="w-5 h-5" />
-                      <span className="font-medium">Déconnexion</span>
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </div>
 
-        {/* ✅ BARRE DE RECHERCHE MOBILE (Visible uniquement sur petit écran) */}
-        <div className="lg:hidden px-4 py-3 border-t border-slate-800/60 space-y-3 bg-slate-900/90">
+        {/* ✅ BARRES DE RECHERCHE MOBILE (TOUJOURS VISIBLES) */}
+        <div className="md:hidden px-4 pb-3 space-y-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input 
@@ -184,21 +164,25 @@ export default function ClientLayout({
               className="w-full pl-10 pr-4 py-2.5 bg-slate-800 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500 text-white placeholder-slate-500 text-sm" 
             />
           </div>
-          
-          {/* Dropdown localité mobile */}
-          {showCityDropdown && (
-            <div className="absolute left-4 right-4 top-full mt-1 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto">
-              <button onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-emerald-400 font-semibold border-b border-slate-800">
-                Toutes les localités
-              </button>
-              {filteredCities.map((city: string) => (
-                <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-slate-300">
-                  {city}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
+
+        {/* Dropdown localité (Desktop + Mobile) */}
+        {showCityDropdown && (
+          <div className="absolute top-full left-0 right-0 mt-1 z-50 px-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-h-60 overflow-y-auto animate-fade-in-up">
+                <button onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-emerald-400 font-semibold border-b border-slate-800">
+                  <MapPin className="w-4 h-4 inline mr-2" />Toutes les localités
+                </button>
+                {filteredCities.map((city: string) => (
+                  <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-slate-300">
+                    {city}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Marquee Catégories */}
         <div className="border-t border-slate-800/60 bg-slate-900/50 overflow-hidden relative">
@@ -218,26 +202,18 @@ export default function ClientLayout({
         </div>
       </header>
 
-      {/* ✅ SIDEBAR MOBILE (Menu glissant) */}
+      {/* ✅ SIDEBAR MOBILE */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute left-0 top-0 h-full w-72 bg-slate-900 border-r border-slate-800 shadow-2xl overflow-y-auto animate-fade-in-up">
+          <div className="absolute left-0 top-0 h-full w-72 bg-slate-900 border-r border-slate-800 shadow-2xl overflow-y-auto">
             <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
-                <span className="font-bold text-white">Menu</span>
-              </div>
+              <span className="font-bold text-white">Menu</span>
               <button onClick={() => setMobileMenuOpen(false)} className="p-2 rounded-lg hover:bg-slate-800">
                 <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
             
-            <div className="p-4 border-b border-slate-800 bg-gradient-to-br from-indigo-900/20 to-purple-900/20">
-              <p className="font-bold text-white">{profile?.full_name || 'Client'}</p>
-              <p className="text-xs text-slate-400 truncate">{profile?.email || ''}</p>
-            </div>
-
             <nav className="p-4 space-y-2">
               {navItems.map((item) => {
                 const Icon = item.icon
@@ -249,10 +225,10 @@ export default function ClientLayout({
                       setActiveView(item.id)
                       setMobileMenuOpen(false) 
                     }} 
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                       isActive 
                         ? 'bg-indigo-900/30 text-indigo-400 font-semibold' 
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        : 'text-slate-300 hover:bg-slate-800'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -260,14 +236,10 @@ export default function ClientLayout({
                   </button>
                 )
               })}
-              
               <div className="pt-4 mt-4 border-t border-slate-800">
-                <button 
-                  onClick={() => { handleLogout(); setMobileMenuOpen(false) }} 
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-900/30 text-red-400 transition-all duration-200"
-                >
+                <button onClick={() => { handleLogout(); setMobileMenuOpen(false) }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-900/30 text-red-400">
                   <LogOut className="w-5 h-5" />
-                  <span className="font-medium">Déconnexion</span>
+                  <span>Déconnexion</span>
                 </button>
               </div>
             </nav>
@@ -276,7 +248,7 @@ export default function ClientLayout({
       )}
 
       {/* ✅ CONTENU PRINCIPAL */}
-      <main className="max-w-7xl mx-auto px-4 py-6 lg:py-8 relative z-10">
+      <main className="max-w-7xl mx-auto px-4 py-6 relative z-10">
         {children}
       </main>
     </div>
