@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import Chatbot from '@/components/Chatbot'
 import FeaturedProfessionals from '@/components/landing/FeaturedProfessionals'
-import FadeIn from '@/components/ui/FadeIn' // ✅ NOUVEAU IMPORT
+import FadeIn from '@/components/ui/FadeIn'
 import { 
   ShieldCheck, Wallet, Zap, Star, CheckCircle2, ArrowRight,
   Wrench, Zap as ZapIcon, Hammer, Paintbrush, 
@@ -44,50 +44,67 @@ export default async function HomePage() {
     return Wrench
   }
 
+  // ✅ CORRECTION CRITIQUE : Mapping statique des couleurs pour Tailwind (évite les bugs d'affichage)
+  const colorMap: Record<string, { bg: string; text: string }> = {
+    emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600' },
+    blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
+    purple: { bg: 'bg-purple-100', text: 'text-purple-600' },
+  }
+
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-900 overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+    <div className="bg-slate-50 dark:bg-slate-950 min-h-screen font-sans text-slate-900 dark:text-slate-100 overflow-x-hidden selection:bg-indigo-500 selection:text-white">
       
-      {/* 1. NAVIGATION BAR (Pas d'animation fade-in pour la nav, elle doit être instantanée) */}
-      <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200/60">
+      {/* 1. NAVIGATION BAR */}
+      <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="Logo ProKorb" className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
+          
+          {/* Logo sécurisé : shrink-0 empêche l'écrasement, max-w empêche le débordement */}
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
+            <img 
+              src="/logo.png" 
+              alt="Logo ProKorb" 
+              className="h-10 w-auto max-w-[150px] object-contain group-hover:scale-105 transition-transform duration-300" 
+            />
             <div className="text-2xl font-black tracking-tight hidden sm:block">
-              <span className="text-indigo-600">PRO</span><span className="text-slate-900">KORB</span>
+              <span className="text-indigo-600">PRO</span>
+              <span className="text-slate-900 dark:text-white">KORB</span>
             </div>
           </Link>
           
-          <div className="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-600">
+          <div className="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-300">
             <a href="#avantages" className="hover:text-indigo-600 transition-colors">Avantages</a>
             <a href="#etapes" className="hover:text-indigo-600 transition-colors">Comment ça marche</a>
             <a href="#categories" className="hover:text-indigo-600 transition-colors">Métiers</a>
             <Link href="/pricing" className="hover:text-indigo-600 transition-colors">Tarifs</Link>
           </div>
           
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="hidden sm:block text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors px-4 py-2">Connexion</Link>
-            <Link href="/register" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-200 hover:shadow-indigo-300 hover:-translate-y-0.5">Inscription</Link>
+          <div className="flex items-center gap-3 shrink-0">
+            <Link href="/login" className="hidden sm:block text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition-colors px-4 py-2">
+              Connexion
+            </Link>
+            <Link href="/register" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-200 dark:shadow-none hover:-translate-y-0.5">
+              Inscription
+            </Link>
           </div>
         </div>
       </nav>
 
       {/* 2. HERO SECTION */}
-      <section className="relative pt-20 pb-24 px-4 sm:px-6 overflow-hidden bg-white">
-        <div className="absolute inset-0 z-0 opacity-[0.03] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+      <section className="relative pt-20 pb-24 px-4 sm:px-6 overflow-hidden bg-white dark:bg-slate-950">
+        <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:40px_40px]"></div>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl -z-10"></div>
         
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
-          {/* Animation en cascade avec des délais */}
           <FadeIn delay={0.1}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-sm font-semibold mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-sm font-semibold mx-auto">
               <Star className="w-4 h-4 fill-indigo-600 text-indigo-600" />
               <span>La plateforme N°1 des services au Togo</span>
             </div>
           </FadeIn>
 
           <FadeIn delay={0.2}>
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-950 leading-[1.1]">
-              Trouvez l'expert qu'il vous faut, <br />
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-slate-950 dark:text-white leading-[1.1]">
+              Trouvez l'expert qu'il vous faut, <br className="hidden sm:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                 ou vendez vos compétences.
               </span>
@@ -95,25 +112,25 @@ export default async function HomePage() {
           </FadeIn>
           
           <FadeIn delay={0.3}>
-            <p className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-500 font-medium leading-relaxed">
+            <p className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
               La marketplace tout-en-un pour connecter les particuliers et les professionnels vérifiés. 
-              <span className="text-slate-900 font-bold"> 0% de commission</span> sur vos interventions.
+              <span className="text-slate-900 dark:text-white font-bold"> 0% de commission</span> sur vos interventions.
             </p>
           </FadeIn>
           
           <FadeIn delay={0.4}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Link href="/register?role=client" className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base px-8 py-4 rounded-xl transition-all shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:-translate-y-1 flex items-center justify-center gap-2">
+              <Link href="/register?role=client" className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base px-8 py-4 rounded-xl transition-all shadow-xl shadow-indigo-200 dark:shadow-none hover:-translate-y-1 flex items-center justify-center gap-2">
                 Je cherche un professionnel <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/register?role=pro" className="w-full sm:w-auto bg-white border-2 border-slate-200 hover:border-indigo-200 text-slate-800 font-bold text-base px-8 py-4 rounded-xl transition-all hover:bg-slate-50 hover:-translate-y-1 flex items-center justify-center gap-2">
+              <Link href="/register?role=pro" className="w-full sm:w-auto bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-200 text-slate-800 dark:text-white font-bold text-base px-8 py-4 rounded-xl transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:-translate-y-1 flex items-center justify-center gap-2">
                 Je propose mes services
               </Link>
             </div>
           </FadeIn>
 
           <FadeIn delay={0.5}>
-            <div className="pt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+            <div className="pt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500 dark:text-slate-400 font-medium">
               <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-emerald-500" /><span>Profils 100% vérifiés</span></div>
               <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-emerald-500" /><span>Paiement direct (T-Money / Flooz)</span></div>
               <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-emerald-500" /><span>Support local réactif</span></div>
@@ -126,8 +143,8 @@ export default async function HomePage() {
       <section id="avantages" className="py-24 px-4 sm:px-6 max-w-7xl mx-auto">
         <FadeIn direction="up">
           <div className="text-center mb-16 space-y-4">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full">Pourquoi nous choisir</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-slate-950 tracking-tight">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-1.5 rounded-full">Pourquoi nous choisir</span>
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-950 dark:text-white tracking-tight">
               Une expérience pensée pour <br />la confiance et l'efficacité
             </h2>
           </div>
@@ -135,30 +152,31 @@ export default async function HomePage() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { icon: Wallet, color: 'emerald', title: '0% Commission', desc: 'Nous ne prenons aucune part sur vos gains. Le client paie directement l\'artisan selon le devis convenu. Transparence totale.' },
-            { icon: ShieldCheck, color: 'blue', title: 'Profils Vérifiés', desc: 'Chaque professionnel soumet ses pièces d\'identité et certifications. Notre équipe valide chaque profil pour votre sécurité.' },
-            { icon: Zap, color: 'purple', title: 'Mise en relation éclair', desc: 'Publiez votre besoin et recevez des propositions de professionnels disponibles dans votre quartier en moins de 24h.' }
+            { color: 'emerald', icon: Wallet, title: '0% Commission', desc: 'Nous ne prenons aucune part sur vos gains. Le client paie directement l\'artisan selon le devis convenu. Transparence totale.' },
+            { color: 'blue', icon: ShieldCheck, title: 'Profils Vérifiés', desc: 'Chaque professionnel soumet ses pièces d\'identité et certifications. Notre équipe valide chaque profil pour votre sécurité.' },
+            { color: 'purple', icon: Zap, title: 'Mise en relation éclair', desc: 'Publiez votre besoin et recevez des propositions de professionnels disponibles dans votre quartier en moins de 24h.' }
           ].map((item, idx) => (
-            <FadeIn key={idx} delay={idx * 0.15} direction="up"> {/* ✅ Animation en cascade (stagger) */}
-              <div className="group bg-white border border-slate-200 rounded-3xl p-8 hover:border-indigo-200 hover:shadow-2xl hover:shadow-indigo-100/50 hover:-translate-y-1 transition-all duration-300 h-full">
-                <div className={`w-14 h-14 bg-${item.color}-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  <item.icon className={`w-7 h-7 text-${item.color}-600`} />
+            <FadeIn key={idx} delay={idx * 0.15} direction="up">
+              <div className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-2xl hover:shadow-indigo-100/50 dark:hover:shadow-none hover:-translate-y-1 transition-all duration-300 h-full">
+                {/* ✅ CORRECTION : Utilisation du mapping statique pour les couleurs */}
+                <div className={`w-14 h-14 ${colorMap[item.color].bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <item.icon className={`w-7 h-7 ${colorMap[item.color].text}`} />
                 </div>
-                <h3 className="text-xl font-black text-slate-950 mb-3">{item.title}</h3>
-                <p className="text-slate-500 leading-relaxed">{item.desc}</p>
+                <h3 className="text-xl font-black text-slate-950 dark:text-white mb-3">{item.title}</h3>
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
               </div>
             </FadeIn>
           ))}
         </div>
       </section>
 
-      {/* 4. PROFESSIONNELS EN VEDETTE (Le composant gère déjà ses propres animations internes si tu le souhaites, sinon on l'enveloppe) */}
+      {/* 4. PROFESSIONNELS EN VEDETTE */}
       <FadeIn direction="up">
         <FeaturedProfessionals />
       </FadeIn>
 
       {/* 5. COMMENT ÇA MARCHE */}
-      <section id="etapes" className="bg-slate-900 text-white py-24 px-4 sm:px-6 relative overflow-hidden">
+      <section id="etapes" className="bg-slate-900 dark:bg-slate-900 text-white py-24 px-4 sm:px-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-3xl -z-10"></div>
         
         <div className="max-w-7xl mx-auto">
@@ -196,8 +214,8 @@ export default async function HomePage() {
         <FadeIn direction="up">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full">Nos Métiers</span>
-              <h2 className="mt-4 text-3xl sm:text-5xl font-black text-slate-950 tracking-tight">
+              <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-1.5 rounded-full">Nos Métiers</span>
+              <h2 className="mt-4 text-3xl sm:text-5xl font-black text-slate-950 dark:text-white tracking-tight">
                 Explorez nos catégories <br /><span className="text-indigo-600">d'experts vérifiés</span>
               </h2>
             </div>
@@ -207,17 +225,17 @@ export default async function HomePage() {
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
           {safeCategories.map((cat, idx) => {
             const Icon = getIconForCategory(cat.name)
             return (
-              <FadeIn key={idx} delay={idx * 0.05} direction="up"> {/* ✅ Délai très court pour un effet "vague" rapide */}
-                <Link href={`/marketplace?category=${cat.name}`} className="group bg-white border border-slate-200 rounded-2xl p-6 text-center hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 hover:-translate-y-1 transition-all duration-300 block h-full">
-                  <div className="w-14 h-14 mx-auto mb-4 bg-slate-50 group-hover:bg-indigo-50 rounded-2xl flex items-center justify-center transition-colors">
-                    <Icon className="w-7 h-7 text-slate-600 group-hover:text-indigo-600 transition-colors" />
+              <FadeIn key={idx} delay={idx * 0.05} direction="up">
+                <Link href={`/marketplace?category=${cat.name}`} className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-xl hover:shadow-indigo-100/50 dark:hover:shadow-none hover:-translate-y-1 transition-all duration-300 block h-full">
+                  <div className="w-14 h-14 mx-auto mb-4 bg-slate-50 dark:bg-slate-800 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 rounded-2xl flex items-center justify-center transition-colors">
+                    <Icon className="w-7 h-7 text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
                   </div>
-                  <h3 className="font-bold text-slate-950 mb-1 group-hover:text-indigo-600 transition-colors">{cat.name}</h3>
-                  <p className="text-xs text-slate-500 font-medium">{cat.professionals_count || 0} professionnels</p>
+                  <h3 className="font-bold text-slate-950 dark:text-white mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{cat.name}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{cat.professionals_count || 0} professionnels</p>
                 </Link>
               </FadeIn>
             )
@@ -246,7 +264,7 @@ export default async function HomePage() {
         </FadeIn>
       </section>
 
-      {/* 8. CHATBOT IA KOBI */}
+      {/* 8. CHATBOT IA */}
       <Chatbot />
       
     </div>
