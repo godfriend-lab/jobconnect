@@ -18,8 +18,9 @@ export default function ClientLayout({
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const filteredCities = allCities.filter((city: string) => 
-    city.toLowerCase().includes(citySearchQuery.toLowerCase())
+  // Sécurité : éviter le crash si allCities est undefined
+  const filteredCities = (allCities || []).filter((city: string) => 
+    city.toLowerCase().includes((citySearchQuery || '').toLowerCase())
   ).slice(0, 10)
 
   if (loading) {
@@ -53,28 +54,21 @@ export default function ClientLayout({
       `}</style>
 
       {/* ✅ HEADER PRINCIPAL */}
-      <header className="glass-effect border-b border-slate-800/60 sticky top-0 z-40 shadow-lg transition-all duration-300">
+      <header className="glass-effect border-b border-slate-800/60 sticky top-0 z-40 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-3">
           
           {/* LIGNE 1: Logo + Menu + Profil */}
-          <div className="flex items-center justify-between gap-4">
-            
-            {/* Logo + Bouton Menu Mobile */}
+          <div className="flex items-center justify-between gap-4 mb-3">
             <div className="flex items-center gap-3 flex-shrink-0">
               <button 
                 onClick={() => setMobileMenuOpen(true)}
                 className="lg:hidden p-2 rounded-lg hover:bg-slate-800 text-white transition-colors"
-                aria-label="Ouvrir le menu"
               >
                 <Menu className="w-6 h-6" />
               </button>
               
               <Link href="/dashboard/client" className="flex items-center gap-3 group">
-                <img 
-                  src="/logo.png" 
-                  alt="Logo ProKorb" 
-                  className="h-8 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
-                />
+                <img src="/logo.png" alt="Logo ProKorb" className="h-8 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
                 <span className="font-black text-lg hidden sm:block tracking-tight">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">PRO</span>
                   <span className="text-white">KORB</span>
@@ -82,112 +76,86 @@ export default function ClientLayout({
               </Link>
             </div>
 
-            {/* Menu Profil Desktop */}
-            <div className="hidden md:block">
-              <div className="relative">
-                <button 
-                  onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-800 transition-colors group"
-                >
-                  <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden ring-2 ring-slate-700 shadow-lg">
-                    {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : profile?.full_name?.charAt(0).toUpperCase() || 'C'}
-                  </div>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
-                </button>
+            {/* Menu Profil */}
+            <div className="relative">
+              <button 
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-800 transition-colors group"
+              >
+                <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden ring-2 ring-slate-700 shadow-lg">
+                  {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : profile?.full_name?.charAt(0).toUpperCase() || 'C'}
+                </div>
+                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-                {profileMenuOpen && (
-                  <>
-                    <div className="fixed inset-0 z-[40]" onClick={() => setProfileMenuOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-56 bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 z-50 overflow-hidden animate-fade-in-up">
-                      <div className="p-3 border-b border-slate-700">
-                        <p className="font-bold text-white text-sm">{profile?.full_name || 'Client'}</p>
-                      </div>
-                      <div className="p-2">
-                        <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-900/30 text-red-400 text-sm">
-                          <LogOut className="w-4 h-4" />
-                          <span>Déconnexion</span>
-                        </button>
-                      </div>
+              {profileMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-[40]" onClick={() => setProfileMenuOpen(false)} />
+                  <div className="absolute right-0 mt-2 w-56 bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 z-50 overflow-hidden animate-fade-in-up">
+                    <div className="p-3 border-b border-slate-700">
+                      <p className="font-bold text-white text-sm">{profile?.full_name || 'Client'}</p>
                     </div>
-                  </>
-                )}
-              </div>
+                    <div className="p-2">
+                      <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-900/30 text-red-400 text-sm">
+                        <LogOut className="w-4 h-4" />
+                        <span>Déconnexion</span>
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
-          {/* LIGNE 2: Barres de recherche (Desktop) */}
-          <div className="hidden md:flex items-center gap-3 mt-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          {/* ✅ LIGNE 2: Barres de recherche (GRILLE RESPONSIVE - VISIBLE PARTOUT) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* Champ Recherche (prend 2/3 de la largeur sur PC, 100% sur mobile) */}
+            <div className="relative md:col-span-2">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input 
                 type="text" 
                 placeholder="Rechercher un service ou professionnel..." 
-                value={searchQuery} 
+                value={searchQuery || ''} 
                 onChange={(e) => setSearchQuery(e.target.value)} 
-                className="w-full pl-9 pr-4 py-2 bg-slate-900 rounded-lg border border-slate-700 focus:outline-none focus:border-indigo-500 text-white text-sm placeholder-slate-500" 
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-900 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500 text-sm" 
               />
             </div>
-            <div className="relative w-48">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            
+            {/* Champ Localité (prend 1/3 de la largeur sur PC, 100% sur mobile) */}
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input 
                 type="text" 
                 placeholder="Localité..." 
-                value={citySearchQuery} 
+                value={citySearchQuery || ''} 
                 onChange={(e) => { setCitySearchQuery(e.target.value); setShowCityDropdown(true); setSelectedCity('all'); }} 
                 onFocus={() => setShowCityDropdown(true)} 
-                className="w-full pl-9 pr-4 py-2 bg-slate-900 rounded-lg border border-slate-700 focus:outline-none focus:border-emerald-500 text-white text-sm placeholder-slate-500" 
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-900 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500 text-white placeholder-slate-500 text-sm" 
               />
             </div>
           </div>
-        </div>
 
-        {/* ✅ BARRES DE RECHERCHE MOBILE (TOUJOURS VISIBLES) */}
-        <div className="md:hidden px-4 pb-3 space-y-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Rechercher un service..." 
-              value={searchQuery} 
-              onChange={(e) => setSearchQuery(e.target.value)} 
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-800 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500 text-sm" 
-            />
-          </div>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Localité..." 
-              value={citySearchQuery} 
-              onChange={(e) => { setCitySearchQuery(e.target.value); setShowCityDropdown(true); setSelectedCity('all'); }} 
-              onFocus={() => setShowCityDropdown(true)} 
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-800 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500 text-white placeholder-slate-500 text-sm" 
-            />
-          </div>
-        </div>
-
-        {/* Dropdown localité (Desktop + Mobile) */}
-        {showCityDropdown && (
-          <div className="absolute top-full left-0 right-0 mt-1 z-50 px-4">
-            <div className="max-w-7xl mx-auto">
+          {/* Dropdown localité (s'affiche sous les champs) */}
+          {showCityDropdown && (
+            <div className="relative mt-2 z-50">
               <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-h-60 overflow-y-auto animate-fade-in-up">
-                <button onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-emerald-400 font-semibold border-b border-slate-800">
-                  <MapPin className="w-4 h-4 inline mr-2" />Toutes les localités
+                <button onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-emerald-400 font-semibold border-b border-slate-800 flex items-center gap-2">
+                  <MapPin className="w-4 h-4" /> Toutes les localités
                 </button>
                 {filteredCities.map((city: string) => (
-                  <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-slate-300">
-                    {city}
+                  <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-slate-300 flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-slate-500" /> {city}
                   </button>
                 ))}
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Marquee Catégories */}
         <div className="border-t border-slate-800/60 bg-slate-900/50 overflow-hidden relative">
           <div className="flex animate-marquee py-3 whitespace-nowrap">
-            {[...marqueeCategories, ...marqueeCategories].map((cat: any, index: number) => {
+            {[...(marqueeCategories || []), ...(marqueeCategories || [])].map((cat: any, index: number) => {
               const Icon = cat.icon || Home
               return (
                 <div key={`${cat.id}-${index}`} className="mx-2 px-4 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 border border-slate-700 bg-slate-800 text-slate-300 flex-shrink-0 shadow-sm hover:shadow-md hover:border-indigo-500 hover:text-indigo-400 transition-all duration-300 cursor-pointer group">
