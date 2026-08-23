@@ -1,10 +1,33 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  typescript: {
-    ignoreBuildErrors: true, // ← CETTE LIGNE EMPÊCHE LE PLANTAGE DU BUILD
+  
+  // Configuration PWA
+  async headers() {
+    return [
+      {
+        source: '/manifest.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json',
+          },
+        ],
+      },
+    ]
   },
-};
+  
+  // Optimisations images
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ddfwhwgpxdzborpvusld.supabase.co',
+      },
+    ],
+    formats: ['image/avif', 'image/webp'],
+  },
+}
 
-export default nextConfig;
+export default nextConfig
