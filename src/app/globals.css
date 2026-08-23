@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* =====================================================
-   🎨 VARIABLES & BASE
+    VARIABLES & BASE
    ===================================================== */
 :root {
   --background: #f8fafc;
@@ -38,11 +38,24 @@ html, body {
 }
 
 /* =====================================================
-   📱 ÉLÉMENTS RESPONSIVES UNIVERSELS
+   📱 ÉLÉMENTS RESPONSIVES INTELLIGENTS
    ===================================================== */
 
-/* Toutes les images, vidéos et iframes s'adaptent à l'écran */
-img, video, iframe, object, embed {
+/* ✅ Images de contenu : responsives mais respectent leur taille naturelle */
+/* Seules les images SANS classe de taille explicite deviennent responsives */
+img:not([class*="h-"]):not([class*="w-"]):not([style*="max-width"]) {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Logos et images avec taille définie : gardent leur taille naturelle */
+img[class*="h-"], img[class*="w-"], img[style*="max-width"] {
+  max-width: none;
+}
+
+/* Vidéos et iframes : toujours responsives */
+video, iframe, object, embed {
   max-width: 100%;
   height: auto;
   display: block;
