@@ -9,6 +9,7 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "fr",
+  "categories": ["business", "shopping", "lifestyle"],
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -22,6 +23,5 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "categories": ["business", "shopping", "lifestyle"]
+  ]
 }

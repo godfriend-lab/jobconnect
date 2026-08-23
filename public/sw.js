@@ -16,10 +16,13 @@ self.addEventListener('install', event => {
         console.log('Cache ouvert')
         return cache.addAll(urlsToCache)
       })
+      .catch(error => {
+        console.error('Erreur cache:', error)
+      })
   )
 })
 
-// Activation et nettoyage des anciens caches
+// Activation et nettoyage
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -40,6 +43,10 @@ self.addEventListener('fetch', event => {
         if (response) {
           return response
         }
+        return fetch(event.request)
+      })
+      .catch(error => {
+        console.error('Erreur fetch:', error)
         return fetch(event.request)
       })
   )
