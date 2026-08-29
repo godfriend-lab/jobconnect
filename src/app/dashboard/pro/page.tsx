@@ -18,7 +18,7 @@ import ServicesView from '@/components/dashboard/pro/views/ServicesView'
 import ProfileView from '@/components/dashboard/pro/views/ProfileView'
 import PortfolioView from '@/components/dashboard/pro/views/PortfolioView'
 import ReviewsView from '@/components/dashboard/pro/views/ReviewsView'
-import SubscriptionView from '@/components/dashboard/pro/views/SubscriptionView'
+// ✅ SUPPRIMÉ : import SubscriptionView
 import VerificationView from '@/components/dashboard/pro/views/VerificationView'
 
 import { Loader2 } from 'lucide-react'
@@ -33,8 +33,6 @@ export default function ProDashboardPage() {
   const { portfolio, uploading: portfolioUploading, uploadImage, addItem, deleteItem } = usePortfolio(profile?.id)
   const { reviews, stats } = useReviews(profile?.id)
 
-  // ✅ CORRECTION 1 : Ne pas utiliser useState. Dériver la valeur directement de profile.
-  // Ainsi, dès que profile se met à jour, isAvailable se met à jour automatiquement partout.
   const isAvailable = profile?.is_available !== false
 
   if (loading || !profile) {
@@ -45,20 +43,14 @@ export default function ProDashboardPage() {
     )
   }
 
-  // ✅ CORRECTION 2 : Handler robuste avec gestion d'erreur
   const handleToggleAvailability = async () => {
     const newStatus = !isAvailable
     
     try {
-      // On met à jour via le hook. 
-      // (Le hook useProfile DOIT mettre à jour son état local après cet appel, voir note plus bas)
       const success = await updateProfile({ is_available: newStatus })
-      
       if (!success) {
         throw new Error("Échec de la mise à jour")
       }
-      
-      // Optionnel : petit feedback visuel
       console.log(`✅ Statut changé : ${newStatus ? 'DISPONIBLE' : 'INDISPONIBLE'}`)
     } catch (error) {
       console.error("Erreur toggle disponibilité:", error)
@@ -71,7 +63,7 @@ export default function ProDashboardPage() {
     router.push('/login')
   }
 
-  // 3. Rendu conditionnel des vues
+  // 3. Rendu conditionnel des vues (✅ 'subscription' retiré)
   const renderView = () => {
     switch (activeView) {
       case 'dashboard':
@@ -93,8 +85,6 @@ export default function ProDashboardPage() {
         return <PortfolioView portfolio={portfolio} uploading={portfolioUploading} uploadImage={uploadImage} addItem={addItem} deleteItem={deleteItem} />
       case 'reviews':
         return <ReviewsView reviews={reviews} stats={stats} />
-      case 'subscription':
-        return <SubscriptionView profile={profile} />
       case 'verification':
         return <VerificationView profile={profile} />
       default:
@@ -110,8 +100,8 @@ export default function ProDashboardPage() {
       darkMode={darkMode}
       setDarkMode={setDarkMode}
       handleLogout={handleLogout}
-      profile={profile} // ✅ Ajouté : pour que le Layout puisse afficher le nom/avatar
-      isAvailable={isAvailable} // ✅ Ajouté : pour afficher un indicateur vert/rouge dans le header si voulu
+      profile={profile}
+      isAvailable={isAvailable}
     >
       {renderView()}
     </ProLayout>

@@ -267,7 +267,7 @@ export default function Footer() {
                   className="bg-slate-900 text-sm text-white font-medium focus:outline-none cursor-pointer rounded"
                   style={{ backgroundColor: '#1e293b' }}
                 >
-                  <option value="tg" style={{ backgroundColor: '#1e293b', color: 'white' }}>Togo</option>
+                  <option value="tg" style={{ backgroundColor: '#1e293b', color: 'white' }}>Afrika</option>
                   <option value="bj" style={{ backgroundColor: '#1e293b', color: 'white' }}>Bénin</option>
                   <option value="ci" style={{ backgroundColor: '#1e293b', color: 'white' }}>Côte d'Ivoire</option>
                 </select>

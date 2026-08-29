@@ -23,8 +23,10 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   
-  /* 📱 CRUCIAL POUR MOBILE : Empêche le scroll horizontal accidentel */
+  /* 📱 CORRECTION SCROLL MOBILE */
   overflow-x: hidden;
+  overflow-y: auto !important;      /* ✅ FORCE le scroll vertical */
+  height: auto !important;          /* ✅ Permet à la page de s'étendre */
   max-width: 100vw;
   
   /* Empêche iOS de modifier la taille du texte automatiquement */
@@ -33,16 +35,14 @@ html, body {
   /* Supprime le flash gris au tap sur mobile */
   -webkit-tap-highlight-color: transparent;
   
-  /* Empêche le "pull to refresh" natif qui peut bugger dans les PWA */
-  overscroll-behavior-y: none;
+  /* ✅ SUPPRIMÉ : overscroll-behavior-y: none; (bloquait le scroll) */
 }
 
 /* =====================================================
-   📱 ÉLÉMENTS RESPONSIVES INTELLIGENTS
+    ÉLÉMENTS RESPONSIVES INTELLIGENTS
    ===================================================== */
 
 /* ✅ Images de contenu : responsives mais respectent leur taille naturelle */
-/* Seules les images SANS classe de taille explicite deviennent responsives */
 img:not([class*="h-"]):not([class*="w-"]):not([style*="max-width"]) {
   max-width: 100%;
   height: auto;
@@ -67,7 +67,7 @@ video, iframe, object, embed {
 }
 
 /* =====================================================
-   👆 ACCESSIBILITÉ TACTILE (Recommandation Apple/Google)
+    ACCESSIBILITÉ TACTILE (Recommandation Apple/Google)
    ===================================================== */
 
 /* Zone de toucher minimale de 44x44px pour les boutons et liens */
@@ -128,11 +128,11 @@ input, textarea, select {
 
 /* Cacher la scrollbar tout en gardant le scroll (utile pour le marquee) */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE et Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari et Opera */
+  display: none;
 }
 
 /* Animation de fondu pour les modales/dropdowns */

@@ -224,7 +224,6 @@ export default function RegisterPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex flex-col">
         <header className="py-6 px-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            {/* ✅ TON VRAI LOGO ICI */}
             <Link href="/" className="flex items-center gap-3 group">
               <img 
                 src="/logo.png" 
@@ -239,7 +238,8 @@ export default function RegisterPage() {
           </div>
         </header>
 
-        <main className="flex-1 flex items-center justify-center px-4">
+        {/* 📱 CORRECTION MOBILE : Retrait de items-center, ajout de py-8 et w-full pour permettre le scroll */}
+        <main className="flex-1 flex justify-center px-4 py-8 w-full">
           <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200 p-8 text-center">
             <div className="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <Mail className="w-10 h-10" />
@@ -277,7 +277,6 @@ export default function RegisterPage() {
       {/* Header */}
       <header className="py-6 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* ✅ TON VRAI LOGO ICI AUSSI */}
           <Link href="/" className="flex items-center gap-3 group">
             <img 
               src="/logo.png" 
@@ -298,8 +297,8 @@ export default function RegisterPage() {
         </div>
       </header>
 
-      {/* Contenu principal */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 relative">
+      {/* 📱 CORRECTION MOBILE : Retrait de items-center, ajout de pb-24 pour éviter que le bas du formulaire soit collé au bord de l'écran */}
+      <main className="flex-1 flex justify-center px-4 py-8 pb-24 relative w-full">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-black text-slate-900 mb-2">Créer un compte 🚀</h1>
@@ -358,28 +357,32 @@ export default function RegisterPage() {
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Nom complet *</label>
                   <div className="relative">
                     <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input type="text" value={formData.fullName} onChange={(e) => setFormData({...formData, fullName: e.target.value})} placeholder="Jean Dupont" required className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
+                    <input type="text" value={formData.fullName} onChange={(e) => setFormData({...formData, fullName: e.target.value})} placeholder="Jean Dupont" required className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Email *</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="votre@email.com" required className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
+                    <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="votre@email.com" required className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Téléphone *</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} placeholder="+228 90 00 00 00" required className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
+                    <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} placeholder="+228 90 00 00 00" required className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                   </div>
                 </div>
                 <div className="relative">
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Ville *</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input type="text" value={formData.city} onChange={(e) => { setFormData({...formData, city: e.target.value}); setShowCityDropdown(true) }} onFocus={() => setShowCityDropdown(true)} placeholder="Rechercher votre ville" required autoComplete="off" className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
+                    <input type="text" value={formData.city} onChange={(e) => { setFormData({...formData, city: e.target.value}); setShowCityDropdown(true) }} onFocus={() => setShowCityDropdown(true)} placeholder="Rechercher votre ville" required autoComplete="off" className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                   </div>
                   {showCityDropdown && formData.city.length > 0 && (
                     <>
@@ -400,7 +403,8 @@ export default function RegisterPage() {
                     <label className="block text-sm font-semibold text-slate-700 mb-2">Spécialité *</label>
                     <div className="relative">
                       <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input type="text" value={formData.specialty} onChange={(e) => { setFormData({...formData, specialty: e.target.value}); setShowSpecialtyDropdown(true) }} onFocus={() => setShowSpecialtyDropdown(true)} placeholder="Ex: Plombier, Électricien..." required autoComplete="off" className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                      {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
+                      <input type="text" value={formData.specialty} onChange={(e) => { setFormData({...formData, specialty: e.target.value}); setShowSpecialtyDropdown(true) }} onFocus={() => setShowSpecialtyDropdown(true)} placeholder="Ex: Plombier, Électricien..." required autoComplete="off" className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                     </div>
                     {showSpecialtyDropdown && formData.specialty.length > 0 && (
                       <>
@@ -445,7 +449,8 @@ export default function RegisterPage() {
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Mot de passe *</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} placeholder="••••••••" required className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${formData.password && !isPasswordSecure(formData.password) ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-indigo-500'}`} />
+                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
+                    <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} placeholder="••••••••" required className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all bg-white text-slate-900 placeholder:text-slate-400 ${formData.password && !isPasswordSecure(formData.password) ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-indigo-500'}`} />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -463,7 +468,8 @@ export default function RegisterPage() {
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Confirmer le mot de passe *</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input type={showPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} placeholder="••••••••" required className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-indigo-500'}`} />
+                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
+                    <input type={showPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} placeholder="••••••••" required className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all bg-white text-slate-900 placeholder:text-slate-400 ${formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-indigo-500'}`} />
                   </div>
                 </div>
                 {error && (

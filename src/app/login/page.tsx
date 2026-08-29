@@ -33,7 +33,7 @@ function LoginFormContent() {
     setLoading(true)
 
     try {
-      console.log('🔍 Tentative de connexion...', { email: email.trim().toLowerCase() })
+      console.log(' Tentative de connexion...', { email: email.trim().toLowerCase() })
 
       // 1. Authentification
       const { data, error: authError } = await supabase.auth.signInWithPassword({
@@ -78,7 +78,7 @@ function LoginFormContent() {
       }
 
       const userRole = profile.role || 'client'
-      console.log(`👉 Redirection vérifiée vers le dashboard: ${userRole}`)
+      console.log(` Redirection vérifiée vers le dashboard: ${userRole}`)
 
       // 3. Redirection sécurisée
       setTimeout(() => {
@@ -127,8 +127,8 @@ function LoginFormContent() {
         </div>
       </header>
 
-      {/* CONTENU PRINCIPAL */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8">
+      {/* 📱 CORRECTION MOBILE : Retrait de items-center, ajout de pb-24 et w-full pour permettre le scroll */}
+      <main className="flex-1 flex justify-center px-4 py-8 pb-24 relative w-full">
         <div className="w-full max-w-md">
           
           {/* TITRE */}
@@ -228,7 +228,7 @@ function LoginFormContent() {
                       placeholder="votre@email.com"
                       required
                       autoComplete="email"
-                      className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                      className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition bg-white text-slate-900 placeholder:text-slate-400"
                     />
                   </div>
                 </div>
@@ -247,7 +247,7 @@ function LoginFormContent() {
                       placeholder="••••••••"
                       required
                       autoComplete="current-password"
-                      className="w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                      className="w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition bg-white text-slate-900 placeholder:text-slate-400"
                     />
                     <button
                       type="button"

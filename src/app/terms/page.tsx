@@ -110,7 +110,7 @@ export default function TermsPage() {
                 <li>Respecter les prix convenus avec les clients</li>
                 <li>Offrir des services de qualité professionnelle</li>
                 <li>Répondre aux demandes dans un délai raisonnable</li>
-                <li>Respecter les lois et réglementations en vigueur au Togo</li>
+                <li>Respecter les lois et réglementations en vigueur </li>
               </ul>
             </section>
 

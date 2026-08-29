@@ -6,6 +6,27 @@ import { TrendingUp, Briefcase, Loader2, AlertCircle, Star, MessageSquare } from
 import { supabase } from '@/lib/supabase'
 import AvailabilityToggle from '@/components/dashboard/pro/shared/AvailabilityToggle'
 
+// ✅ FONCTION DE SALUTATION DYNAMIQUE
+const getDynamicGreeting = (firstName: string) => {
+  const hour = new Date().getHours()
+  const randomChance = Math.random()
+
+  // 15% de chances d'avoir une salutation décontractée ("Yo" ou "Salut")
+  if (randomChance < 0.08) return `Yo, ${firstName} ! 👋`
+  if (randomChance < 0.15) return `Salut ${firstName} ! 👋`
+
+  // Salutations adaptées à l'heure réelle
+  if (hour >= 5 && hour < 12) {
+    return `Bonjour, ${firstName} ☀️`
+  } else if (hour >= 12 && hour < 18) {
+    return `Bon après-midi, ${firstName} 🌤️`
+  } else if (hour >= 18 && hour < 22) {
+    return `Bonsoir, ${firstName} 🌆`
+  } else {
+    return `Bonne nuit, ${firstName} 🌙`
+  }
+}
+
 export default function DashboardHome({ profile }: any) {
   const [stats, setStats] = useState({
     rating: 0,
@@ -54,17 +75,21 @@ export default function DashboardHome({ profile }: any) {
     )
   }
 
+  const firstName = profile?.full_name?.split(' ')[0] || 'Pro'
+  const dynamicGreeting = getDynamicGreeting(firstName)
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Header avec gradient */}
+      {/* Header avec gradient et salutation dynamique */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
+            {/* ✅ SALUTATION DYNAMIQUE ICI */}
             <h1 className="text-3xl md:text-4xl font-black text-white">
-              Bonjour, {profile?.full_name?.split(' ')[0]} 👋
+              {dynamicGreeting}
             </h1>
             <p className="text-indigo-100 text-base md:text-lg max-w-xl">
               Voici un résumé de votre activité sur ProKorb. Continuez comme ça !
@@ -209,7 +234,7 @@ export default function DashboardHome({ profile }: any) {
   )
 }
 
-// Helper component
+// Helper component (conservé tel quel)
 function CheckIcon({ className }: { className?: string }) {
   return (
     <svg 

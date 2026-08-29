@@ -68,22 +68,29 @@ export default function LeaveReviewModal({ proId, proName, onClose, onSuccess }:
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+        {/* En-tête */}
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-slate-900">Laisser un avis</h3>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-lg transition">
-            <X className="w-5 h-5" />
+          <button 
+            onClick={onClose} 
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            aria-label="Fermer"
+          >
+            <X className="w-5 h-5 text-slate-600" />
           </button>
         </div>
 
+        {/* Message d'introduction */}
         <div className="mb-6">
           <p className="text-sm text-slate-600">
             Vous souhaitez évaluer <span className="font-semibold text-slate-900">{proName}</span> ?
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Note */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Votre note *
@@ -96,10 +103,11 @@ export default function LeaveReviewModal({ proId, proName, onClose, onSuccess }:
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoveredRating(star)}
                   onMouseLeave={() => setHoveredRating(0)}
-                  className="transition-transform hover:scale-110"
+                  className="transition-transform hover:scale-110 focus:outline-none"
+                  aria-label={`${star} étoile${star > 1 ? 's' : ''}`}
                 >
                   <Star
-                    className={`w-8 h-8 ${
+                    className={`w-8 h-8 transition-colors ${
                       star <= (hoveredRating || rating)
                         ? 'text-yellow-500 fill-yellow-500'
                         : 'text-slate-300'
@@ -108,15 +116,16 @@ export default function LeaveReviewModal({ proId, proName, onClose, onSuccess }:
                 </button>
               ))}
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 mt-2 h-4">
               {rating === 1 && '😞 Très mauvais'}
               {rating === 2 && '😕 Mauvais'}
-              {rating === 3 && ' Moyen'}
+              {rating === 3 && '😐 Moyen'}
               {rating === 4 && '😊 Bien'}
-              {rating === 5 && '🤩 Excellent'}
+              {rating === 5 && ' Excellent'}
             </p>
           </div>
 
+          {/* Commentaire */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Votre avis (optionnel)
@@ -126,10 +135,11 @@ export default function LeaveReviewModal({ proId, proName, onClose, onSuccess }:
               onChange={(e) => setComment(e.target.value)}
               placeholder="Partagez votre expérience avec ce professionnel..."
               rows={4}
-              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none text-slate-900 placeholder:text-slate-400 bg-white"
             />
           </div>
 
+          {/* Message d'erreur */}
           {error && (
             <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -137,21 +147,25 @@ export default function LeaveReviewModal({ proId, proName, onClose, onSuccess }:
             </div>
           )}
 
-          <div className="flex gap-3">
+          {/* Boutons */}
+          <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition"
+              className="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition-colors"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={loading || rating === 0}
-              className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Envoi...</>
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> 
+                  Envoi...
+                </>
               ) : (
                 'Publier l\'avis'
               )}
