@@ -75,8 +75,13 @@ export default function DashboardHome({ profile }: any) {
     )
   }
 
+  // ✅ SÉCURISATION : Extraction sécurisée des données du profil
   const firstName = profile?.full_name?.split(' ')[0] || 'Pro'
   const dynamicGreeting = getDynamicGreeting(firstName)
+  
+  // ✅ CORRECTION CRITIQUE : On sécurise profile.id pour éviter "undefined"
+  const safeProfileId = profile?.id || ''
+  const isAvailable = profile?.is_available ?? false
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -97,9 +102,10 @@ export default function DashboardHome({ profile }: any) {
           </div>
           
           <div className="flex-shrink-0">
+            {/* ✅ CORRECTION : On passe safeProfileId au lieu de profile.id */}
             <AvailabilityToggle 
-              userId={profile.id}
-              currentStatus={profile.is_available}
+              userId={safeProfileId}
+              currentStatus={isAvailable}
             />
           </div>
         </div>
@@ -234,7 +240,7 @@ export default function DashboardHome({ profile }: any) {
   )
 }
 
-// Helper component (conservé tel quel)
+// Helper component
 function CheckIcon({ className }: { className?: string }) {
   return (
     <svg 
