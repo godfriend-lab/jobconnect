@@ -15,7 +15,7 @@ interface LanguageContextType {
 const translations: Record<Language, Record<string, string>> = {
   fr: {
     // Footer
-    'footer.tagline': 'La plateforme de référence au Afrika pour connecter les professionnels qualifiés avec les clients.',
+    'footer.tagline': 'La plateforme de référence au Togo pour connecter les professionnels qualifiés avec les clients.',
     'footer.stay_informed': 'Restez informé',
     'footer.newsletter_desc': 'Inscrivez-vous à notre newsletter pour recevoir les dernières actualités.',
     'footer.email_placeholder': 'Votre adresse email',
@@ -70,7 +70,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   en: {
     // Footer
-    'footer.tagline': 'The leading platform in Afrika connecting qualified professionals with clients.',
+    'footer.tagline': 'The leading platform in Togo connecting qualified professionals with clients.',
     'footer.stay_informed': 'Stay informed',
     'footer.newsletter_desc': 'Subscribe to our newsletter to receive the latest news.',
     'footer.email_placeholder': 'Your email address',
