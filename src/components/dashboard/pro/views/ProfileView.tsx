@@ -31,7 +31,7 @@ export default function ProfileView({ profile, updateProfile, uploadAvatar, load
     }
   }, [profile])
 
-  // ✅ Upload d'image de profil
+  // ✅ Upload d'image de profil CORRIGÉ
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     
@@ -56,10 +56,16 @@ export default function ProfileView({ profile, updateProfile, uploadAvatar, load
       
       if (res === true || res?.success) {
         alert('✅ Photo de profil mise à jour avec succès')
-        // Rafraîchir pour voir les changements partout
-        setTimeout(() => {
-          window.location.reload()
-        }, 1000)
+        
+        // ✅ CORRECTION 1 : Rafraîchir les données du profil de manière fluide
+        if (typeof loadProfile === 'function') {
+          await loadProfile()
+        } else {
+          // Fallback uniquement si loadProfile n'est pas disponible
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
+        }
       } else {
         alert('❌ Erreur lors de l\'upload: ' + (res?.error || 'Erreur inconnue'))
       }
@@ -85,17 +91,14 @@ export default function ProfileView({ profile, updateProfile, uploadAvatar, load
       if (res === true || res?.success) {
         alert('✅ Profil sauvegardé avec succès !')
         
-        // ✅ MÉTHODE 1: Rechargement complet (simple et efficace)
-        setTimeout(() => {
-          window.location.reload()
-        }, 1500)
-        
-        // ✅ MÉTHODE 2: Événement personnalisé (décommente pour utiliser)
-        // window.dispatchEvent(new CustomEvent('profileUpdated', {
-        //   detail: { profile: profileData }
-        // }))
-        // alert('✅ Profil sauvegardé ! Les modifications seront visibles après rafraîchissement.')
-        
+        // ✅ CORRECTION 2 : Rafraîchissement fluide après sauvegarde
+        if (typeof loadProfile === 'function') {
+          await loadProfile()
+        } else {
+          setTimeout(() => {
+            window.location.reload()
+          }, 1500)
+        }
       } else {
         alert('❌ Erreur lors de la sauvegarde: ' + (res?.error || 'Vérifiez votre connexion'))
       }
@@ -129,11 +132,11 @@ export default function ProfileView({ profile, updateProfile, uploadAvatar, load
         </h2>
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-          {/* Avatar */}
+          {/* Avatar avec CACHE-BUSTER pour forcer l'affichage de la nouvelle image */}
           <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-slate-200 dark:bg-slate-700 shadow-lg border-4 border-indigo-100 dark:border-indigo-900 flex-shrink-0">
             {profile?.avatar_url ? (
               <img 
-                src={profile.avatar_url} 
+                src={`${profile.avatar_url}?v=${Date.now()}`} 
                 alt="Photo de profil" 
                 className="w-full h-full object-cover"
               />
