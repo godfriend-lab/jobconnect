@@ -14,11 +14,11 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 }
 
-// ✅ CONFIGURATION METADATA PWA
+// ✅ CONFIGURATION METADATA PWA & SEO
 export const metadata: Metadata = {
   title: "ProKorb - La Marketplace N°1 des Services au Togo",
-  description: "Trouvez les meilleurs professionnels vérifiés du Togo. Plombiers, électriciens, maçons et plus encore.",
-  keywords: ["services", "professionnels", "Togo", "Lomé", "marketplace", "ProKorb"],
+  description: "Trouvez les meilleurs professionnels vérifiés du Togo. Plombiers, électriciens, maçons et plus encore à Lomé, Kpalimé, Sokodé.",
+  keywords: ["services", "professionnels", "Togo", "Lomé", "marketplace", "ProKorb", "plombier Lomé", "électricien Togo", "artisan vérifié"],
   manifest: "/manifest.json",
   icons: {
     icon: '/favicon.png',
@@ -28,6 +28,11 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "ProKorb",
+  },
+  
+  // ✅ AJOUT DE LA VÉRIFICATION GOOGLE SEARCH CONSOLE
+  verification: {
+    google: "mYpnXsmHzgD9s0WWb6ULIYD4Wl8m0UPQZgTFOs-R9aw",
   },
 }
 

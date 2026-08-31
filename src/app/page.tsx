@@ -1,5 +1,7 @@
 // @ts-nocheck
 import Link from 'next/link'
+import Image from 'next/image'
+import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/client'
 import Chatbot from '@/components/Chatbot'
 import FeaturedProfessionals from '@/components/landing/FeaturedProfessionals'
@@ -9,6 +11,99 @@ import {
   Wrench, Zap as ZapIcon, Hammer, Paintbrush, 
   Home, Car, Scissors, Stethoscope, Laptop
 } from 'lucide-react'
+
+// ==========================================================
+// 🚀 SEO ULTRA-PUISSANT : MÉTADONNÉES NEXT.JS
+// ==========================================================
+export const metadata: Metadata = {
+  title: 'ProKorb | Trouvez un Artisan ou Professionnel Vérifié au Togo',
+  description: 'La 1ère marketplace au Togo pour trouver des plombiers, électriciens, mécaniciens et artisans vérifiés à Lomé, Kpalimé, Sokodé. Inscription 100% gratuite, 0% commission.',
+  keywords: 'plombier Lomé, électricien Togo, artisan vérifié, ProKorb, service à domicile Togo, réparation climatiseur, menuisier Kpalimé, marketplace services Togo, trouver un pro',
+  authors: [{ name: 'ProKorb Togo' }],
+  creator: 'ProKorb',
+  publisher: 'ProKorb',
+  formatDetection: { telephone: true },
+  alternates: {
+    canonical: 'https://prokorb.com',
+  },
+  openGraph: {
+    title: 'ProKorb | Trouvez un professionnel de confiance au Togo',
+    description: 'Connectez-vous avec les meilleurs artisans et professionnels du Togo. 100% Gratuit et sans commission.',
+    url: 'https://prokorb.com',
+    siteName: 'ProKorb',
+    locale: 'fr_TG',
+    type: 'website',
+    images: [
+      {
+        url: 'https://prokorb.com/og-image.jpg', // ⚠️ Crée une image 1200x630px dans le dossier public/
+        width: 1200,
+        height: 630,
+        alt: 'ProKorb - Marketplace de services au Togo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ProKorb | Trouvez un professionnel de confiance au Togo',
+    description: 'La 1ère marketplace au Togo pour trouver des artisans vérifiés. 100% Gratuit.',
+    images: ['https://prokorb.com/og-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  // verification: {
+  //   google: 'TON_CODE_DE_VERIFICATION_GOOGLE_ICI', // À ajouter après inscription sur Search Console
+  // },
+}
+
+// ==========================================================
+// 🧠 SEO ULTRA-PUISSANT : DONNÉES STRUCTURÉES (JSON-LD)
+// ==========================================================
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://prokorb.com/#organization',
+      name: 'ProKorb',
+      url: 'https://prokorb.com',
+      logo: 'https://prokorb.com/logo.png',
+      description: 'La 1ère marketplace au Togo pour connecter les particuliers et les professionnels vérifiés.',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Lomé',
+        addressCountry: 'TG',
+      },
+      sameAs: [
+        'https://facebook.com/prokorb', // Remplace par tes vrais liens
+        'https://instagram.com/prokorb',
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://prokorb.com/#website',
+      url: 'https://prokorb.com',
+      name: 'ProKorb',
+      description: 'Trouvez un artisan ou professionnel vérifié au Togo',
+      publisher: {
+        '@id': 'https://prokorb.com/#organization',
+      },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://prokorb.com/marketplace?search={search_term_string}',
+        'query-input': 'required name=search_term_string',
+      },
+    }
+  ]
+}
 
 export default async function HomePage() {
   const supabase = createClient()
@@ -53,13 +148,23 @@ export default async function HomePage() {
   return (
     <div className="bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col font-sans text-slate-900 dark:text-slate-100 overflow-x-hidden selection:bg-indigo-500 selection:text-white">
       
-      {/* 1. NAVIGATION BAR (Sans lien Tarifs) */}
+      {/* INJECTION DES DONNÉES STRUCTURÉES JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      {/* 1. NAVIGATION BAR */}
       <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <img 
+          <Link href="/" className="flex items-center gap-3 group shrink-0" aria-label="Retour à l'accueil ProKorb">
+            {/* ✅ OPTIMISATION SEO : Utilisation de Next/Image pour le LCP (Largest Contentful Paint) */}
+            <Image 
               src="/logo.png" 
-              alt="Logo ProKorb" 
+              alt="Logo ProKorb - Marketplace de services au Togo" 
+              width={150}
+              height={40}
+              priority
               className="h-10 w-auto max-w-[150px] object-contain group-hover:scale-105 transition-transform duration-300" 
             />
             <div className="text-2xl font-black tracking-tight hidden sm:block">
@@ -101,18 +206,19 @@ export default async function HomePage() {
             </FadeIn>
 
             <FadeIn delay={0.2}>
+              {/* ✅ OPTIMISATION SEO : H1 contient les mots-clés principaux "Artisan", "Professionnel Vérifié", "Togo" */}
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-slate-950 dark:text-white leading-[1.1]">
-                Trouvez l'expert qu'il vous faut, <br className="hidden sm:block" />
+                Trouvez un artisan ou professionnel <br className="hidden sm:block" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-                  ou vendez vos compétences.
+                  vérifié au Togo.
                 </span>
               </h1>
             </FadeIn>
             
             <FadeIn delay={0.3}>
               <p className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-                La marketplace tout-en-un pour connecter les particuliers et les professionnels vérifiés. 
-                <span className="text-slate-900 dark:text-white font-bold"> 100% Gratuit</span> pour commencer.
+                La marketplace tout-en-un pour connecter les particuliers et les professionnels à Lomé, Kpalimé et Sokodé. 
+                <span className="text-slate-900 dark:text-white font-bold"> 100% Gratuit</span> pour commencer, 0% commission.
               </p>
             </FadeIn>
             
@@ -141,7 +247,7 @@ export default async function HomePage() {
         <section id="avantages" className="py-24 px-4 sm:px-6 max-w-7xl mx-auto">
           <FadeIn direction="up">
             <div className="text-center mb-16 space-y-4">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-1.5 rounded-full">Pourquoi nous choisir</span>
+              <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-1.5 rounded-full">Pourquoi choisir ProKorb</span>
               <h2 className="text-3xl sm:text-5xl font-black text-slate-950 dark:text-white tracking-tight">
                 Une expérience pensée pour <br />la confiance et l'efficacité
               </h2>
@@ -213,10 +319,10 @@ export default async function HomePage() {
               <div className="max-w-2xl">
                 <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-1.5 rounded-full">Nos Métiers</span>
                 <h2 className="mt-4 text-3xl sm:text-5xl font-black text-slate-950 dark:text-white tracking-tight">
-                  Explorez nos catégories <br /><span className="text-indigo-600">d'experts vérifiés</span>
+                  Explorez nos catégories <br /><span className="text-indigo-600">d'experts vérifiés au Togo</span>
                 </h2>
               </div>
-              <Link href="/marketplace" className="text-indigo-600 font-bold flex items-center gap-2 hover:gap-3 transition-all">
+              <Link href="/marketplace" className="text-indigo-600 font-bold flex items-center gap-2 hover:gap-3 transition-all" aria-label="Voir tous les métiers sur la marketplace">
                 Voir tous les métiers <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -227,7 +333,11 @@ export default async function HomePage() {
               const Icon = getIconForCategory(cat.name)
               return (
                 <FadeIn key={idx} delay={idx * 0.05} direction="up">
-                  <Link href={`/marketplace?category=${cat.name}`} className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-xl hover:shadow-indigo-100/50 dark:hover:shadow-none hover:-translate-y-1 transition-all duration-300 block h-full">
+                  <Link 
+                    href={`/marketplace?category=${cat.name}`} 
+                    className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-xl hover:shadow-indigo-100/50 dark:hover:shadow-none hover:-translate-y-1 transition-all duration-300 block h-full"
+                    aria-label={`Trouver un professionnel en ${cat.name}`}
+                  >
                     <div className="w-14 h-14 mx-auto mb-4 bg-slate-50 dark:bg-slate-800 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 rounded-2xl flex items-center justify-center transition-colors">
                       <Icon className="w-7 h-7 text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
                     </div>
@@ -240,15 +350,15 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* 7. BIG CTA SECTION (Sans lien vers les tarifs) */}
+        {/* 7. BIG CTA SECTION */}
         <section className="bg-indigo-600 text-white py-24 px-4 sm:px-6 pb-40 text-center relative overflow-hidden">
           <div className="absolute inset-0 z-0 opacity-[0.05] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:30px_30px]"></div>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-purple-500/20 rounded-full blur-3xl -z-10"></div>
           
           <FadeIn direction="up" className="relative z-10 max-w-3xl mx-auto space-y-8">
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">Prêt à simplifier vos services ?</h2>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">Prêt à simplifier vos services au Togo ?</h2>
             <p className="text-indigo-100 text-lg font-medium max-w-xl mx-auto">
-              Rejoignez dès aujourd'hui la communauté qui transforme le marché du service au Togo. L'inscription est 100% gratuite.
+              Rejoignez dès aujourd'hui la communauté qui transforme le marché du service. L'inscription est 100% gratuite.
             </p>
             <div className="pt-4 flex flex-col sm:flex-row justify-center gap-4">
               <Link href="/register" className="bg-white text-indigo-600 font-extrabold text-base px-8 py-4 rounded-xl transition-all shadow-xl hover:bg-slate-50 hover:-translate-y-1 inline-flex items-center justify-center gap-2">
