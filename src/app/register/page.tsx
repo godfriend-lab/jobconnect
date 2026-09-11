@@ -95,6 +95,14 @@ const commonSpecialties = [
   'Coiffeur(se)', 'Développeur Web', 'Graphiste', 'Comptable', 'Avocat', 'Médecin', 'Infirmier(ère)'
 ]
 
+// ✅ CENTRALISATION DES ROUTES DE DASHBOARD SELON LE RÔLE
+// Client -> /dashboard/client | Professionnel -> /dashboard/pro
+// (Modifie ces deux chemins ici si tes routes réelles portent un autre nom)
+const getDashboardRoute = (userRole: 'client' | 'pro' | null) => {
+  if (userRole === 'pro') return '/dashboard/pro'
+  return '/dashboard/client'
+}
+
 export default function RegisterPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
@@ -111,10 +119,11 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  
-  // ✅ NOUVEAU : État pour afficher l'écran de succès après l'inscription
-  const [isVerificationSent, setIsVerificationSent] = useState(false)
-  
+
+  // ✅ écran de succès affiché brièvement avant la redirection automatique
+  const [isRegistered, setIsRegistered] = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
+
   const [showCityDropdown, setShowCityDropdown] = useState(false)
   const [showSpecialtyDropdown, setShowSpecialtyDropdown] = useState(false)
 
@@ -140,21 +149,29 @@ export default function RegisterPage() {
         return
       }
 
+      // ✅ On capture le rôle choisi dans une variable locale immuable,
+      // pour ne jamais dépendre d'un état React qui pourrait changer entre-temps.
+      const chosenRole = role
+      if (!chosenRole) {
+        setError('Veuillez sélectionner un profil (Client ou Professionnel).')
+        setLoading(false)
+        return
+      }
+
       const cleanEmail = formData.email.trim().toLowerCase()
       const cleanPhone = formData.phone.replace(/\s+/g, '')
       const cleanName = formData.fullName.trim()
       const cleanCity = formData.city.trim()
-      const cleanSpecialty = role === 'pro' ? formData.specialty.trim() : null
+      const cleanSpecialty = chosenRole === 'pro' ? formData.specialty.trim() : null
 
-      // ✅ AJOUT : emailRedirectTo pour que Supabase sache où renvoyer l'utilisateur après le clic
+      // ✅ Plus de emailRedirectTo : aucune confirmation par email nécessaire
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: cleanEmail,
         password: formData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
           data: {
             full_name: cleanName,
-            role: role
+            role: chosenRole
           }
         }
       })
@@ -182,21 +199,48 @@ export default function RegisterPage() {
           id: authData.user.id,
           full_name: cleanName,
           email: cleanEmail,
-          role: role,
+          role: chosenRole,
           phone: cleanPhone,
           city: cleanCity,
           specialty: cleanSpecialty,
           is_active: true,
-          is_verified: false,
-          is_available: role === 'pro'
+          is_verified: true, // ✅ plus de vérification email requise
+          is_available: chosenRole === 'pro'
         })
 
       if (profileError) {
         console.warn('⚠️ Erreur création profil:', profileError)
+        setError("Compte créé, mais une erreur est survenue lors de l'enregistrement du profil. Contactez le support si le problème persiste.")
       }
 
-      // ✅ SUCCÈS : On ne connecte pas l'utilisateur, on affiche l'écran de vérification
-      setIsVerificationSent(true)
+      // ✅ Connexion automatique juste après l'inscription.
+      // ⚠️ Nécessite que "Confirm email" soit DÉSACTIVÉ dans
+      // Supabase > Authentication > Providers > Email.
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password: formData.password
+      })
+
+      if (signInError) {
+        console.warn('⚠️ Connexion automatique impossible:', signInError.message)
+        setError("Compte créé, mais la connexion automatique a échoué. Veuillez vous connecter manuellement.")
+        setIsRegistered(true)
+        setLoading(false)
+        return
+      }
+
+      // ✅ Succès complet : on affiche un court écran de confirmation
+      // puis on redirige AUTOMATIQUEMENT vers le bon dashboard selon le rôle.
+      setIsRegistered(true)
+      setRedirecting(true)
+
+      const destination = getDashboardRoute(chosenRole)
+
+      // Petit délai pour laisser l'écran de succès s'afficher, puis redirection.
+      setTimeout(() => {
+        router.push(destination)
+        router.refresh()
+      }, 1200)
 
     } catch (err) {
       console.error('❌ Erreur critique inscription:', err)
@@ -218,8 +262,8 @@ export default function RegisterPage() {
     spec.toLowerCase().includes(formData.specialty.toLowerCase())
   ).slice(0, 8)
 
-  // ✅ ÉCRAN DE SUCCÈS : Vérification par email
-  if (isVerificationSent) {
+  // ✅ ÉCRAN DE SUCCÈS : plus d'attente d'email, redirection automatique + bouton de secours
+  if (isRegistered) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex flex-col">
         <header className="py-6 px-4">
@@ -238,40 +282,52 @@ export default function RegisterPage() {
           </div>
         </header>
 
-        {/* 📱 CORRECTION MOBILE : Retrait de items-center, ajout de py-8 et w-full pour permettre le scroll */}
         <main className="flex-1 flex justify-center px-4 py-8 w-full">
           <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200 p-8 text-center">
-            <div className="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Mail className="w-10 h-10" />
+            <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">Vérifiez votre boîte mail</h2>
-            <p className="text-slate-600 mb-8 leading-relaxed">
-              Nous avons envoyé un lien de confirmation à <br />
-              <strong className="text-slate-900">{formData.email}</strong>
+            <h2 className="text-2xl font-bold text-slate-900 mb-3">Compte créé avec succès 🎉</h2>
+            <p className="text-slate-600 mb-6 leading-relaxed">
+              Bienvenue sur ProKorb, <br />
+              <strong className="text-slate-900">{formData.fullName}</strong>
             </p>
-            <p className="text-sm text-slate-500 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
-              Cliquez sur le lien dans l'email pour activer votre compte ProKorb et accéder à votre espace.
-            </p>
-            <Link
-              href="/login"
+
+            {error && (
+              <div className="flex items-center gap-2 p-3 mb-6 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm text-left">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" /><span>{error}</span>
+              </div>
+            )}
+
+            {redirecting ? (
+              <div className="flex items-center justify-center gap-2 text-slate-500 text-sm mb-6">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Redirection vers votre espace {role === 'pro' ? 'professionnel' : 'client'}...
+              </div>
+            ) : null}
+
+            <button
+              onClick={() => router.push(role === 'pro' ? '/dashboard/pro' : '/dashboard/client')}
               className="inline-flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:shadow-lg transition-all"
             >
-              Retour à la connexion
+              Accéder à mon espace {role === 'pro' ? 'professionnel' : 'client'}
               <ArrowRight className="w-5 h-5" />
-            </Link>
-            <button 
-              onClick={() => setIsVerificationSent(false)}
-              className="mt-4 text-sm text-slate-500 hover:text-indigo-600 underline"
-            >
-              Renvoyer l'email de vérification
             </button>
+
+            {!redirecting && (
+              <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+                <p className="text-sm text-slate-500">
+                  Ou <Link href="/login" className="text-indigo-600 font-semibold hover:underline">connectez-vous manuellement</Link>
+                </p>
+              </div>
+            )}
           </div>
         </main>
       </div>
     )
   }
 
-  // Le reste du JSX (Étapes 1, 2 et 3)
+  // Le reste du JSX (Étapes 1, 2 et 3) — inchangé
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex flex-col">
       {/* Header */}
@@ -297,7 +353,6 @@ export default function RegisterPage() {
         </div>
       </header>
 
-      {/* 📱 CORRECTION MOBILE : Retrait de items-center, ajout de pb-24 pour éviter que le bas du formulaire soit collé au bord de l'écran */}
       <main className="flex-1 flex justify-center px-4 py-8 pb-24 relative w-full">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
@@ -357,7 +412,6 @@ export default function RegisterPage() {
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Nom complet *</label>
                   <div className="relative">
                     <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
                     <input type="text" value={formData.fullName} onChange={(e) => setFormData({...formData, fullName: e.target.value})} placeholder="Jean Dupont" required className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                   </div>
                 </div>
@@ -365,7 +419,6 @@ export default function RegisterPage() {
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Email *</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
                     <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="votre@email.com" required className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                   </div>
                 </div>
@@ -373,7 +426,6 @@ export default function RegisterPage() {
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Téléphone *</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
                     <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} placeholder="+228 90 00 00 00" required className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                   </div>
                 </div>
@@ -381,7 +433,6 @@ export default function RegisterPage() {
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Ville *</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
                     <input type="text" value={formData.city} onChange={(e) => { setFormData({...formData, city: e.target.value}); setShowCityDropdown(true) }} onFocus={() => setShowCityDropdown(true)} placeholder="Rechercher votre ville" required autoComplete="off" className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                   </div>
                   {showCityDropdown && formData.city.length > 0 && (
@@ -403,7 +454,6 @@ export default function RegisterPage() {
                     <label className="block text-sm font-semibold text-slate-700 mb-2">Spécialité *</label>
                     <div className="relative">
                       <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
                       <input type="text" value={formData.specialty} onChange={(e) => { setFormData({...formData, specialty: e.target.value}); setShowSpecialtyDropdown(true) }} onFocus={() => setShowSpecialtyDropdown(true)} placeholder="Ex: Plombier, Électricien..." required autoComplete="off" className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white text-slate-900 placeholder:text-slate-400" />
                     </div>
                     {showSpecialtyDropdown && formData.specialty.length > 0 && (
@@ -449,7 +499,6 @@ export default function RegisterPage() {
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Mot de passe *</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
                     <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} placeholder="••••••••" required className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all bg-white text-slate-900 placeholder:text-slate-400 ${formData.password && !isPasswordSecure(formData.password) ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-indigo-500'}`} />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -468,7 +517,6 @@ export default function RegisterPage() {
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Confirmer le mot de passe *</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    {/* ✅ CORRECTION VISIBILITÉ TEXTE */}
                     <input type={showPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} placeholder="••••••••" required className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all bg-white text-slate-900 placeholder:text-slate-400 ${formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-indigo-500'}`} />
                   </div>
                 </div>
