@@ -1,497 +1,805 @@
 // @ts-nocheck
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { 
-  Search, MapPin, Star, ShieldCheck, Pause,
-  Heart, Home, Loader2, AlertCircle, Eye, MessageCircle,
-  User, Check
+import VerifiedBadge from '@/components/VerifiedBadge'
+
+import {
+  Search,
+  MapPin,
+  Star,
+  Heart,
+  Loader2,
+  AlertCircle,
+  Eye,
+  MessageCircle,
+  User,
+  Pause,
+  CheckCircle2,
+  SlidersHorizontal,
+  X,
+  ChevronDown,
+  RefreshCw,
 } from 'lucide-react'
 
-// ✅ LISTE COMPLÈTE DES MÉTIERS (1000+ métiers)
-const allMetiers = [
-  "Tous les métiers", "Maçon", "Carreleur", "Plombier", "Électricien bâtiment", "Peintre en bâtiment", "Charpentier", "Couvreur", "Menuisier", "Ébéniste", "Ferronnier", "Métallier", "Soudeur", "Serrurier", "Vitrier", "Plâtrier", "Plaquiste", "Staffeur", "Façadier", "Tailleur de pierre", "Marbrier", "Poseur de parquet", "Poseur de moquette", "Poseur de revêtements muraux", "Étancheur", "Terrassier", "Paveur", "Grutier", "Conducteur d'engins de chantier", "Opérateur de bétonnière", "Coffreur", "Ferrailleur", "Bancheur", "Conducteur de travaux bâtiment", "Installateur sanitaire", "Installateur de chauffage", "Frigoriste", "Climaticien", "Installateur photovoltaïque", "Installateur d'antennes", "Installateur de portes", "Installateur de fenêtres", "Installateur de stores", "Poseur de vérandas", "Poseur de cuisines", "Poseur de salles de bains", "Monteur de cloisons", "Monteur de faux plafonds", "Applicateur d'enduits", "Applicateur de béton décoratif", "Applicateur de résine", "Polisseur de béton", "Restaurateur de bâtiments", "Restaurateur de façades", "Démolisseur", "Désamianteur", "Ramoneur", "Nettoyeur de façades", "Nettoyeur de vitres", "Nettoyeur de toitures", "Technicien de maintenance bâtiment", "Jardinier", "Paysagiste", "Élagueur", "Arboriste", "Pépiniériste", "Horticulteur", "Maraîcher", "Floriculteur", "Fleuriste", "Producteur de plantes aromatiques", "Producteur de plantes médicinales", "Producteur de champignons", "Apiculteur", "Éleveur de volailles", "Éleveur de porcs", "Éleveur de bovins", "Éleveur de chèvres", "Éleveur de moutons", "Éleveur de lapins", "Éleveur de poissons", "Pisciculteur", "Ostréiculteur", "Mytiliculteur", "Aquaculteur", "Pêcheur professionnel", "Marin-pêcheur", "Palefrenier", "Maréchal-ferrant", "Berger", "Bouvier", "Vacher", "Conducteur de tracteur", "Ouvrier agricole", "Irrigateur agricole", "Greffeur d'arbres", "Taille-haie professionnel", "Tailleur de vigne", "Vendangeur", "Cueilleur de fruits", "Cueilleur de plantes sauvages", "Meunier", "Boulanger", "Pâtissier", "Chocolatier", "Confiseur", "Glacier", "Biscuitier", "Traiteur", "Charcutier", "Boucher", "Poissonnier", "Fromager", "Torréfacteur de café", "Brasseur artisanal", "Fabricant de jus", "Fabricant de sirops", "Fabricant de confitures", "Fabricant de sauces", "Fabricant de vinaigre", "Fabricant de pâtes alimentaires", "Fabricant de couscous", "Fabricant de farine", "Fabricant d'huile alimentaire", "Fabricant de beurre", "Fabricant de yaourt", "Fabricant de fromage", "Fabricant de pain traditionnel", "Fabricant de beignets", "Fabricant de biscuits artisanaux", "Fabricant de bonbons", "Fabricant de caramel", "Fabricant de nougat", "Fabricant de glaces artisanales", "Préparateur de plats cuisinés", "Cuisinier", "Grillardin", "Rôtisseur", "Pizzaïolo", "Crêpier", "Sushi-man", "Artisan glacier", "Découpeur de viande", "Préparateur de poisson", "Fumeur de poisson", "Fumeur de viande", "Sécheur de fruits", "Sécheur de légumes", "Transformateur de manioc", "Transformateur de maïs", "Transformateur de soja", "Transformateur de cacao", "Transformateur de café", "Transformateur d'arachides", "Transformateur de noix", "Transformateur de céréales", "Tailleur", "Couturier", "Modéliste", "Styliste", "Brodeur", "Tricoteur", "Crocheteur", "Tisserand", "Fileur de laine", "Teinturier textile", "Sérigraphe textile", "Imprimeur textile", "Fabricant de vêtements", "Fabricant de chemises", "Fabricant de pantalons", "Fabricant de robes", "Fabricant de vestes", "Fabricant de costumes", "Fabricant d'uniformes", "Fabricant de vêtements traditionnels", "Fabricant de pagnes", "Fabricant d'écharpes", "Fabricant de foulards", "Fabricant de chapeaux", "Chapelier", "Modiste", "Fabricant de casquettes", "Fabricant de sacs en tissu", "Fabricant de rideaux", "Tapissier", "Garnisseur de meubles", "Matelassier", "Fabricant de matelas", "Fabricant d'oreillers", "Fabricant de couvertures", "Fabricant de chaussures", "Cordonnier", "Bottier", "Maroquinier", "Sellier", "Fabricant de ceintures", "Fabricant de portefeuilles", "Fabricant de bracelets en cuir", "Travailleur du cuir", "Teinturier de cuir", "Potier", "Céramiste", "Faïencier", "Porcelainier", "Modeleur en argile", "Sculpteur sur argile", "Sculpteur sur bois", "Sculpteur sur pierre", "Sculpteur sur métal", "Graveur sur bois", "Graveur sur métal", "Graveur sur verre", "Graveur sur pierre", "Graveur à la main", "Bijoutier", "Joaillier", "Orfèvre", "Lapidaire", "Polisseur de pierres précieuses", "Sertisseur", "Horloger", "Réparateur de montres", "Réparateur de bijoux", "Fabricant de bijoux fantaisie", "Fabricant de perles", "Artisan du bronze", "Artisan du cuivre", "Artisan du laiton", "Artisan de l'aluminium", "Fondeur artisanal", "Forgeron", "Coutelier", "Fabricant d'outils agricoles", "Fabricant de houes", "Fabricant de pioches", "Fabricant de haches", "Affûteur", "Aiguiseur", "Réparateur d'outils", "Tourneur-fraiseur", "Usineur", "Ajusteur-mécanicien", "Mécanicien automobile", "Mécanicien moto", "Mécanicien poids lourds", "Mécanicien agricole", "Mécanicien de machines", "Mécanicien naval", "Mécanicien cycles", "Réparateur de vélos", "Réparateur de motos", "Réparateur de voitures", "Carrossier", "Peintre automobile", "Tôlier automobile", "Dépanneur automobile", "Électricien automobile", "Électromécanicien", "Mécatronicien", "Réparateur de moteurs", "Réparateur de pompes", "Réparateur de groupes électrogènes", "Réparateur de machines agricoles", "Réparateur de machines industrielles", "Réparateur de matériel de chantier", "Réparateur de réfrigérateurs", "Réparateur de climatiseurs", "Réparateur de machines à laver", "Réparateur de fours", "Réparateur de cuisinières", "Réparateur de téléviseurs", "Réparateur de radios", "Réparateur d'appareils électroniques", "Réparateur de téléphones", "Réparateur d'ordinateurs", "Assembleur d'ordinateurs", "Technicien électronique", "Technicien électromécanique", "Bobinier de moteurs", "Installateur électrique", "Monteur de tableaux électriques", "Câbleur électrique", "Électricien industriel", "Électricien naval", "Installateur domotique", "Installateur de systèmes de sécurité", "Installateur de vidéosurveillance", "Installateur d'alarmes", "Installateur de contrôle d'accès", "Technicien de maintenance électrique", "Technicien de maintenance industrielle", "Monteur mécanique", "Assembleur mécanique", "Ajusteur industriel", "Chaudronnier", "Tuyauteur", "Plieur de métal", "Découpeur de métal", "Découpeur plasma", "Opérateur de machine-outil", "Opérateur CNC", "Perceur industriel", "Meuleur", "Polisseur de métal", "Sableur", "Galvaniseur", "Peintre industriel", "Monteur de structures métalliques", "Monteur de charpentes métalliques", "Poseur de garde-corps", "Poseur de grilles", "Poseur de clôtures", "Fabricant de portes métalliques", "Fabricant de fenêtres métalliques", "Fabricant de meubles métalliques", "Fabricant d'étagères métalliques", "Fabricant de chaises métalliques", "Menuisier aluminium", "Menuisier PVC", "Restaurateur de meubles", "Fabricant de meubles", "Fabricant de tables", "Fabricant de chaises", "Fabricant de lits", "Fabricant d'armoires", "Fabricant de bibliothèques", "Fabricant de bureaux", "Fabricant de portes en bois", "Fabricant de fenêtres en bois", "Fabricant d'escaliers", "Fabricant de meubles de cuisine", "Fabricant de meubles de salle de bains", "Fabricant de meubles de jardin", "Fabricant de meubles sur mesure", "Tourneur sur bois", "Marqueteur", "Vernisseur de meubles", "Laqueur de meubles", "Polisseur de bois", "Restaurateur de bois", "Fabricant de jouets en bois", "Fabricant d'objets en bois", "Fabricant d'ustensiles en bois", "Fabricant de cuillères en bois", "Fabricant de planches à découper", "Fabricant de cadres en bois", "Vannier", "Tresseur de fibres végétales", "Tresseur de paniers", "Tresseur de nattes", "Fabricant de paniers", "Fabricant de corbeilles", "Fabricant de meubles en rotin", "Fabricant de meubles en bambou", "Artisan du bambou", "Artisan du raphia", "Artisan du jonc", "Fabricant de nattes traditionnelles", "Fabricant de chapeaux en paille", "Fabricant de sacs en raphia", "Fabricant de sacs en bambou", "Fabricant de paniers en osier", "Fabricant de meubles en osier", "Fabricant de balais artisanaux", "Fabricant de brosses", "Fabricant de cordes", "Cordier", "Fabricant de filets de pêche", "Fabricant de filets agricoles", "Fabricant de hamacs", "Fabricant de tapis artisanaux", "Tisserand de tapis", "Fabricant de tapisseries", "Fabricant de macramé", "Artisan macramé", "Fabricant de décorations végétales", "Fabricant de fleurs artificielles", "Fabricant de décorations en fibres", "Fabricant de paniers décoratifs", "Fabricant de lampes en bambou", "Fabricant de luminaires artisanaux", "Fabricant de bougies", "Cirier", "Fabricant de savons artisanaux", "Savonnier", "Fabricant de parfums artisanaux", "Parfumeur", "Fabricant de cosmétiques artisanaux", "Fabricant de pommades artisanales", "Fabricant d'huiles cosmétiques", "Fabricant de bougies parfumées", "Fabricant d'encens", "Fabricant de désodorisants artisanaux", "Fabricant de produits ménagers artisanaux", "Fabricant de détergents", "Fabricant de lessive artisanale", "Bûcheron", "Scieur de bois", "Scieur de long", "Exploitant forestier", "Débardeur forestier", "Charbonnier", "Producteur de charbon de bois", "Résinier", "Récolteur de miel", "Récolteur de sève", "Récolteur de liège", "Travailleur forestier", "Ouvrier sylvicole", "Planteur d'arbres", "Producteur de bambou", "Producteur de rotin", "Producteur de raphia", "Producteur de bois", "Fabricant de palettes", "Fabricant de caisses en bois", "Fabricant de cageots", "Fabricant de tonneaux", "Tonnelier", "Boisselier", "Sabotier", "Fabricant de sabots", "Fabricant de manches d'outils", "Fabricant de cannes en bois", "Fabricant de bâtons", "Fabricant de flûtes en bois", "Luthier", "Fabricant de guitares", "Fabricant de violons", "Fabricant d'instruments de musique", "Réparateur d'instruments de musique", "Accordeur de pianos", "Facteur d'orgues", "Fabricant de tambours", "Fabricant de djembés", "Fabricant de balafons", "Fabricant de xylophones", "Fabricant de maracas", "Fabricant de percussions", "Fabricant de harpes", "Fabricant de flûtes", "Fabricant de trompettes artisanales", "Fabricant de saxophones", "Réparateur de guitares", "Réparateur de pianos", "Réparateur d'instruments à vent", "Réparateur d'instruments à cordes", "Restaurateur d'instruments anciens", "Sculpteur sur bois décoratif", "Sculpteur de statues", "Sculpteur de masques", "Fabricant de masques traditionnels", "Fabricant de figurines", "Fabricant de poupées", "Fabricant de marionnettes", "Marionnettiste", "Fabricant de jouets artisanaux", "Fabricant de jeux en bois", "Fabricant de puzzles en bois", "Fabricant de dominos artisanaux", "Fabricant d'échecs artisanaux", "Fabricant de jeux de société", "Fabricant de cerfs-volants", "Fabricant de bateaux miniatures", "Modéliste naval", "Fabricant de maquettes", "Maquettiste", "Fabricant de modèles réduits", "Restaurateur de meubles anciens", "Restaurateur de sculptures", "Restaurateur d'objets anciens", "Restaurateur de cadres", "Restaurateur de tableaux", "Encadreur", "Dorure sur bois", "Doreur", "Patineur de meubles", "Décorateur sur bois", "Peintre décorateur", "Peintre muraliste", "Fresquiste", "Mosaïste", "Mosaïste décorateur", "Poseur de mosaïque", "Décorateur de céramique", "Peintre sur porcelaine", "Peintre sur verre", "Peintre sur céramique", "Émailleur", "Émailleur sur métal", "Émailleur sur verre", "Verrier", "Souffleur de verre", "Vitraliste", "Fabricant de vitraux", "Restaurateur de vitraux", "Graveur sur verre", "Sculpteur sur verre", "Miroitier", "Fabricant de miroirs", "Polisseur de verre", "Découpeur de verre", "Tailleur de verre", "Fabricant de bouteilles artisanales", "Fabricant de vases en verre", "Fabricant de lampes en verre", "Fabricant d'objets en verre", "Souffleur de verre décoratif", "Artisan du verre recyclé", "Fabricant de perles en verre", "Bijoutier en verre", "Créateur de mosaïques", "Fabricant de carreaux décoratifs", "Fabricant de carreaux en terre cuite", "Tuilier", "Fabricant de tuiles", "Briquetier", "Fabricant de briques", "Fabricant de blocs en béton", "Fabricant de pavés", "Fabricant de bordures", "Fabricant de béton préfabriqué", "Fabricant de pierres artificielles", "Producteur de chaux", "Fabricant de plâtre", "Producteur de ciment artisanal", "Fabricant de mortier", "Fabricant de peinture artisanale", "Fabricant de pigments", "Fabricant de colorants", "Fabricant d'enduits décoratifs", "Fabricant de résines", "Fabricant de colle artisanale", "Fabricant de cire", "Fabricant de vernis", "Fabricant de produits d'entretien", "Fabricant de cirage", "Fabricant de pâte à polir", "Fabricant d'adhésifs", "Fabricant de mastic", "Fabricant de produits pour bois", "Fabricant de produits pour cuir", "Fabricant de produits pour métal", "Fabricant de produits pour verre", "Fabricant de produits pour carrelage", "Fabricant de produits de construction", "Artisan bétonnier", "Applicateur de stuc", "Stucateur", "Décorateur en stuc", "Staffeur-ornemaniste", "Ornemaniste", "Sculpteur ornemaniste", "Mouleur", "Modeleur", "Fabricant de moules", "Mouliste", "Plâtrier décorateur", "Staffeur décorateur", "Fabricant d'éléments décoratifs", "Fabricant de colonnes décoratives", "Fabricant de corniches", "Fabricant de rosaces", "Fabricant de moulures", "Poseur de moulures", "Poseur de corniches", "Poseur d'ornements", "Décorateur de plafonds", "Décorateur intérieur artisanal", "Installateur de papier peint", "Poseur de papier peint", "Poseur de tissus muraux", "Poseur de lambris", "Poseur de panneaux décoratifs", "Poseur de revêtements de sol", "Poseur de lino", "Poseur de vinyle", "Poseur de stratifié", "Ponçeur de parquet", "Vitrificateur de parquet", "Restaurateur de parquet", "Teinteur de bois", "Décapeur de meubles", "Nettoyeur de meubles", "Nettoyeur industriel", "Nettoyeur de tapis", "Nettoyeur de moquettes", "Nettoyeur de canapés", "Nettoyeur de matelas", "Nettoyeur de façades", "Nettoyeur haute pression", "Agent de nettoyage manuel", "Laveur automobile", "Préparateur esthétique automobile", "Polisseur automobile", "Detailer automobile", "Réparateur de pneus", "Monteur de pneus", "Vulcanisateur", "Réparateur de chambres à air", "Fabricant de pneus reconditionnés", "Réparateur de jantes", "Peintre de jantes", "Débosselage automobile", "Débosseleur", "Installateur de pare-brise", "Réparateur de pare-brise", "Installateur d'accessoires automobiles", "Installateur d'attelages", "Fabricant de carrosseries", "Fabricant de remorques", "Fabricant de charrettes", "Fabricant de brouettes", "Fabricant de vélos", "Fabricant de motos artisanales", "Fabricant de tricycles", "Fabricant de pousse-pousse", "Réparateur de tricycles", "Réparateur de fauteuils roulants", "Réparateur de matériel médical mécanique", "Réparateur de machines à coudre", "Réparateur de balances", "Réparateur de pompes à eau", "Réparateur de compresseurs", "Réparateur de générateurs", "Réparateur de moteurs diesel", "Réparateur de moteurs essence", "Réparateur de transmissions", "Réparateur de boîtes de vitesses", "Réparateur d'embrayages", "Réparateur de freins", "Réparateur de suspensions", "Réparateur de directions", "Réparateur de systèmes hydrauliques", "Hydraulicien", "Pneumaticien industriel", "Installateur hydraulique", "Installateur de pompes", "Installateur de systèmes d'irrigation", "Installateur de forage", "Foreur", "Puitsier", "Constructeur de puits", "Réparateur de puits", "Technicien de forage", "Opérateur de forage", "Carrier", "Extracteur de pierre", "Mineur artisanal", "Tailleur de granit", "Tailleur de marbre", "Polisseur de marbre", "Polisseur de granit", "Graveur de pierre tombale", "Fabricant de monuments funéraires", "Marbrier funéraire", "Sculpteur funéraire", "Poseur de pierres", "Maçon de pierre sèche", "Maçon traditionnel", "Constructeur de murs en pierre", "Constructeur en terre crue", "Constructeur en adobe", "Constructeur en briques de terre", "Fabricant de briques de terre", "Fabricant de blocs de terre comprimée", "Constructeur de maisons en terre", "Constructeur de maisons en bambou", "Constructeur de maisons en bois", "Constructeur de maisons traditionnelles", "Couvreur en chaume", "Chaumier", "Poseur de chaume", "Fabricant de tuiles artisanales", "Fabricant de toiture végétale", "Installateur de toiture végétale", "Étancheur toiture", "Zingueur", "Couvreur-zingueur", "Bardeur", "Poseur de bardage", "Poseur d'isolation", "Isolateur thermique", "Isolateur acoustique", "Souffleur d'isolant", "Installateur de gouttières", "Fabricant de gouttières", "Poseur de gouttières", "Installateur de cheminées", "Fumiste", "Constructeur de cheminées", "Poseur de poêles", "Installateur de poêles", "Ramoneur professionnel", "Technicien en énergie solaire", "Installateur de panneaux solaires", "Installateur de chauffe-eau solaire", "Technicien solaire", "Monteur de structures solaires", "Installateur d'éoliennes", "Technicien éolien", "Installateur de batteries solaires", "Installateur de bornes de recharge", "Technicien de recharge électrique", "Installateur de pompes à chaleur", "Technicien en climatisation", "Technicien frigoriste", "Réparateur de chambres froides", "Installateur de chambres froides", "Fabricant de glacières artisanales", "Fabricant de séchoirs solaires", "Constructeur de fours solaires", "Fabricant de fours artisanaux", "Fabricant de fours à bois", "Fabricant de fours à charbon", "Fabricant de foyers améliorés", "Fabricant de réchauds artisanaux", "Fabricant de cuisinières artisanales", "Fabricant de barbecue artisanal", "Fabricant de grilles de cuisson", "Fabricant de marmites métalliques", "Fabricant de casseroles artisanales", "Fabricant de poêles métalliques", "Fabricant d'ustensiles de cuisine", "Fabricant de couteaux de cuisine", "Fabricant de cuillères métalliques", "Fabricant de fourchettes artisanales", "Fabricant de spatules", "Fabricant de mortiers de cuisine", "Fabricant de pilons", "Fabricant de moulins manuels", "Fabricant de râpes", "Fabricant de tamis", "Fabricant de passoires", "Fabricant de paniers alimentaires", "Fabricant de séchoirs alimentaires", "Fabricant de fumoirs artisanaux", "Fabricant de pressoirs", "Fabricant de moulins à huile", "Fabricant de moulins à céréales", "Fabricant de décortiqueuses artisanales", "Fabricant de broyeurs agricoles", "Fabricant de machines agricoles artisanales", "Fabricant de semoirs", "Fabricant de charrues", "Fabricant de herses", "Fabricant de pulvérisateurs", "Fabricant d'arrosoirs", "Fabricant de brouettes agricoles", "Fabricant d'outils de jardinage", "Fabricant de râteaux", "Fabricant de bêches", "Fabricant de pelles", "Fabricant de fourches agricoles", "Fabricant de serpes", "Fabricant de faucilles", "Fabricant de paniers agricoles", "Fabricant de caisses agricoles", "Fabricant de ruches", "Fabricant de cadres de ruches", "Fabricant d'abreuvoirs", "Fabricant de mangeoires", "Fabricant de cages à volailles", "Fabricant de clapiers", "Fabricant d'enclos", "Fabricant de clôtures en bois", "Fabricant de clôtures végétales", "Poseur de clôtures électriques", "Installateur de clôtures agricoles", "Fabricant de grillages", "Poseur de grillage", "Fabricant de filets agricoles", "Réparateur de filets", "Fabricant de cordages marins", "Cordier maritime", "Constructeur de pirogues", "Constructeur de bateaux en bois", "Charpentier naval", "Calfat", "Peintre naval", "Réparateur de bateaux", "Réparateur de moteurs hors-bord", "Fabricant de pagaies", "Fabricant de rames", "Fabricant de filets de pêche", "Fabricant de casiers de pêche", "Fabricant de nasses", "Fabricant d'hameçons artisanaux", "Fabricant de flotteurs", "Réparateur de matériel de pêche", "Fumoir de poisson artisanal", "Sécheur de poisson", "Transformateur de poisson", "Transformateur de fruits de mer", "Salaisonnier", "Saunier", "Producteur de sel artisanal", "Fabricant de poisson séché", "Fabricant de viande séchée", "Fabricant de viande fumée", "Fabricant de produits carnés", "Fabricant de saucisses", "Fabricant de jambons artisanaux", "Fabricant de pâtés", "Fabricant de terrines", "Fabricant de bouillons artisanaux", "Fabricant d'épices", "Mélangeur d'épices", "Producteur de piments séchés", "Sécheur d'épices", "Producteur de farine de manioc", "Producteur de farine de maïs", "Producteur de farine de mil", "Producteur de farine de sorgho", "Producteur de farine de riz", "Transformateur de patate douce", "Transformateur d'igname", "Transformateur de banane plantain", "Fabricant de chips de banane", "Fabricant de chips de manioc", "Fabricant de farine de banane", "Fabricant de gari", "Fabricant de tapioca", "Fabricant d'amidon", "Fabricant de pâte de tomate", "Fabricant de purée de fruits", "Fabricant de jus de fruits", "Fabricant de nectar de fruits", "Fabricant de boissons artisanales", "Fabricant de boissons non alcoolisées", "Fabricant de thé artisanal", "Mélangeur de thés", "Sécheur de feuilles", "Producteur de tisanes", "Fabricant d'infusions", "Fabricant de café moulu", "Torréfacteur artisanal", "Moudreur de café", "Producteur de cacao", "Chocolatier artisanal", "Fabricant de chocolat", "Fabricant de pâte d'arachide", "Fabricant de beurre d'arachide", "Fabricant de pâte de noix", "Fabricant de noix grillées", "Transformateur de graines", "Fabricant d'huile de palme", "Producteur d'huile de coco", "Fabricant d'huile d'arachide", "Fabricant d'huile de soja", "Fabricant d'huile de sésame", "Fabricant d'huile de neem", "Fabricant de savon noir", "Fabricant de savon liquide", "Fabricant de savon solide", "Fabricant de shampoing artisanal", "Fabricant de crème corporelle", "Fabricant de baumes", "Fabricant de lotions", "Fabricant de pommades", "Fabricant de beurre corporel", "Fabricant d'huiles essentielles", "Distillateur de plantes aromatiques", "Fabricant d'eau florale", "Fabricant de parfums naturels", "Fabricant de bougies décoratives", "Fabricant de bougies artisanales", "Fabricant d'encens naturel", "Fabricant de diffuseurs parfumés", "Fabricant de sachets parfumés", "Fabricant de paniers cadeaux", "Créateur d'objets artisanaux", "Fabricant de sacs en cuir", "Fabricant de chaussures en cuir", "Fabricant de sandales", "Fabricant de tongs", "Fabricant de bottes", "Réparateur de chaussures", "Réparateur de sacs", "Réparateur de ceintures", "Artisan du cuir", "Graveur sur cuir", "Peintre sur cuir", "Embosseur sur cuir", "Découpeur de cuir", "Couturier cuir", "Sellier automobile", "Sellier-harnacheur", "Bourrelier", "Fabricant de selles", "Fabricant de harnais", "Fabricant de brides", "Fabricant de colliers pour animaux", "Fabricant de laisses", "Fabricant de muselières", "Fabricant de sacs à dos", "Fabricant de valises", "Fabricant de mallettes", "Fabricant de pochettes", "Fabricant de porte-monnaie", "Fabricant de trousses", "Fabricant de cartables", "Fabricant de sacs de voyage", "Fabricant de sacs de sport", "Fabricant de sacs à main", "Fabricant de paniers en cuir", "Fabricant de tabliers en cuir", "Fabricant de gants en cuir", "Fabricant de vêtements en cuir", "Fabricant de vestes en cuir", "Fabricant de chapeaux en cuir", "Fabricant de bracelets en cuir", "Fabricant de bijoux en cuir", "Fabricant de porte-clés en cuir", "Fabricant de housses en cuir", "Fabricant de sièges en cuir", "Restaurateur de cuir", "Nettoyeur de cuir", "Teinturier de cuir", "Finisseur de cuir", "Fabricant de tissus artisanaux", "Fabricant de tissus traditionnels", "Fabricant de tissus imprimés", "Fabricant de tissus teints", "Fabricant de tissus brodés", "Fabricant de tissus tissés", "Fabricant de pagnes traditionnels", "Fabricant de foulards traditionnels", "Fabricant de turbans", "Fabricant de bandeaux", "Fabricant de vêtements africains", "Fabricant de vêtements traditionnels", "Fabricant de vêtements cérémoniels", "Fabricant de vêtements de travail", "Fabricant de vêtements scolaires", "Fabricant de vêtements pour enfants", "Fabricant de vêtements pour bébés", "Fabricant de vêtements de sport", "Fabricant de lingerie artisanale", "Fabricant de sous-vêtements", "Fabricant de pyjamas", "Fabricant de chemises traditionnelles", "Fabricant de pantalons traditionnels", "Fabricant de jupes", "Fabricant de robes traditionnelles", "Fabricant de boubous", "Fabricant de caftans", "Fabricant de tenues de cérémonie", "Fabricant de costumes traditionnels", "Fabricant de vêtements de scène", "Costumier", "Habilleur", "Retoucheur", "Réparateur de vêtements", "Brodeur à la main", "Brodeur machine", "Dentellier", "Fabricant de dentelle", "Fabricant de galons", "Fabricant de rubans", "Fabricant de boutons artisanaux", "Fabricant de fermetures artisanales", "Fabricant d'accessoires textiles", "Fabricant de pompons", "Fabricant de franges", "Fabricant de perles textiles", "Fabricant de fleurs en tissu", "Fabricant de nœuds décoratifs", "Fabricant de coussins décoratifs", "Fabricant de housses de coussins", "Fabricant de housses de fauteuils", "Fabricant de housses de sièges", "Fabricant de nappes", "Fabricant de serviettes en tissu", "Fabricant de sets de table", "Fabricant de torchons", "Fabricant de tabliers", "Fabricant de rideaux artisanaux", "Fabricant de stores en tissu", "Fabricant de moustiquaires", "Fabricant de hamacs en tissu", "Fabricant de couvertures artisanales", "Fabricant de dessus-de-lit", "Fabricant de tapis en tissu", "Fabricant de tapis tressés", "Fabricant de tapis noués", "Fabricant de tapisseries murales", "Fabricant de tentures", "Fabricant de décorations textiles", "Fabricant de drapeaux", "Fabricant de fanions", "Fabricant de banderoles", "Fabricant de décorations pour événements", "Décorateur événementiel", "Décorateur de mariage", "Installateur de décorations", "Monteur de stands", "Fabricant de stands", "Fabricant de kiosques", "Fabricant de comptoirs", "Fabricant de présentoirs", "Fabricant d'enseignes artisanales", "Peintre d'enseignes", "Lettrier", "Calligraphe", "Graveur d'enseignes", "Fabricant de panneaux publicitaires", "Fabricant de panneaux en bois", "Fabricant de panneaux métalliques", "Fabricant de lettres en relief", "Fabricant de lettres lumineuses", "Poseur d'enseignes", "Poseur de panneaux", "Fabricant de tampons", "Fabricant de cachets", "Graveur de tampons", "Imprimeur artisanal", "Sérigraphe", "Typographe", "Relieur", "Brocheur", "Fabricant de carnets", "Fabricant de cahiers", "Fabricant d'agendas", "Fabricant d'albums photo", "Fabricant de livres artisanaux", "Restaurateur de livres", "Restaurateur de documents", "Calligraphe décoratif", "Enlumineur", "Fabricant de cartes artisanales", "Fabricant de cartes de vœux", "Fabricant d'invitations", "Fabricant de faire-part", "Fabricant de boîtes cadeaux", "Fabricant de boîtes en carton", "Cartonnier", "Fabricant d'emballages", "Fabricant de sacs en papier", "Fabricant de sachets en papier", "Fabricant d'étiquettes", "Fabricant de papier artisanal", "Papetier", "Fabricant de papier recyclé", "Fabricant de papier décoratif", "Fabricant de papier cadeau", "Fabricant de papier à lettres", "Fabricant d'origami", "Artisan du papier", "Fabricant de fleurs en papier", "Fabricant de décorations en papier", "Fabricant de lanternes en papier", "Fabricant de guirlandes en papier", "Fabricant de pompons en papier", "Fabricant de confettis", "Fabricant de décorations de fête", "Fabricant de décorations de Noël", "Fabricant de décorations de Pâques", "Fabricant de décorations de mariage", "Fabricant de boules décoratives", "Fabricant de couronnes décoratives", "Fabricant de cadres décoratifs", "Fabricant de miroirs décoratifs", "Fabricant d'horloges artisanales", "Fabricant de pendules", "Réparateur d'horloges", "Horloger réparateur", "Fabricant de réveils artisanaux", "Fabricant de sabliers", "Fabricant de thermomètres artisanaux", "Fabricant d'objets décoratifs", "Créateur d'artisanat", "Artisan polyvalent", "Artisan décorateur", "Artisan créateur", "Artisan du recyclage", "Recycleur de plastique", "Transformateur de plastique", "Fabricant d'objets en plastique recyclé", "Fabricant de meubles en plastique recyclé", "Fabricant de pavés en plastique recyclé", "Fabricant de briques recyclées", "Recycleur de verre", "Transformateur de verre recyclé", "Recycleur de métal", "Transformateur de métal recyclé", "Recycleur de papier", "Transformateur de papier recyclé", "Fabricant d'objets recyclés", "Fabricant de meubles recyclés", "Fabricant de décoration recyclée", "Fabricant de bijoux recyclés", "Fabricant de sacs recyclés", "Fabricant de vêtements recyclés", "Fabricant de jouets recyclés", "Fabricant de pots recyclés", "Fabricant de jardinières recyclées", "Fabricant de meubles en palettes", "Fabricant de tables en palettes", "Fabricant de canapés en palettes", "Fabricant de lits en palettes", "Fabricant d'étagères en palettes", "Fabricant de décorations en palettes", "Fabricant de meubles en pneus recyclés", "Fabricant de poufs recyclés", "Fabricant de sièges recyclés", "Fabricant de lampes recyclées", "Fabricant d'abat-jours recyclés", "Fabricant de sculptures recyclées", "Sculpteur d'objets recyclés", "Artisan récupérateur", "Collecteur de matériaux recyclables", "Trieur de déchets recyclables", "Transformateur de déchets organiques", "Composteur", "Producteur de compost", "Fabricant d'engrais organiques", "Producteur d'engrais naturel", "Fabricant de terreau", "Producteur de terreau", "Fabricant de briquettes combustibles", "Fabricant de briquettes de biomasse", "Producteur de biomasse", "Transformateur de déchets agricoles", "Fabricant de charbon écologique", "Fabricant de charbon vert", "Fabricant de biochar", "Producteur de lombricompost", "Éleveur de vers de compost", "Producteur d'aliments pour animaux", "Fabricant d'aliments pour volailles", "Fabricant d'aliments pour poissons", "Fabricant d'aliments pour bétail", "Fabricant de granulés alimentaires", "Fabricant de provende", "Mélangeur d'aliments pour animaux", "Fabricant de mangeoires", "Fabricant d'abreuvoirs", "Fabricant de cages", "Fabricant de poulaillers", "Fabricant de clapiers", "Fabricant d'enclos", "Fabricant de niches pour chiens", "Fabricant de maisons pour animaux", "Fabricant d'aquariums artisanaux", "Fabricant de terrariums", "Fabricant de cages à oiseaux", "Fabricant de perchoirs", "Fabricant de nichoirs", "Fabricant de ruches", "Fabricant d'équipements apicoles", "Fabricant d'enfumoirs apicoles", "Fabricant de cadres apicoles", "Fabricant de cire d'abeille", "Transformateur de cire d'abeille", "Fabricant de bougies en cire d'abeille", "Fabricant de produits à base de miel", "Producteur de miel", "Producteur de cire", "Producteur de propolis", "Fabricant de produits de la ruche", "Transformateur de miel", "Conditionneur de miel", "Fabricant de paniers apicoles", "Fabricant d'équipements agricoles", "Réparateur d'équipements agricoles", "Fabricant d'outils forestiers", "Réparateur d'outils forestiers", "Fabricant d'équipements de pêche", "Réparateur d'équipements de pêche", "Fabricant d'équipements d'élevage", "Réparateur d'équipements d'élevage"
-]
+/* =========================================================
+   TYPES
+========================================================= */
 
-// ✅ SYSTÈME DE PRIORITÉ INVISIBLE
-const PLAN_PRIORITY: Record<string, number> = {
-  'premium': 4,
-  'business': 3,
-  'starter': 2,
-  'gratuit': 1,
+interface Profile {
+  id: string
+  full_name: string
+  phone: string | null
+  avatar_url: string | null
+  specialty: string | null
+  rating: number | null
+  total_reviews: number | null
+  plan: string | null
+  is_verified: boolean | null
+  verified_at: string | null
+  is_available: boolean | null
+  city: string | null
 }
 
 interface Service {
   id: string
   title: string
-  description: string
-  category: string
-  price: string
+  description: string | null
+  category: string | null
+  price: string | number | null
   city: string | null
   pro_id: string
   created_at: string
-  profiles: {
-    id: string
-    full_name: string
-    phone: string
-    avatar_url: string | null
-    specialty: string
-    rating: number
-    total_reviews: number
-    plan: string
-    is_verified: boolean
-    is_available: boolean
-    city: string | null
-  }
+  is_active?: boolean
+  profiles: Profile
 }
+
+/* =========================================================
+   CONFIGURATION
+========================================================= */
+
+const PLAN_PRIORITY: Record<string, number> = {
+  premium: 4,
+  business: 3,
+  starter: 2,
+  gratuit: 1,
+}
+
+const CITIES = [
+  'Lomé', 'Adidogomé', 'Agoè-Nyivé', 'Bè', 'Tokoin', 'Akodesséwa',
+  'Nyékonakpoè', 'Djidjolé', 'Attiégou', 'Kégué', 'Tsévié', 'Kpalimé',
+  'Sokodé', 'Kara', 'Dapaong',
+]
+
+const ALL_METIERS = [
+  'Tous les métiers', 'Maçon', 'Carreleur', 'Plombier', 'Électricien bâtiment',
+  'Peintre en bâtiment', 'Charpentier', 'Couvreur', 'Menuisier', 'Ébéniste',
+  'Ferronnier', 'Métallier', 'Soudeur', 'Serrurier', 'Vitrier', 'Plâtrier',
+  'Plaquiste', 'Staffeur', 'Façadier', 'Tailleur de pierre', 'Marbrier',
+  'Poseur de parquet', 'Poseur de moquette', 'Poseur de revêtements muraux',
+  'Étancheur', 'Terrassier', 'Paveur', 'Grutier', 'Conducteur d’engins de chantier',
+  'Coffreur', 'Ferrailleur', 'Bancheur', 'Conducteur de travaux bâtiment',
+  'Installateur sanitaire', 'Installateur de chauffage', 'Frigoriste', 'Climaticien',
+  'Installateur photovoltaïque', 'Installateur d’antennes', 'Installateur de portes',
+  'Installateur de fenêtres', 'Installateur de stores', 'Poseur de vérandas',
+  'Poseur de cuisines', 'Poseur de salles de bains', 'Jardinier', 'Paysagiste',
+  'Élagueur', 'Arboriste', 'Pépiniériste', 'Horticulteur', 'Maraîcher', 'Floriculteur',
+  'Fleuriste', 'Apiculteur', 'Éleveur de volailles', 'Éleveur de porcs', 'Éleveur de bovins',
+  'Éleveur de chèvres', 'Éleveur de moutons', 'Éleveur de lapins', 'Éleveur de poissons',
+  'Pisciculteur', 'Pêcheur professionnel', 'Berger', 'Bouvier', 'Vacher', 'Conducteur de tracteur',
+  'Ouvrier agricole', 'Irrigateur agricole', 'Greffeur d’arbres', 'Producteur de plantes',
+  'Producteur de champignons', 'Producteur de miel', 'Producteur de cacao', 'Producteur de café',
+  'Meunier', 'Boulanger', 'Pâtissier', 'Chocolatier', 'Confiseur', 'Glacier', 'Biscuitier',
+  'Traiteur', 'Charcutier', 'Boucher', 'Poissonnier', 'Fromager', 'Torréfacteur de café',
+  'Fabricant de jus', 'Fabricant de sirops', 'Fabricant de confitures', 'Fabricant de sauces',
+  'Fabricant de pâtes alimentaires', 'Fabricant de farine', 'Fabricant d’huile alimentaire',
+  'Fabricant de beurre', 'Fabricant de yaourt', 'Cuisinier', 'Grillardin', 'Rôtisseur',
+  'Pizzaïolo', 'Crêpier', 'Préparateur de plats cuisinés', 'Transformateur de manioc',
+  'Transformateur de maïs', 'Transformateur de soja', 'Transformateur de cacao',
+  'Transformateur de café', 'Transformateur d’arachides', 'Transformateur de céréales',
+  'Fabricant de gari', 'Fabricant de tapioca', 'Fabricant de chips de manioc',
+  'Fabricant de chips de banane', 'Fabricant de pâte de tomate', 'Fabricant de jus de fruits',
+  'Fabricant de nectar de fruits', 'Fabricant de boissons non alcoolisées', 'Tailleur',
+  'Couturier', 'Modéliste', 'Styliste', 'Brodeur', 'Tricoteur', 'Crocheteur', 'Tisserand',
+  'Teinturier textile', 'Sérigraphe textile', 'Imprimeur textile', 'Fabricant de vêtements',
+  'Fabricant de chemises', 'Fabricant de pantalons', 'Fabricant de robes', 'Fabricant de vestes',
+  'Fabricant de costumes', 'Fabricant d’uniformes', 'Fabricant de vêtements traditionnels',
+  'Fabricant de pagnes', 'Fabricant d’écharpes', 'Fabricant de foulards', 'Fabricant de chapeaux',
+  'Chapelier', 'Fabricant de casquettes', 'Tapissier', 'Garnisseur de meubles', 'Matelassier',
+  'Fabricant de matelas', 'Fabricant de chaussures', 'Cordonnier', 'Bottier', 'Maroquinier',
+  'Sellier', 'Fabricant de ceintures', 'Fabricant de portefeuilles', 'Fabricant de sacs en cuir',
+  'Fabricant de bracelets en cuir', 'Travailleur du cuir', 'Réparateur de chaussures',
+  'Réparateur de sacs', 'Artisan du cuir', 'Graveur sur cuir', 'Peintre sur cuir',
+  'Embosseur sur cuir', 'Découpeur de cuir', 'Couturier cuir', 'Sellier automobile',
+  'Sellier-harnacheur', 'Bourrelier', 'Fabricant de selles', 'Fabricant de harnais', 'Potier',
+  'Céramiste', 'Faïencier', 'Modeleur en argile', 'Sculpteur sur argile', 'Sculpteur sur bois',
+  'Sculpteur sur pierre', 'Sculpteur sur métal', 'Graveur sur bois', 'Graveur sur métal',
+  'Graveur sur verre', 'Graveur sur pierre', 'Bijoutier', 'Joaillier', 'Orfèvre', 'Lapidaire',
+  'Sertisseur', 'Horloger', 'Réparateur de montres', 'Réparateur de bijoux',
+  'Fabricant de bijoux fantaisie', 'Forgeron', 'Fabricant d’outils agricoles', 'Affûteur',
+  'Aiguiseur', 'Mécanicien automobile', 'Mécanicien moto', 'Mécanicien poids lourds',
+  'Mécanicien agricole', 'Mécanicien de machines', 'Mécanicien naval', 'Mécanicien cycles',
+  'Réparateur de vélos', 'Réparateur de motos', 'Réparateur de voitures', 'Carrossier',
+  'Peintre automobile', 'Tôlier automobile', 'Dépanneur automobile', 'Électricien automobile',
+  'Électromécanicien', 'Mécatronicien', 'Réparateur de moteurs', 'Réparateur de pompes',
+  'Réparateur de groupes électrogènes', 'Réparateur de machines agricoles',
+  'Réparateur de machines industrielles', 'Réparateur de matériel de chantier',
+  'Réparateur de réfrigérateurs', 'Réparateur de climatiseurs', 'Réparateur de machines à laver',
+  'Réparateur de fours', 'Réparateur de cuisinières', 'Réparateur de téléviseurs',
+  'Réparateur de radios', 'Réparateur d’appareils électroniques', 'Réparateur de téléphones',
+  'Réparateur d’ordinateurs', 'Assembleur d’ordinateurs', 'Technicien électronique',
+  'Technicien électromécanique', 'Installateur électrique', 'Monteur de tableaux électriques',
+  'Câbleur électrique', 'Électricien industriel', 'Électricien naval', 'Installateur domotique',
+  'Installateur de systèmes de sécurité', 'Installateur de vidéosurveillance',
+  'Installateur d’alarmes', 'Installateur de contrôle d’accès', 'Technicien de maintenance électrique',
+  'Technicien de maintenance industrielle', 'Monteur mécanique', 'Assembleur mécanique',
+  'Ajusteur industriel', 'Chaudronnier', 'Tuyauteur', 'Plieur de métal', 'Découpeur de métal',
+  'Découpeur plasma', 'Opérateur de machine-outil', 'Opérateur CNC', 'Perceur industriel',
+  'Meuleur', 'Polisseur de métal', 'Sableur', 'Galvaniseur', 'Peintre industriel',
+  'Restaurateur de meubles', 'Fabricant de meubles', 'Fabricant de tables', 'Fabricant de chaises',
+  'Fabricant de lits', 'Fabricant d’armoires', 'Fabricant de bibliothèques', 'Fabricant de bureaux',
+  'Fabricant de portes en bois', 'Fabricant de fenêtres en bois', 'Fabricant d’escaliers',
+  'Fabricant de meubles de cuisine', 'Fabricant de meubles de salle de bains',
+  'Fabricant de meubles de jardin', 'Fabricant de meubles sur mesure', 'Tourneur sur bois',
+  'Marqueteur', 'Vernisseur de meubles', 'Laqueur de meubles', 'Polisseur de bois',
+  'Restaurateur de bois', 'Fabricant de jouets en bois', 'Fabricant d’objets en bois',
+  'Fabricant d’ustensiles en bois', 'Vannier', 'Tresseur de fibres végétales', 'Tresseur de paniers',
+  'Tresseur de nattes', 'Fabricant de paniers', 'Fabricant de corbeilles', 'Fabricant de meubles en rotin',
+  'Fabricant de meubles en bambou', 'Artisan du bambou', 'Artisan du raphia', 'Artisan du jonc',
+  'Peintre décorateur', 'Peintre muraliste', 'Fresquiste', 'Mosaïste', 'Mosaïste décorateur',
+  'Poseur de mosaïque', 'Décorateur de céramique', 'Peintre sur porcelaine', 'Peintre sur verre',
+  'Peintre sur céramique', 'Émailleur', 'Verrier', 'Souffleur de verre', 'Vitraliste',
+  'Fabricant de vitraux', 'Restaurateur de vitraux', 'Miroitier', 'Fabricant de miroirs',
+  'Polisseur de verre', 'Découpeur de verre', 'Tailleur de verre', 'Fabricant de vases en verre',
+  'Fabricant d’objets en verre', 'Fabricant de tuiles', 'Tuilier', 'Briquetier', 'Fabricant de briques',
+  'Fabricant de blocs en béton', 'Fabricant de pavés', 'Fabricant de bordures', 'Fabricant de béton préfabriqué',
+  'Fabricant de pierres artificielles', 'Fabricant de plâtre', 'Fabricant de mortier',
+  'Fabricant de peinture artisanale', 'Fabricant de pigments', 'Fabricant d’enduits décoratifs',
+  'Fabricant de résines', 'Fabricant de colle artisanale', 'Fabricant de vernis',
+  'Fabricant de produits d’entretien', 'Artisan bétonnier', 'Applicateur de stuc', 'Stucateur',
+  'Décorateur en stuc', 'Staffeur-ornemaniste', 'Ornemaniste', 'Sculpteur ornemaniste', 'Mouleur',
+  'Modeleur', 'Fabricant de moules', 'Mouliste', 'Plâtrier décorateur', 'Staffeur décorateur',
+  'Fabricant d’éléments décoratifs', 'Fabricant de colonnes décoratives', 'Fabricant de corniches',
+  'Fabricant de rosaces', 'Fabricant de moulures', 'Poseur de moulures', 'Poseur de corniches',
+  'Poseur d’ornements', 'Décorateur de plafonds', 'Nettoyeur industriel', 'Nettoyeur de tapis',
+  'Nettoyeur de moquettes', 'Nettoyeur de canapés', 'Nettoyeur de matelas', 'Nettoyeur de façades',
+  'Nettoyeur haute pression', 'Agent de nettoyage manuel', 'Laveur automobile', 'Préparateur esthétique automobile',
+  'Polisseur automobile', 'Detailer automobile', 'Réparateur de pneus', 'Monteur de pneus',
+  'Vulcanisateur', 'Réparateur de chambres à air', 'Réparateur de jantes', 'Peintre de jantes',
+  'Débosselage automobile', 'Débosseleur', 'Installateur de pare-brise', 'Réparateur de pare-brise',
+  'Installateur d’accessoires automobiles', 'Installateur d’attelages', 'Hydraulicien',
+  'Pneumaticien industriel', 'Installateur hydraulique', 'Installateur de pompes',
+  'Installateur de systèmes d’irrigation', 'Installateur de forage', 'Foreur', 'Puitsier',
+  'Constructeur de puits', 'Réparateur de puits', 'Technicien de forage', 'Opérateur de forage',
+  'Technicien en énergie solaire', 'Installateur de panneaux solaires', 'Installateur de chauffe-eau solaire',
+  'Technicien solaire', 'Monteur de structures solaires', 'Installateur d’éoliennes', 'Technicien éolien',
+  'Installateur de batteries solaires', 'Installateur de bornes de recharge', 'Technicien de recharge électrique',
+  'Installateur de pompes à chaleur', 'Technicien en climatisation', 'Technicien frigoriste',
+  'Réparateur de chambres froides', 'Installateur de chambres froides', 'Constructeur de pirogues',
+  'Constructeur de bateaux en bois', 'Charpentier naval', 'Calfat', 'Peintre naval', 'Réparateur de bateaux',
+  'Réparateur de moteurs hors-bord', 'Fabricant de pagaies', 'Fabricant de rames', 'Fabricant de filets de pêche',
+  'Fabricant de casiers de pêche', 'Fabricant de nasses', 'Réparateur de matériel de pêche', 'Sécheur de poisson',
+  'Transformateur de poisson', 'Transformateur de fruits de mer', 'Salaisonnier', 'Producteur de sel artisanal',
+  'Imprimeur artisanal', 'Sérigraphe', 'Typographe', 'Relieur', 'Brocheur', 'Fabricant de carnets',
+  'Fabricant de cahiers', 'Fabricant d’agendas', 'Fabricant d’albums photo', 'Fabricant de livres artisanaux',
+  'Restaurateur de livres', 'Restaurateur de documents', 'Calligraphe', 'Calligraphe décoratif', 'Enlumineur',
+  'Fabricant de cartes artisanales', 'Fabricant de cartes de vœux', 'Fabricant d’invitations',
+  'Fabricant de faire-part', 'Fabricant de boîtes cadeaux', 'Fabricant de boîtes en carton', 'Cartonnier',
+  'Fabricant d’emballages', 'Fabricant de sacs en papier', 'Fabricant d’étiquettes', 'Fabricant de papier artisanal',
+  'Papetier', 'Fabricant de papier recyclé', 'Décorateur événementiel', 'Décorateur de mariage',
+  'Installateur de décorations', 'Monteur de stands', 'Fabricant de stands', 'Fabricant de kiosques',
+  'Fabricant de comptoirs', 'Fabricant de présentoirs', 'Fabricant d’enseignes artisanales', 'Peintre d’enseignes',
+  'Lettrier', 'Graveur d’enseignes', 'Fabricant de panneaux publicitaires', 'Fabricant de panneaux en bois',
+  'Fabricant de panneaux métalliques', 'Fabricant de lettres en relief', 'Fabricant de lettres lumineuses',
+  'Poseur d’enseignes', 'Poseur de panneaux', 'Recycleur de plastique', 'Transformateur de plastique',
+  'Fabricant d’objets en plastique recyclé', 'Fabricant de meubles en plastique recyclé',
+  'Fabricant de pavés en plastique recyclé', 'Fabricant de briques recyclées', 'Recycleur de verre',
+  'Transformateur de verre recyclé', 'Recycleur de métal', 'Transformateur de métal recyclé',
+  'Recycleur de papier', 'Transformateur de papier recyclé', 'Fabricant d’objets recyclés',
+  'Fabricant de meubles recyclés', 'Fabricant de décoration recyclée', 'Fabricant de bijoux recyclés',
+  'Fabricant de sacs recyclés', 'Fabricant de vêtements recyclés', 'Fabricant de jouets recyclés',
+  'Artisan récupérateur', 'Collecteur de matériaux recyclables', 'Trieur de déchets recyclables',
+  'Transformateur de déchets organiques', 'Composteur', 'Producteur de compost', 'Fabricant d’engrais organiques',
+  'Producteur d’engrais naturel', 'Fabricant de terreau', 'Producteur de terreau', 'Producteur de biomasse',
+  'Fabricant de charbon écologique', 'Fabricant de biochar', 'Producteur d’aliments pour animaux',
+  'Fabricant d’aliments pour volailles', 'Fabricant d’aliments pour poissons', 'Fabricant d’aliments pour bétail',
+  'Fabricant de provende', 'Mélangeur d’aliments pour animaux', 'Fabricant de cages', 'Fabricant de poulaillers',
+  'Fabricant de clapiers', 'Fabricant d’enclos', 'Fabricant de niches pour chiens', 'Fabricant de maisons pour animaux',
+  'Fabricant d’aquariums artisanaux', 'Fabricant de terrariums', 'Fabricant de cages à oiseaux', 'Fabricant de perchoirs',
+  'Fabricant de nichoirs', 'Fabricant de ruches', 'Fabricant d’équipements apicoles', 'Fabricant d’enfumoirs apicoles',
+  'Fabricant de cadres apicoles', 'Fabricant de cire d’abeille', 'Transformateur de cire d’abeille',
+  'Fabricant de produits de la ruche', 'Transformateur de miel', 'Conditionneur de miel', 'Artisan polyvalent',
+  'Artisan décorateur', 'Artisan créateur', 'Créateur d’objets artisanaux',
+]
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const normalize = (value: unknown): string => {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
+const getPlanPriority = (plan: string | null | undefined): number => {
+  return PLAN_PRIORITY[normalize(plan)] || 1
+}
+
+const getPlanName = (plan: string | null | undefined): string => {
+  const value = normalize(plan)
+  if (value === 'premium') return 'Premium'
+  if (value === 'business') return 'Business'
+  if (value === 'starter') return 'Starter'
+  return 'Gratuit'
+}
+
+const normalizePhone = (phone: string | null | undefined): string => {
+  if (!phone) return ''
+  let value = phone.replace(/[^\d+]/g, '')
+  if (value.startsWith('+')) return value
+  if (value.startsWith('228')) return `+${value}`
+  if (/^(7|9)/.test(value)) return `+228${value}`
+  return value
+}
+
+const hashString = (value: string): number => {
+  let hash = 0
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash << 5) - hash + value.charCodeAt(i)
+    hash |= 0
+  }
+  return Math.abs(hash)
+}
+
+const getFairExposureScore = (service: Service): number => {
+  const day = new Date().toISOString().slice(0, 10)
+  return hashString(`${day}-${service.id}`)
+}
+
+/* =========================================================
+   COMPONENT
+========================================================= */
 
 export default function MarketplacePage() {
   const router = useRouter()
+
   const [services, setServices] = useState<Service[]>([])
-  const [filteredServices, setFilteredServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [dbError, setDbError] = useState<string | null>(null)
+
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCity, setSelectedCity] = useState('all')
   const [selectedCategory, setSelectedCategory] = useState('all')
+
   const [citySearchQuery, setCitySearchQuery] = useState('')
   const [showCityDropdown, setShowCityDropdown] = useState(false)
-  const [imageError, setImageError] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
+
   const [favorites, setFavorites] = useState<string[]>([])
   const [currentUser, setCurrentUser] = useState<any>(null)
 
-  const allCities = [
-    'Lomé', 'Adidogomé', 'Agoè-Nyivé', 'Bè', 'Tokoin', 'Akodesséwa', 'Nyékonakpoè', 'Djidjolé', 'Attiégou', 'Kégué', 
-    'Tsévié', 'Kpalimé', 'Sokodé', 'Kara', 'Dapaong'
-  ]
-
-  const filteredCities = allCities.filter(city => 
-    city.toLowerCase().includes(citySearchQuery.toLowerCase())
-  )
+  // ✅ État pour forcer la mise à jour de l'affichage (rotation toutes les 5 min)
+  const [currentTime, setCurrentTime] = useState(Date.now())
 
   useEffect(() => {
-    checkUserSession()
-    loadServices()
+    let mounted = true
+    const initialize = async () => {
+      await Promise.all([checkUserSession(mounted), loadServices()])
+    }
+    initialize()
+    return () => { mounted = false }
+  }, [])
+
+  // ✅ Intervalle pour mettre à jour l'heure et déclencher la rotation des 28 cartes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now())
+    }, 60000) // Vérifie chaque minute
+    return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
-    filterServices()
-  }, [services, searchQuery, selectedCity, selectedCategory])
-
-  const checkUserSession = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-        setCurrentUser(profileData)
+      const saved = localStorage.getItem('prokorb_favorites')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) setFavorites(parsed)
       }
+    } catch (error) {
+      console.error('Erreur favoris:', error)
+    }
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('prokorb_favorites', JSON.stringify(favorites))
+    } catch (error) {
+      console.error('Erreur sauvegarde favoris:', error)
+    }
+  }, [favorites])
+
+  const checkUserSession = async (mounted = true) => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error) { console.error('Erreur session:', error); return }
+      if (!session) { if (mounted) setCurrentUser(null); return }
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles').select('*').eq('id', session.user.id).maybeSingle()
+      if (profileError) { console.error('Erreur profil:', profileError.message); return }
+      if (mounted) setCurrentUser(profileData)
     } catch (error) {
       console.error('Erreur vérification session:', error)
     }
   }
 
-  const loadServices = async () => {
+  const loadServices = async (isRefresh = false) => {
     try {
+      if (isRefresh) setRefreshing(true)
+      else setLoading(true)
       setDbError(null)
-      const { data: servicesData, error } = await supabase
+
+      const { data, error } = await supabase
         .from('services')
         .select(`
           id, title, description, category, price, city, pro_id, created_at, is_active,
-          profiles:pro_id (
-            id, full_name, phone, avatar_url, specialty, rating, total_reviews, plan, is_verified, is_available, city
-          )
+          profiles:pro_id (id, full_name, phone, avatar_url, specialty, rating, total_reviews, plan, is_verified, verified_at, is_available, city)
         `)
         .eq('is_active', true)
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('❌ Erreur Supabase:', error.message)
-        setDbError(error.message)
-        throw error
+        console.error('Erreur Supabase:', error.message)
+        setDbError('Impossible de charger les services actuellement.')
+        return
       }
 
-      if (servicesData) {
-        const formatted = servicesData.map(s => ({
-          ...s,
-          profiles: s.profiles || { 
-            id: s.pro_id,
-            full_name: 'Professionnel', 
-            phone: '', 
-            avatar_url: null, 
-            specialty: '', 
-            rating: 0, 
-            total_reviews: 0, 
-            plan: 'Gratuit', 
-            is_verified: false, 
-            is_available: true, 
-            city: s.city || ''
-          }
-        }))
-        setServices(formatted)
-      }
+      const formatted: Service[] = (data || []).map((service: any) => {
+        let profile = service.profiles
+        if (Array.isArray(profile)) profile = profile[0]
+        const safeProfile: Profile = {
+          id: profile?.id || service.pro_id,
+          full_name: profile?.full_name || 'Professionnel',
+          phone: profile?.phone || null,
+          avatar_url: profile?.avatar_url || null,
+          specialty: profile?.specialty || null,
+          rating: Number(profile?.rating || 0),
+          total_reviews: Number(profile?.total_reviews || 0),
+          plan: profile?.plan || 'Gratuit',
+          is_verified: Boolean(profile?.is_verified),
+          verified_at: profile?.verified_at || null,
+          is_available: profile?.is_available !== false,
+          city: profile?.city || service.city || null,
+        }
+        return { ...service, profiles: safeProfile }
+      }).filter(service => service.pro_id && service.profiles)
+
+      setServices(formatted)
     } catch (error: any) {
-      console.error('❌ Erreur chargement services:', error.message || error)
+      console.error('Erreur chargement services:', error)
+      setDbError(error?.message || 'Une erreur inattendue est survenue.')
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }
 
-  const filterServices = () => {
-    let filtered = [...services]
+  const filteredCities = useMemo(() => {
+    const query = normalize(citySearchQuery)
+    if (!query) return CITIES
+    return CITIES.filter(city => normalize(city).includes(query))
+  }, [citySearchQuery])
 
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(service => service.category?.toLowerCase().includes(selectedCategory.toLowerCase()))
+  const filteredServices = useMemo(() => {
+    let result = [...services]
+    const search = normalize(searchQuery)
+    const city = normalize(selectedCity)
+    const category = normalize(selectedCategory)
+
+    if (search) {
+      result = result.filter(service => {
+        const values = [service.title, service.description, service.category, service.profiles?.full_name, service.profiles?.specialty, service.profiles?.city, service.city]
+        return values.some(value => normalize(value).includes(search))
+      })
     }
 
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(service =>
-        service.title?.toLowerCase().includes(query) ||
-        service.description?.toLowerCase().includes(query) ||
-        service.profiles?.full_name?.toLowerCase().includes(query)
-      )
+    if (category && category !== 'all' && category !== normalize('Tous les métiers')) {
+      result = result.filter(service => {
+        const serviceCategory = normalize(service.category)
+        const specialty = normalize(service.profiles?.specialty)
+        return serviceCategory.includes(category) || category.includes(serviceCategory) || specialty.includes(category) || category.includes(specialty)
+      })
     }
 
-    if (selectedCity !== 'all') {
-      filtered = filtered.filter(service => 
-        (service.city || service.profiles?.city)?.toLowerCase() === selectedCity.toLowerCase()
-      )
+    if (city && city !== 'all') {
+      result = result.filter(service => {
+        const serviceCity = normalize(service.city)
+        const profileCity = normalize(service.profiles?.city)
+        return serviceCity === city || profileCity === city
+      })
     }
 
-    // ✅ TRI PRIORITAIRE INVISIBLE
-    filtered.sort((a, b) => {
-      const priorityA = PLAN_PRIORITY[a.profiles?.plan?.toLowerCase() || 'gratuit'] || 1
-      const priorityB = PLAN_PRIORITY[b.profiles?.plan?.toLowerCase() || 'gratuit'] || 1
-      
-      if (priorityB !== priorityA) return priorityB - priorityA
-      
-      const ratingA = a.profiles?.rating || 0
-      const ratingB = b.profiles?.rating || 0
-      if (ratingB !== ratingA) return ratingB - ratingA
-      
+    // Tri : 1. Vérifiés, 2. Bonne note, 3. Plan, 4. Exposition équitable, 5. Date
+    result.sort((a, b) => {
+      const aVerified = a.profiles?.is_verified ? 1 : 0
+      const bVerified = b.profiles?.is_verified ? 1 : 0
+      if (bVerified !== aVerified) return bVerified - aVerified
+
+      const aRating = Number(a.profiles?.rating || 0)
+      const bRating = Number(b.profiles?.rating || 0)
+      if (bRating !== aRating) return bRating - aRating
+
+      const aPlan = getPlanPriority(a.profiles?.plan)
+      const bPlan = getPlanPriority(b.profiles?.plan)
+      if (bPlan !== aPlan) return bPlan - aPlan
+
+      const aFair = getFairExposureScore(a)
+      const bFair = getFairExposureScore(b)
+      if (aFair !== bFair) return aFair - bFair
+
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     })
 
-    setFilteredServices(filtered)
-  }
+    return result
+  }, [services, searchQuery, selectedCity, selectedCategory])
+
+  // ✅ Détermine si un filtre de recherche est actif
+  const hasActiveFilter = searchQuery !== '' || selectedCity !== 'all' || selectedCategory !== 'all'
+
+  // ✅ Logique de rotation toutes les 5 minutes (300 000 ms)
+  const servicesToDisplay = useMemo(() => {
+    if (hasActiveFilter) {
+      return filteredServices
+    }
+
+    const pageSize = 28
+    const totalPages = Math.ceil(filteredServices.length / pageSize) || 1
+    
+    const FIVE_MINUTES_MS = 5 * 60 * 1000
+    const currentSlot = Math.floor(currentTime / FIVE_MINUTES_MS)
+    const currentOffset = (currentSlot % totalPages) * pageSize
+
+    return filteredServices.slice(currentOffset, currentOffset + pageSize)
+  }, [filteredServices, hasActiveFilter, currentTime])
 
   const toggleFavorite = (serviceId: string) => {
-    setFavorites(prev => prev.includes(serviceId) ? prev.filter(id => id !== serviceId) : [...prev, serviceId])
+    setFavorites(previous => {
+      if (previous.includes(serviceId)) return previous.filter(id => id !== serviceId)
+      return [...previous, serviceId]
+    })
   }
 
-  const contactWhatsApp = async (service: Service) => {
-    if (!service.profiles?.is_available) {
+  const contactWhatsApp = (service: Service) => {
+    const pro = service.profiles
+    if (!pro?.is_available) {
       alert('Ce professionnel est actuellement en mission. Veuillez réessayer plus tard.')
       return
     }
-
-    const pro = service.profiles
-    let phone = pro.phone?.replace(/\s+/g, '') || ''
-    if (phone && !phone.startsWith('+')) {
-      if (phone.startsWith('228')) phone = '+' + phone
-      else if (phone.startsWith('9') || phone.startsWith('7')) phone = '+228' + phone
+    const phone = normalizePhone(pro.phone)
+    if (!phone) {
+      alert('Ce professionnel n’a pas encore renseigné de numéro WhatsApp.')
+      return
     }
-    const message = encodeURIComponent(`Bonjour ${pro.full_name}, je suis intéressé(e) par votre service "${service.title}" (${service.price} FCFA) sur ProKorb.`)
-    window.open(`https://wa.me/${phone.replace('+', '')}?text=${message}`, '_blank')
+    const cleanPhone = phone.replace(/\D/g, '')
+    const message = encodeURIComponent(`Bonjour ${pro.full_name}, je suis intéressé(e) par votre service "${service.title}" sur ProKorb.`)
+    window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank', 'noopener,noreferrer')
   }
 
   const handleMonEspace = () => {
-    if (currentUser) {
-      if (currentUser.role === 'pro') {
-        router.push('/dashboard/pro')
-      } else {
-        router.push('/dashboard/client')
-      }
-    } else {
-      router.push('/login')
-    }
+    if (!currentUser) { router.push('/login'); return }
+    if (currentUser.role === 'pro') { router.push('/dashboard/pro'); return }
+    router.push('/dashboard/client')
+  }
+
+  const resetFilters = () => {
+    setSearchQuery('')
+    setSelectedCity('all')
+    setSelectedCategory('all')
+    setCitySearchQuery('')
+    setShowCityDropdown(false)
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <Loader2 className="w-16 h-16 animate-spin text-indigo-500 mx-auto mb-4" />
-        <p className="text-slate-300 font-medium">Chargement de la marketplace...</p>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-6">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+          </div>
+          <h2 className="text-white font-bold text-lg">Chargement de la marketplace</h2>
+          <p className="text-slate-500 text-sm mt-2">Recherche des meilleurs professionnels...</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-300">
-      <style>{`
-        @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: scroll 180s linear infinite;
-        }
-        .animate-marquee:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
-
-      {/* ✅ HEADER 100% RESPONSIVE (Recherche visible sur mobile) */}
-      <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          
-          {/* LIGNE 1 : Logo + Bouton Mon Espace */}
-          <div className="flex items-center justify-between gap-4 mb-3">
+      <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between gap-4 mb-4">
             <Link href="/" className="flex items-center gap-3 shrink-0 group">
-              <img src="/logo.png" alt="Logo ProKorb" className="h-10 w-auto object-contain group-hover:scale-105 transition-transform" />
+              <img src="/logo.png" alt="ProKorb" className="h-9 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105" />
               <span className="font-black text-xl tracking-tight hidden sm:block">
-                <span className="text-indigo-400">PRO</span>
-                <span className="text-white">KORB</span>
+                <span className="text-indigo-400">PRO</span><span className="text-white">KORB</span>
               </span>
             </Link>
-            
-            <button onClick={handleMonEspace} className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0">
-              <User className="w-4 h-4" /> <span className="hidden sm:inline">Mon Espace</span>
-            </button>
-          </div>
-
-          {/* LIGNE 2 : Barre de recherche principale (visible sur TOUS les écrans) */}
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Rechercher un service ou professionnel..." 
-              value={searchQuery} 
-              onChange={(e) => setSearchQuery(e.target.value)} 
-              className="w-full pl-10 pr-4 py-3 bg-slate-900 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500 text-sm" 
-            />
-          </div>
-
-          {/* LIGNE 3 : Filtre par localité (visible sur TOUS les écrans) */}
-          <div className="relative">
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="Localité..." 
-                value={citySearchQuery}
-                onChange={(e) => { setCitySearchQuery(e.target.value); setShowCityDropdown(true); setSelectedCity('all') }}
-                onFocus={() => setShowCityDropdown(true)}
-                className="w-full pl-10 pr-4 py-3 bg-slate-900 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500 text-white placeholder-slate-500 text-sm" 
-              />
+            <div className="flex items-center gap-2">
+              <button onClick={() => loadServices(true)} disabled={refreshing} className="w-10 h-10 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 flex items-center justify-center transition-all" title="Actualiser">
+                <RefreshCw className={`w-4 h-4 text-slate-400 ${refreshing ? 'animate-spin' : ''}`} />
+              </button>
+              <button onClick={handleMonEspace} className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+                <User className="w-4 h-4" /><span className="hidden sm:inline">Mon Espace</span>
+              </button>
             </div>
-            {showCityDropdown && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowCityDropdown(false)} />
-                <div className="absolute top-full left-0 right-0 mt-2 w-full bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto">
-                  <button onClick={() => { setSelectedCity('all'); setShowCityDropdown(false); setCitySearchQuery('') }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-emerald-400 font-semibold sticky top-0 bg-slate-900">
-                    <MapPin className="w-4 h-4 inline mr-2" /> Toutes les localités
-                  </button>
-                  {filteredCities.map((city) => (
-                    <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); setCitySearchQuery(city) }} className="w-full px-4 py-3 text-left text-sm hover:bg-emerald-900/30 text-slate-300">
-                      <MapPin className="w-4 h-4 inline mr-2 text-slate-500" /> {city}
-                    </button>
-                  ))}
-                </div>
-              </>
+          </div>
+
+          <div className="relative mb-3">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={event => setSearchQuery(event.target.value)}
+              placeholder="Rechercher un service, un métier ou un professionnel..."
+              className="w-full pl-12 pr-12 py-3.5 bg-slate-900 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg hover:bg-slate-800 flex items-center justify-center">
+                <X className="w-4 h-4 text-slate-400" />
+              </button>
             )}
+          </div>
+
+          <button onClick={() => setShowFilters(!showFilters)} className="md:hidden w-full mb-3 py-3 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center gap-2 text-sm font-semibold text-white">
+            <SlidersHorizontal className="w-4 h-4" /> Filtres
+            <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+          </button>
+
+          <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${showFilters ? 'block' : 'hidden md:grid'}`}>
+            <div className="relative">
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 z-10" />
+              <input
+                type="text"
+                placeholder="Rechercher une localité..."
+                value={citySearchQuery}
+                onChange={event => {
+                  setCitySearchQuery(event.target.value)
+                  setShowCityDropdown(true)
+                  if (event.target.value) setSelectedCity('all')
+                }}
+                onFocus={() => setShowCityDropdown(true)}
+                className="w-full pl-12 pr-10 py-3.5 bg-slate-900 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              />
+              {citySearchQuery && (
+                <button onClick={() => { setCitySearchQuery(''); setSelectedCity('all') }} className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <X className="w-4 h-4 text-slate-500" />
+                </button>
+              )}
+              {showCityDropdown && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowCityDropdown(false)} />
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-72 overflow-y-auto">
+                    <button onClick={() => { setSelectedCity('all'); setCitySearchQuery(''); setShowCityDropdown(false) }} className="w-full px-4 py-3 text-left text-sm font-semibold text-emerald-400 hover:bg-emerald-500/10 border-b border-slate-800">
+                      <MapPin className="w-4 h-4 inline mr-2" /> Toutes les localités
+                    </button>
+                    {filteredCities.length > 0 ? (
+                      filteredCities.map(city => (
+                        <button key={city} onClick={() => { setSelectedCity(city); setCitySearchQuery(city); setShowCityDropdown(false) }} className={`w-full px-4 py-3 text-left text-sm hover:bg-slate-800 transition-colors ${normalize(selectedCity) === normalize(city) ? 'text-emerald-400 bg-emerald-500/5' : 'text-slate-300'}`}>
+                          <MapPin className="w-4 h-4 inline mr-2 text-slate-500" /> {city}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-4 py-6 text-center text-sm text-slate-500">Aucune localité trouvée</div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="relative">
+              <SlidersHorizontal className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 pointer-events-none" />
+              <select
+                value={selectedCategory === 'all' ? 'Tous les métiers' : selectedCategory}
+                onChange={event => setSelectedCategory(event.target.value === 'Tous les métiers' ? 'all' : event.target.value)}
+                className="appearance-none w-full pl-12 pr-10 py-3.5 bg-slate-900 border border-slate-700 rounded-2xl text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
+              >
+                {ALL_METIERS.map(metier => (
+                  <option key={metier} value={metier} className="bg-slate-900 text-white">{metier}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 pointer-events-none" />
+            </div>
           </div>
         </div>
 
-        {/* ✅ MARQUEE CATÉGORIES - BOUCLE INFINIE PARFAITE */}
-        <div className="border-t border-slate-800/60 bg-slate-900/50 overflow-hidden py-3">
-          <div className="flex animate-marquee whitespace-nowrap">
-            <div className="flex items-center gap-3 px-4 shrink-0">
-              {allMetiers.map((metier, index) => (
-                <button 
-                  key={`set1-${index}`} 
-                  onClick={() => setSelectedCategory(metier === 'Tous les métiers' ? 'all' : metier)} 
-                  className="px-5 py-2 rounded-full text-sm font-medium border border-slate-700 bg-slate-800/80 text-slate-300 hover:border-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-400 transition-all duration-200 shrink-0 whitespace-nowrap"
-                >
+        <div className="border-t border-slate-800 bg-slate-900/50 overflow-hidden py-3">
+          <div className="flex gap-3 overflow-x-auto px-4 scrollbar-hide">
+            {ALL_METIERS.slice(0, 80).map(metier => {
+              const active = selectedCategory === 'all' ? metier === 'Tous les métiers' : normalize(selectedCategory) === normalize(metier)
+              return (
+                <button key={metier} onClick={() => setSelectedCategory(metier === 'Tous les métiers' ? 'all' : metier)} className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium border whitespace-nowrap transition-all shrink-0 ${active ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500/50 hover:text-indigo-400'}`}>
                   {metier}
                 </button>
-              ))}
-            </div>
-            
-            <div className="flex items-center gap-3 px-4 shrink-0">
-              {allMetiers.map((metier, index) => (
-                <button 
-                  key={`set2-${index}`} 
-                  onClick={() => setSelectedCategory(metier === 'Tous les métiers' ? 'all' : metier)} 
-                  className="px-5 py-2 rounded-full text-sm font-medium border border-slate-700 bg-slate-800/80 text-slate-300 hover:border-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-400 transition-all duration-200 shrink-0 whitespace-nowrap"
-                >
-                  {metier}
-                </button>
-              ))}
-            </div>
+              )
+            })}
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* ERREUR BDD */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        {/* ERROR */}
         {dbError && (
-          <div className="bg-red-900/20 border border-red-800 rounded-2xl p-6 text-center mb-8">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
-            <h3 className="text-xl font-bold text-red-400 mb-2">Erreur de connexion</h3>
-            <p className="text-slate-400">{dbError}</p>
+          <div className="mb-8 bg-red-950/30 border border-red-900/50 rounded-2xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 shrink-0 rounded-xl bg-red-500/10 flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-red-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-red-400">Impossible de charger la marketplace</h3>
+                <p className="text-sm text-slate-400 mt-1">{dbError}</p>
+                <button onClick={() => loadServices()} className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-semibold">Réessayer</button>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* GRILLE DE SERVICES */}
-        {!dbError && filteredServices.length === 0 ? (
-          <div className="bg-slate-900 rounded-3xl shadow-lg border border-slate-800 p-16 text-center">
-            <Search className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <p className="text-white font-bold text-lg">Aucun service trouvé</p>
-            <p className="text-slate-400 mt-2">Essayez de modifier vos critères</p>
+        {/* EMPTY STATE */}
+        {!dbError && filteredServices.length === 0 && (
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 sm:p-20 text-center">
+            <div className="w-20 h-20 mx-auto rounded-3xl bg-slate-800 flex items-center justify-center mb-6">
+              <Search className="w-9 h-9 text-slate-600" />
+            </div>
+            <h2 className="text-xl font-bold text-white">Aucun service trouvé</h2>
+            <p className="text-slate-500 mt-2 max-w-md mx-auto">Aucun professionnel ne correspond actuellement à vos critères.</p>
+            <button onClick={resetFilters} className="mt-6 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold transition-all">Voir tous les professionnels</button>
           </div>
-        ) : !dbError && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredServices.map((service, index) => {
-              const isAvailable = service.profiles?.is_available !== false
-              const isPremium = service.profiles?.plan === 'Premium' || service.profiles?.plan === 'Business'
-              const displayCity = service.city || service.profiles?.city
+        )}
 
-              return (
-                <div 
-                  key={service.id} 
-                  className={`bg-slate-900 rounded-2xl overflow-hidden border-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl group ${
-                    isPremium ? 'border-amber-500/30 hover:border-amber-500/60' : 'border-slate-800 hover:border-indigo-500/50'
-                  }`}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="relative aspect-square overflow-hidden bg-slate-800">
-                    {service.profiles?.avatar_url ? (
-                      <img 
-                        src={service.profiles.avatar_url} 
-                        alt={service.profiles.full_name} 
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-600">
-                        <User className="w-20 h-20 text-white/50" />
-                      </div>
-                    )}
+        {/* SERVICE GRID - DIRECTEMENT SANS TITRE */}
+        {!dbError && servicesToDisplay.length > 0 && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {servicesToDisplay.map((service, index) => {
+                const pro = service.profiles
+                const isAvailable = pro?.is_available !== false
+                const rating = Number(pro?.rating || 0)
+                const reviews = Number(pro?.total_reviews || 0)
+                const isVerified = Boolean(pro?.is_verified)
+                const plan = getPlanName(pro?.plan)
+                const isPremium = normalize(pro?.plan) === 'premium' || normalize(pro?.plan) === 'business'
+                const displayCity = service.city || pro?.city
+                const isFavorite = favorites.includes(service.id)
 
-                    <div className="absolute top-3 left-3">
-                      {isAvailable ? (
-                        <span className="px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full shadow-lg">
-                          Disponible
-                        </span>
+                return (
+                  <article key={service.id} className={`group bg-slate-900 rounded-2xl overflow-hidden border transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${isPremium ? 'border-amber-500/20 hover:border-amber-500/50' : 'border-slate-800 hover:border-indigo-500/40'}`} style={{ animationDelay: `${index * 40}ms` }}>
+                    <div className="relative aspect-square overflow-hidden bg-slate-800">
+                      {pro?.avatar_url ? (
+                        <img src={pro.avatar_url} alt={pro.full_name} loading={index < 4 ? 'eager' : 'lazy'} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       ) : (
-                        <span className="px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1">
-                          <Pause className="w-3 h-3" />
-                          En mission
-                        </span>
-                      )}
-                    </div>
-
-                    <button 
-                      onClick={() => toggleFavorite(service.id)} 
-                      className="absolute top-3 right-3 w-8 h-8 bg-slate-900/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-slate-900/80 transition-all"
-                    >
-                      <Heart className={`w-4 h-4 ${favorites.includes(service.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
-                    </button>
-
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                      {service.profiles?.rating > 0 && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg">
-                          <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                          <span className="text-sm font-bold text-slate-900">{service.profiles.rating.toFixed(1)}</span>
-                          {service.profiles.total_reviews > 0 && (
-                            <span className="text-xs text-slate-600">({service.profiles.total_reviews})</span>
-                          )}
+                        <div className="w-full h-full bg-gradient-to-br from-indigo-600 via-purple-600 to-slate-900 flex items-center justify-center">
+                          <User className="w-20 h-20 text-white/30" />
                         </div>
                       )}
-                      
-                      {service.profiles?.is_verified && (
-                        <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-                          <Check className="w-5 h-5 text-white" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-5 space-y-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors">
-                          {service.profiles?.full_name}
-                        </h3>
-                        {service.profiles?.is_verified && (
-                          <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
-                            <Check className="w-3.5 h-3.5 text-white" />
-                          </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute top-3 left-3">
+                        {isAvailable ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-full shadow-lg">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Disponible
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-white text-xs font-bold rounded-full shadow-lg">
+                            <Pause className="w-3.5 h-3.5" /> En mission
+                          </span>
                         )}
                       </div>
-                      <p className="text-sm text-slate-400">{service.profiles?.specialty || service.category}</p>
-                    </div>
-
-                    {displayCity && (
-                      <div className="flex items-center gap-1.5 text-sm text-slate-400">
-                        <MapPin className="w-4 h-4" />
-                        <span>{displayCity}</span>
-                      </div>
-                    )}
-
-                    <div className="pt-2 border-t border-slate-800">
-                      <p className={`font-bold text-lg ${isAvailable ? 'text-emerald-400' : 'text-slate-500'}`}>
-                        {service.price}
-                      </p>
-                    </div>
-
-                    <div className="flex gap-3 pt-2">
-                      <Link 
-                        href={`/pro/${service.pro_id}`} 
-                        className="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border border-slate-700"
-                      >
-                        <Eye className="w-4 h-4" />
-                        Voir le profil
-                      </Link>
-                      
-                      {isAvailable ? (
-                        <button 
-                          onClick={() => contactWhatsApp(service)}
-                          className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/30"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          Contacter
-                        </button>
-                      ) : (
-                        <button 
-                          disabled
-                          className="flex-1 px-4 py-3 bg-slate-700 text-slate-400 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-slate-600"
-                          title="Professionnel actuellement en mission"
-                        >
-                          <Pause className="w-4 h-4" />
-                          Indisponible
-                        </button>
+                      {plan !== 'Gratuit' && (
+                        <div className="absolute top-3 right-3">
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide backdrop-blur-md ${plan === 'Premium' ? 'bg-amber-500 text-slate-950' : plan === 'Business' ? 'bg-emerald-500 text-slate-950' : 'bg-blue-500 text-white'}`}>
+                            {plan}
+                          </span>
+                        </div>
+                      )}
+                      <button type="button" onClick={() => toggleFavorite(service.id)} aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'} className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-slate-950/70 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-slate-950 transition-all">
+                        <Heart className={`w-5 h-5 transition-all ${isFavorite ? 'fill-red-500 text-red-500 scale-110' : 'text-white'}`} />
+                      </button>
+                      {rating > 0 && (
+                        <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg shadow-xl">
+                          <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                          <span className="text-sm font-black text-slate-900">{rating.toFixed(1)}</span>
+                          {reviews > 0 && <span className="text-xs text-slate-500">({reviews})</span>}
+                        </div>
                       )}
                     </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+
+                    <div className="p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h2 className="text-base font-bold text-white truncate group-hover:text-indigo-400 transition-colors">{pro?.full_name}</h2>
+                            {isVerified && (
+                              <VerifiedBadge isVerified={true} verifiedAt={pro.verified_at} size={18} showLabel={false} showExpiration={false} />
+                            )}
+                          </div>
+                          <p className="text-sm text-slate-500 mt-1 line-clamp-1">{pro?.specialty || service.category || 'Professionnel'}</p>
+                        </div>
+                      </div>
+                      {displayCity && (
+                        <div className="flex items-center gap-2 text-sm text-slate-400 mt-4">
+                          <MapPin className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span className="truncate">{displayCity}</span>
+                        </div>
+                      )}
+                      <div className="mt-4 pt-4 border-t border-slate-800">
+                        <p className="text-xs uppercase tracking-wider text-slate-600 font-semibold">Service</p>
+                        <h3 className="text-sm font-semibold text-slate-200 mt-1 line-clamp-2 min-h-[40px]">{service.title}</h3>
+                      </div>
+                      <div className="mt-4">
+                        <p className="text-xs text-slate-600">À partir de</p>
+                        <p className={`text-lg font-black mt-0.5 ${isAvailable ? 'text-emerald-400' : 'text-slate-500'}`}>
+                          {service.price || 'Prix sur devis'} {service.price && !String(service.price).toLowerCase().includes('fcfa') ? 'FCFA' : ''}
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mt-5">
+                        <Link href={`/pro/${service.pro_id}`} className="px-3 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all">
+                          <Eye className="w-4 h-4" /> Profil
+                        </Link>
+                        {isAvailable ? (
+                          <button type="button" onClick={() => contactWhatsApp(service)} className="px-3 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20">
+                            <MessageCircle className="w-4 h-4" /> Contacter
+                          </button>
+                        ) : (
+                          <button type="button" disabled className="px-3 py-3 bg-slate-800 border border-slate-700 text-slate-600 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-not-allowed">
+                            <Pause className="w-4 h-4" /> En mission
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+
+            {/* BOUTON "VOIR PLUS" (Visible seulement si pas de filtre actif et qu'il reste des éléments) */}
+            {!hasActiveFilter && servicesToDisplay.length < filteredServices.length && (
+              <div className="flex justify-center mt-10">
+                <button
+                  onClick={() => {
+                    // Force une mise à jour de l'heure pour passer au lot suivant immédiatement
+                    setCurrentTime(Date.now() + 5 * 60 * 1000)
+                  }}
+                  className="px-8 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg"
+                >
+                  Voir plus de professionnels
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </>
         )}
       </main>
 
-      {/* FOOTER */}
-      <footer className="bg-slate-900 border-t border-slate-800 mt-16">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+      <footer className="mt-20 border-t border-slate-800 bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Logo ProKorb" className="h-8 w-auto object-contain" />
-              <span className="font-black text-lg text-white">PRO<span className="text-indigo-400">KORB</span></span>
+              <img src="/logo.png" alt="ProKorb" className="h-8 w-auto" />
+              <div>
+                <div className="font-black text-lg text-white">PRO<span className="text-indigo-400">KORB</span></div>
+                <p className="text-xs text-slate-600">Connecter les clients aux professionnels.</p>
+              </div>
             </div>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <a href="/terms" className="hover:text-indigo-400 transition-colors">Conditions</a>
-              <a href="/privacy" className="hover:text-indigo-400 transition-colors">Confidentialité</a>
-              <a href="/contact" className="hover:text-indigo-400 transition-colors">Support</a>
-            </div>
-            <p className="text-sm text-slate-500">© {new Date().getFullYear()} ProKorb Togo</p>
+            <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
+              <Link href="/terms" className="text-slate-500 hover:text-white transition-colors">Conditions</Link>
+              <Link href="/privacy" className="text-slate-500 hover:text-white transition-colors">Confidentialité</Link>
+              <Link href="/contact" className="text-slate-500 hover:text-white transition-colors">Support</Link>
+            </nav>
+            <p className="text-xs text-slate-600">© {new Date().getFullYear()} ProKorb</p>
           </div>
         </div>
       </footer>

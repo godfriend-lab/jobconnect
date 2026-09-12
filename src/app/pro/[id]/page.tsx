@@ -5,11 +5,11 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { Logo } from '@/components/Logo'
 import {
   MapPin, Star, Phone, MessageSquare,
   Award, Clock, Heart, ArrowLeft, 
-  Loader2, Calendar, Briefcase, BadgeCheck
+  Loader2, Calendar, Briefcase, BadgeCheck,
+  X, Maximize2
 } from 'lucide-react'
 
 export default function ProfessionalProfilePage() {
@@ -21,6 +21,7 @@ export default function ProfessionalProfilePage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('about')
   const [isFavorite, setIsFavorite] = useState(false)
+  const [selectedPortfolio, setSelectedPortfolio] = useState<any>(null)
 
   useEffect(() => {
     if (params.id) {
@@ -79,7 +80,7 @@ export default function ProfessionalProfilePage() {
               viewer_avatar: viewerAvatar
             })
             .then(({ error }) => {
-              if (error) console.error('❌ Erreur historique vues:', error)
+              if (error) console.error(' Erreur historique vues:', error)
             })
         }
 
@@ -225,18 +226,9 @@ export default function ProfessionalProfilePage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-300">
-      {/* HEADER */}
+      {/* HEADER ÉPURÉ (Sans Logo) */}
       <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/dashboard/client" className="flex items-center gap-3 group">
-            <Logo className="w-10 h-10 group-hover:scale-105 transition-transform" />
-            <div>
-              <span className="font-black text-xl tracking-tight">
-                <span className="text-indigo-400">PRO</span>
-                <span className="text-white">KORB</span>
-              </span>
-            </div>
-          </Link>
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center">
           <button 
             onClick={() => router.back()} 
             className="flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl transition-all border border-slate-700"
@@ -298,7 +290,7 @@ export default function ProfessionalProfilePage() {
                       <MapPin className="w-4 h-4" /> {pro.city || 'Non renseigné'}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Briefcase className="w-4 h-4" /> {pro.years_of_experience || 0} ans d'expérience {/* ✅ CORRIGÉ ICI */}
+                      <Briefcase className="w-4 h-4" /> {pro.years_of_experience || 0} ans d'expérience
                     </span>
                   </div>
                 </div>
@@ -424,7 +416,7 @@ export default function ProfessionalProfilePage() {
                       <Award className="w-5 h-5 text-indigo-400" />
                       <span className="text-sm font-bold text-slate-200">Expérience</span>
                     </div>
-                    <p className="text-slate-300 font-medium">{pro.years_of_experience || 0} ans dans le métier</p> {/* ✅ CORRIGÉ ICI AUSSI */}
+                    <p className="text-slate-300 font-medium">{pro.years_of_experience || 0} ans dans le métier</p>
                   </div>
                 </div>
 
@@ -458,14 +450,23 @@ export default function ProfessionalProfilePage() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {portfolio.map(item => (
-                      <div key={item.id} className="group bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-indigo-500/50 transition-all duration-300">
+                      <div 
+                        key={item.id} 
+                        onClick={() => setSelectedPortfolio(item)}
+                        className="group bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer"
+                      >
                         <div className="relative overflow-hidden aspect-[4/3]">
                           <img
                             src={item.image_url}
                             alt={item.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                            <div className="flex items-center gap-2 text-white font-semibold bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                              <Maximize2 className="w-4 h-4" />
+                              <span>Voir les détails</span>
+                            </div>
+                          </div>
                         </div>
                         <div className="p-5">
                           <h3 className="font-bold text-lg text-white mb-2">{item.title}</h3>
@@ -562,6 +563,66 @@ export default function ProfessionalProfilePage() {
           </div>
         )}
       </main>
+
+      {/* MODAL PORTFOLIO AMÉLIORÉ */}
+      {selectedPortfolio && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setSelectedPortfolio(null)}
+        >
+          <div 
+            className="relative w-full max-w-4xl bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-700 max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header du Modal */}
+            <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-800 bg-slate-900 z-10">
+              <h2 className="text-xl md:text-2xl font-bold text-white truncate pr-4">{selectedPortfolio.title}</h2>
+              <button 
+                onClick={() => setSelectedPortfolio(null)}
+                className="p-2 hover:bg-slate-800 rounded-xl transition-colors flex-shrink-0"
+              >
+                <X className="w-6 h-6 text-slate-400 hover:text-white" />
+              </button>
+            </div>
+
+            {/* Contenu scrollable du Modal */}
+            <div className="overflow-y-auto custom-scrollbar">
+              {/* Image en grand */}
+              <div className="relative w-full bg-slate-950 flex items-center justify-center">
+                <img
+                  src={selectedPortfolio.image_url}
+                  alt={selectedPortfolio.title}
+                  className="w-full h-auto max-h-[60vh] object-contain"
+                />
+              </div>
+
+              {/* Description */}
+              <div className="p-6 md:p-8">
+                <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-indigo-400" />
+                  Description du projet
+                </h3>
+                <p className="text-slate-300 leading-relaxed whitespace-pre-wrap text-base md:text-lg">
+                  {selectedPortfolio.description || 'Aucune description disponible pour ce projet.'}
+                </p>
+                
+                {selectedPortfolio.created_at && (
+                  <div className="mt-8 pt-6 border-t border-slate-800">
+                    <div className="flex items-center gap-2 text-sm text-slate-400">
+                      <Calendar className="w-4 h-4" />
+                      <span>Publié le {new Date(selectedPortfolio.created_at).toLocaleDateString('fr-FR', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

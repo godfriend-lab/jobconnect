@@ -204,7 +204,7 @@ export default function RegisterPage() {
           city: cleanCity,
           specialty: cleanSpecialty,
           is_active: true,
-          is_verified: true, // ✅ plus de vérification email requise
+          is_verified: false, // ✅ plus de vérification email requise
           is_available: chosenRole === 'pro'
         })
 

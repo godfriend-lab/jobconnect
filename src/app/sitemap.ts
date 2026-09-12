@@ -2,8 +2,12 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@/lib/supabase/server'
 
+// ✅ CORRECTION : Empêche la génération statique pendant le build (évite l'erreur cookies)
+export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // Met en cache le sitemap pendant 1 heure
+
 // ✅ CONFIGURATION DE BASE - URL COMPLÈTE
-const BASE_URL = 'https://www.prokorb.com'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.prokorb.com'
 
 // ✅ LISTE COMPLÈTE DES VILLES DU TOGO (SEO LOCAL)
 const TOGO_CITIES = [
@@ -151,7 +155,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     
     const profilePages = profiles.map((pro: Profile) => ({
       url: `${BASE_URL}/pro/${pro.id}`,
-      lastModified: now,
+      lastModified: pro.created_at ? new Date(pro.created_at) : now,
       changeFrequency: 'weekly' as const,
       priority: pro.is_verified ? 0.8 : 0.6,
     }))
@@ -170,7 +174,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     
     const servicePages = services.map((service: Service) => ({
       url: `${BASE_URL}/marketplace?service=${service.id}`,
-      lastModified: new Date(service.created_at || now),
+      lastModified: service.created_at ? new Date(service.created_at) : now,
       changeFrequency: 'weekly' as const,
       priority: 0.65,
     }))
@@ -178,7 +182,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     sitemapEntries.push(...servicePages)
     console.log(`✅ Sitemap: ${servicePages.length} services ajoutés`)
   } catch (error) {
-    console.error(' Erreur génération services sitemap:', error)
+    console.error('❌ Erreur génération services sitemap:', error)
   }
 
   // ============================================
