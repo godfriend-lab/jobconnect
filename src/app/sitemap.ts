@@ -52,7 +52,6 @@ interface Service {
   created_at?: string
 }
 
-// ✅ NOUVEAU TYPE POUR LES ARTICLES
 interface Article {
   id: string
   slug: string
@@ -76,7 +75,6 @@ async function getProProfiles(): Promise<Profile[]> {
       console.error('❌ Erreur récupération profils pour sitemap:', error)
       return []
     }
-
     return data || []
   } catch (error) {
     console.error('❌ Erreur critique sitemap profils:', error)
@@ -98,7 +96,6 @@ async function getActiveServices(): Promise<Service[]> {
       console.error('❌ Erreur récupération services pour sitemap:', error)
       return []
     }
-
     return data || []
   } catch (error) {
     console.error('❌ Erreur critique sitemap services:', error)
@@ -106,7 +103,6 @@ async function getActiveServices(): Promise<Service[]> {
   }
 }
 
-// ✅ NOUVELLE FONCTION POUR RÉCUPÉRER LES ARTICLES PUBLIÉS
 async function getArticles(): Promise<Article[]> {
   try {
     const supabase = await createClient()
@@ -120,7 +116,6 @@ async function getArticles(): Promise<Article[]> {
       console.error('❌ Erreur récupération articles pour sitemap:', error)
       return []
     }
-
     return data || []
   } catch (error) {
     console.error('❌ Erreur critique sitemap articles:', error)
@@ -139,6 +134,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const mainPages = [
     { url: `${BASE_URL}/`, lastModified: now, changeFrequency: 'daily' as const, priority: 1.0 },
     { url: `${BASE_URL}/marketplace`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.95 },
+    // ✅ CORRECTION APPLIQUÉE ICI : Ajout des pages manquantes
+    { url: `${BASE_URL}/company`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${BASE_URL}/articles`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
+    // ------------------------------------------
     { url: `${BASE_URL}/about`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE_URL}/contact`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE_URL}/faq`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
@@ -161,7 +160,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly' as const,
     priority: 0.75,
   }))
-
   sitemapEntries.push(...cityPages)
 
   // ============================================
@@ -173,7 +171,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }))
-
   sitemapEntries.push(...metierPages)
 
   // ============================================
@@ -181,14 +178,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ============================================
   try {
     const profiles = await getProProfiles()
-    
     const profilePages = profiles.map((pro: Profile) => ({
       url: `${BASE_URL}/pro/${pro.id}`,
       lastModified: pro.created_at ? new Date(pro.created_at) : now,
       changeFrequency: 'weekly' as const,
       priority: pro.is_verified ? 0.8 : 0.6,
     }))
-
     sitemapEntries.push(...profilePages)
     console.log(`✅ Sitemap: ${profilePages.length} profils pros ajoutés`)
   } catch (error) {
@@ -200,14 +195,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ============================================
   try {
     const services = await getActiveServices()
-    
     const servicePages = services.map((service: Service) => ({
       url: `${BASE_URL}/marketplace?service=${service.id}`,
       lastModified: service.created_at ? new Date(service.created_at) : now,
       changeFrequency: 'weekly' as const,
       priority: 0.65,
     }))
-
     sitemapEntries.push(...servicePages)
     console.log(`✅ Sitemap: ${servicePages.length} services ajoutés`)
   } catch (error) {
@@ -215,18 +208,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // ============================================
-  // 📰 6. ARTICLES (DYNAMIQUE) - NOUVEAU
+  // 📰 6. ARTICLES (DYNAMIQUE)
   // ============================================
   try {
     const articles = await getArticles()
-    
     const articlePages = articles.map((article: Article) => ({
       url: `${BASE_URL}/articles/${article.slug}`,
       lastModified: article.published_at ? new Date(article.published_at) : now,
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }))
-
     sitemapEntries.push(...articlePages)
     console.log(`✅ Sitemap: ${articlePages.length} articles ajoutés`)
   } catch (error) {
@@ -249,7 +240,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'yearly' as const,
     priority: 0.3,
   }))
-
   sitemapEntries.push(...legalPages)
 
   console.log('========================================')
