@@ -34,6 +34,14 @@ export const metadata: Metadata = {
   verification: {
     google: "mYpnXsmHzgD9s0WWb6ULIYD4Wl8m0UPQZgTFOs-R9aw",
   },
+
+  // ✅ NOUVEAU : Auto-découverte des flux pour les agrégateurs (Google, Phoenix, lecteurs RSS)
+  alternates: {
+    types: {
+      'application/rss+xml': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.prokorb.com'}/rss.xml`,
+      'application/atom+xml': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.prokorb.com'}/atom.xml`,
+    },
+  },
 }
 
 export default function RootLayout({

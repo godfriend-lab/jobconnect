@@ -52,6 +52,13 @@ interface Service {
   created_at?: string
 }
 
+// ✅ NOUVEAU TYPE POUR LES ARTICLES
+interface Article {
+  id: string
+  slug: string
+  published_at: string
+}
+
 // ✅ FONCTIONS SUPABASE
 async function getProProfiles(): Promise<Profile[]> {
   try {
@@ -95,6 +102,28 @@ async function getActiveServices(): Promise<Service[]> {
     return data || []
   } catch (error) {
     console.error('❌ Erreur critique sitemap services:', error)
+    return []
+  }
+}
+
+// ✅ NOUVELLE FONCTION POUR RÉCUPÉRER LES ARTICLES PUBLIÉS
+async function getArticles(): Promise<Article[]> {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('articles')
+      .select('id, slug, published_at')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false })
+
+    if (error) {
+      console.error('❌ Erreur récupération articles pour sitemap:', error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('❌ Erreur critique sitemap articles:', error)
     return []
   }
 }
@@ -186,7 +215,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // ============================================
-  // 📄 6. PAGES LÉGALES
+  // 📰 6. ARTICLES (DYNAMIQUE) - NOUVEAU
+  // ============================================
+  try {
+    const articles = await getArticles()
+    
+    const articlePages = articles.map((article: Article) => ({
+      url: `${BASE_URL}/articles/${article.slug}`,
+      lastModified: article.published_at ? new Date(article.published_at) : now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    }))
+
+    sitemapEntries.push(...articlePages)
+    console.log(`✅ Sitemap: ${articlePages.length} articles ajoutés`)
+  } catch (error) {
+    console.error('❌ Erreur génération articles sitemap:', error)
+  }
+
+  // ============================================
+  // 📄 7. PAGES LÉGALES
   // ============================================
   const legalPages = [
     '/terms',

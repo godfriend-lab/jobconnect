@@ -15,7 +15,8 @@ import {
   Phone,
   MapPin,
   ChevronRight,
-  Lock
+  Lock,
+  FileText, // ✅ AJOUTÉ ICI
 } from 'lucide-react'
 
 // Icônes SVG inline pour les réseaux sociaux (UNIQUEMENT FB, IG, X)
@@ -169,6 +170,16 @@ export default function Footer() {
                 <MapPin className="w-4 h-4 text-indigo-400 flex-shrink-0" />
                 <span>Lomé, Togo</span>
               </div>
+              
+              {/* ✅ NOUVEAU BOUTON ARTICLES AJOUTÉ ICI */}
+              <Link 
+                href="/articles" 
+                className="flex items-center gap-3 text-sm group"
+              >
+                <FileText className="w-4 h-4 text-indigo-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="hover:text-indigo-400 transition-colors">Articles & Conseils</span>
+              </Link>
+              
             </div>
           </div>
 
