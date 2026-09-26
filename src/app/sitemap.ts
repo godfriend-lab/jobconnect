@@ -2,14 +2,14 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@/lib/supabase/server'
 
-// ✅ CORRECTION : Empêche la génération statique pendant le build (évite l'erreur cookies)
+// ✅ CORRECTION : Empêche la génération statique pendant le build
 export const dynamic = 'force-dynamic'
-export const revalidate = 3600 // Met en cache le sitemap pendant 1 heure
+export const revalidate = 3600
 
 // ✅ CONFIGURATION DE BASE - URL COMPLÈTE
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.prokorb.com'
 
-// ✅ LISTE COMPLÈTE DES VILLES DU TOGO (SEO LOCAL)
+// ✅ LISTE COMPLÈTE DES VILLES DU TOGO
 const TOGO_CITIES = [
   'lome', 'adidogome', 'agoe-nyive', 'be', 'tokoin', 'akodessewa', 
   'nyekonakpoe', 'djidjole', 'attiegu', 'kegue', 'baguida', 'benua',
@@ -38,9 +38,11 @@ interface Profile {
   full_name: string | null
   specialty: string | null
   city: string | null
+  avatar_url: string | null
   is_verified: boolean
   is_active: boolean
-  created_at?: string
+  created_at?: string | null
+  updated_at?: string | null
 }
 
 interface Service {
@@ -49,12 +51,14 @@ interface Service {
   category: string | null
   city: string | null
   pro_id: string
-  created_at?: string
+  created_at?: string | null
 }
 
 interface Article {
   id: string
   slug: string
+  title: string | null
+  thumbnail_url: string | null
   published_at: string
 }
 
@@ -64,12 +68,12 @@ async function getProProfiles(): Promise<Profile[]> {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, specialty, city, is_verified, is_active, created_at')
+      .select('id, full_name, specialty, city, avatar_url, is_verified, is_active, created_at, updated_at')
       .eq('role', 'pro')
       .eq('is_active', true)
-      .limit(500)
+      .limit(1000)
       .order('is_verified', { ascending: false })
-      .order('created_at', { ascending: false })
+      .order('updated_at', { ascending: false })
 
     if (error) {
       console.error('❌ Erreur récupération profils pour sitemap:', error)
@@ -108,7 +112,7 @@ async function getArticles(): Promise<Article[]> {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('articles')
-      .select('id, slug, published_at')
+      .select('id, slug, title, thumbnail_url, published_at')
       .eq('is_published', true)
       .order('published_at', { ascending: false })
 
@@ -123,67 +127,69 @@ async function getArticles(): Promise<Article[]> {
   }
 }
 
-// ✅ FONCTION PRINCIPALE
+// ✅ FONCTION PRINCIPALE HIGH END SEO
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
   const sitemapEntries: MetadataRoute.Sitemap = []
 
   // ============================================
-  // 🏠 1. PAGES PRINCIPALES (URLS COMPLÈTES)
+  // 🏠 1. PAGES PRINCIPALES
   // ============================================
   const mainPages = [
     { url: `${BASE_URL}/`, lastModified: now, changeFrequency: 'daily' as const, priority: 1.0 },
     { url: `${BASE_URL}/marketplace`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.95 },
-    // ✅ CORRECTION APPLIQUÉE ICI : Ajout des pages manquantes
-    { url: `${BASE_URL}/company`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${BASE_URL}/articles`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
-    // ------------------------------------------
-    { url: `${BASE_URL}/about`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${BASE_URL}/contact`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: `${BASE_URL}/faq`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: `${BASE_URL}/company`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.9 },
+    { url: `${BASE_URL}/articles`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.85 },
+    { url: `${BASE_URL}/about`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${BASE_URL}/contact`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${BASE_URL}/faq`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE_URL}/categories`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
     { url: `${BASE_URL}/client/how-it-works`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE_URL}/pro/how-it-works`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${BASE_URL}/pricing`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: `${BASE_URL}/security`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.5 },
-    { url: `${BASE_URL}/client-protection`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.5 },
+    { url: `${BASE_URL}/pricing`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${BASE_URL}/security`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: `${BASE_URL}/client-protection`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
   ]
-
   sitemapEntries.push(...mainPages)
 
   // ============================================
-  // 📍 2. PAGES PAR VILLE (SEO LOCAL TOGO)
+  // 📍 2. PAGES PAR VILLE
   // ============================================
   const cityPages = TOGO_CITIES.map((city) => ({
     url: `${BASE_URL}/marketplace?city=${encodeURIComponent(city)}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
-    priority: 0.75,
+    priority: 0.8,
   }))
   sitemapEntries.push(...cityPages)
 
   // ============================================
-  // 🔧 3. PAGES PAR MÉTIER/CATÉGORIE
+  // 🔧 3. PAGES PAR MÉTIER
   // ============================================
   const metierPages = TOP_METIERS.map((metier) => ({
     url: `${BASE_URL}/marketplace?category=${encodeURIComponent(metier)}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
-    priority: 0.7,
+    priority: 0.8,
   }))
   sitemapEntries.push(...metierPages)
 
   // ============================================
-  // 👨‍🔧 4. PROFILS PROFESSIONNELS (DYNAMIQUE)
+  // 👨‍🔧 4. PROFILS PROFESSIONNELS
   // ============================================
   try {
     const profiles = await getProProfiles()
-    const profilePages = profiles.map((pro: Profile) => ({
-      url: `${BASE_URL}/pro/${pro.id}`,
-      lastModified: pro.created_at ? new Date(pro.created_at) : now,
-      changeFrequency: 'weekly' as const,
-      priority: pro.is_verified ? 0.8 : 0.6,
-    }))
+    const profilePages = profiles.map((pro: Profile) => {
+      // ✅ Gestion sécurisée des dates
+      const lastModDate = pro.updated_at || pro.created_at ? new Date(pro.updated_at || pro.created_at || now) : now
+      
+      return {
+        url: `${BASE_URL}/pro/${pro.id}`,
+        lastModified: lastModDate,
+        changeFrequency: 'weekly' as const,
+        priority: pro.is_verified ? 0.9 : 0.7,
+      }
+    })
     sitemapEntries.push(...profilePages)
     console.log(`✅ Sitemap: ${profilePages.length} profils pros ajoutés`)
   } catch (error) {
@@ -191,16 +197,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // ============================================
-  // 🛠️ 5. SERVICES ACTIFS (DYNAMIQUE)
+  // 🛠️ 5. SERVICES ACTIFS
   // ============================================
   try {
     const services = await getActiveServices()
-    const servicePages = services.map((service: Service) => ({
-      url: `${BASE_URL}/marketplace?service=${service.id}`,
-      lastModified: service.created_at ? new Date(service.created_at) : now,
-      changeFrequency: 'weekly' as const,
-      priority: 0.65,
-    }))
+    const servicePages = services.map((service: Service) => {
+      const lastModDate = service.created_at ? new Date(service.created_at) : now
+      
+      return {
+        url: `${BASE_URL}/marketplace?service=${service.id}`,
+        lastModified: lastModDate,
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      }
+    })
     sitemapEntries.push(...servicePages)
     console.log(`✅ Sitemap: ${servicePages.length} services ajoutés`)
   } catch (error) {
@@ -208,16 +218,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // ============================================
-  // 📰 6. ARTICLES (DYNAMIQUE)
+  // 📰 6. ARTICLES
   // ============================================
   try {
     const articles = await getArticles()
-    const articlePages = articles.map((article: Article) => ({
-      url: `${BASE_URL}/articles/${article.slug}`,
-      lastModified: article.published_at ? new Date(article.published_at) : now,
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }))
+    const articlePages = articles.map((article: Article) => {
+      const lastModDate = article.published_at ? new Date(article.published_at) : now
+      
+      return {
+        url: `${BASE_URL}/articles/${article.slug}`,
+        lastModified: lastModDate,
+        changeFrequency: 'weekly' as const,
+        priority: 0.85,
+      }
+    })
     sitemapEntries.push(...articlePages)
     console.log(`✅ Sitemap: ${articlePages.length} articles ajoutés`)
   } catch (error) {
@@ -238,14 +252,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${BASE_URL}${path}`,
     lastModified: now,
     changeFrequency: 'yearly' as const,
-    priority: 0.3,
+    priority: 0.5,
   }))
   sitemapEntries.push(...legalPages)
 
   console.log('========================================')
-  console.log('✅ SITEMAP GÉNÉRÉ AVEC SUCCÈS')
+  console.log('✅ SITEMAP HIGH-END SEO GÉNÉRÉ AVEC SUCCÈS')
   console.log('========================================')
-  console.log(`📍 Total URLs: ${sitemapEntries.length}`)
+  console.log(`📍 Total URLs générées: ${sitemapEntries.length}`)
   console.log('========================================')
 
   return sitemapEntries
