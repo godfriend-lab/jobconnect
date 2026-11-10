@@ -26,7 +26,7 @@ export async function GET() {
   <channel>
     <title>ProKorb - Actualités et Conseils</title>
     <link>${baseUrl}</link>
-    <description>Découvrez les derniers articles, conseils et actualités de ProKorb, la marketplace N°1 au Togo pour connecter clients et professionnels qualifiés.</description>
+    <description>Découvrez les derniers articles, conseils et actualités de ProKorb, la marketplace N°1 en Afrique pour connecter clients et professionnels qualifiés.</description>
     <language>fr-FR</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />

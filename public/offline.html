@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#4f46e5" />
+<title>ProKorb · Hors ligne</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --line: #334155;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --brand: #6366f1;
+    --brand-soft: rgba(99, 102, 241, .15);
+    --warn: #f59e0b;
+    --ok: #10b981;
+    --grid: rgba(255, 255, 255, .03);
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  
+  body {
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: center top;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    display: flex; flex-direction: column;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+  }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px clamp(20px, 5vw, 48px);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; letter-spacing: -.02em; }
+  .brand-mark { width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); display: grid; place-items: center; box-shadow: 0 4px 12px rgba(99, 102, 241, .4); }
+  .brand-mark svg { width: 18px; height: 18px; stroke: #fff; }
+  .brand b { font-weight: 700; color: var(--brand); }
+
+  .state {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    padding: 6px 12px 6px 10px; border: 1px solid var(--line);
+    background: var(--surface); border-radius: 999px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+  .state[data-ok="true"] .dot { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .state[data-checking="true"] .dot { animation: blink 1s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .25; } }
+
+  main {
+    flex: 1; display: grid; place-items: center;
+    padding: 24px clamp(20px, 5vw, 48px) 56px;
+  }
+  .stage { width: 100%; max-width: 560px; text-align: center; }
+
+  .radar { position: relative; width: 180px; height: 180px; margin: 0 auto 48px; }
+  .radar .ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 2px solid var(--brand); opacity: 0;
+    animation: ping 3.6s cubic-bezier(.2,.6,.3,1) infinite;
+  }
+  .radar .ring:nth-child(2) { animation-delay: 1.2s; }
+  .radar .ring:nth-child(3) { animation-delay: 2.4s; }
+  @keyframes ping { 0% { transform: scale(.34); opacity: .6; } 100% { transform: scale(1); opacity: 0; } }
+  .radar .core {
+    position: absolute; inset: 50% auto auto 50%; width: 80px; height: 80px; transform: translate(-50%, -50%);
+    border-radius: 24px; background: var(--surface); border: 1px solid var(--line);
+    box-shadow: 0 0 0 12px var(--brand-soft), 0 20px 40px rgba(0,0,0,.3);
+    display: grid; place-items: center;
+  }
+  .core svg { width: 36px; height: 36px; stroke: var(--brand); }
+  .core .slash { stroke: var(--warn); stroke-width: 2.5; }
+
+  h1 { font-size: clamp(32px, 6vw, 44px); line-height: 1.1; font-weight: 800; letter-spacing: -.035em; margin-bottom: 16px; background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .lead { font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 44ch; margin: 0 auto 40px; }
+
+  .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    appearance: none; cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 48px; padding: 0 24px; border-radius: 12px;
+    font: inherit; font-size: 15px; font-weight: 600; letter-spacing: -.01em;
+    transition: all .2s;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #fff; border: 1px solid transparent; box-shadow: 0 4px 16px rgba(99, 102, 241, .4); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99, 102, 241, .5); }
+  .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--brand); background: var(--brand-soft); }
+  .btn:active { transform: scale(.98); }
+
+  .auto { margin-top: 32px; font-size: 13px; color: var(--muted); }
+  .bar { height: 3px; width: 140px; margin: 12px auto 0; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #6366f1, #8b5cf6); border-radius: 3px; }
+
+  .cache { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--line); text-align: left; }
+  .cache h2 { font-size: 15px; font-weight: 600; letter-spacing: -.01em; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .cache h2::before { content: "✓"; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--ok); color: #fff; border-radius: 50%; font-size: 11px; font-weight: 700; }
+  .cache p { font-size: 14px; color: var(--muted); margin-bottom: 18px; }
+  .pages { display: flex; flex-wrap: wrap; gap: 10px; }
+  .page {
+    font-size: 14px; color: var(--text); text-decoration: none;
+    padding: 10px 16px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px;
+    transition: all .2s; font-weight: 500;
+  }
+  .page:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-soft); transform: translateY(-1px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .radar .ring { animation: none; opacity: .2; }
+    .radar .ring:nth-child(1) { transform: scale(.55); }
+    .radar .ring:nth-child(2) { transform: scale(.78); }
+    .radar .ring:nth-child(3) { transform: scale(1); }
+    .dot { animation: none !important; }
+  }
+  @media (max-width: 420px) { .btn { width: 100%; } }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+      </span>
+      <span>Pro<b>Korb</b></span>
+    </div>
+    <div class="state" id="state" role="status" aria-live="polite">
+      <span class="dot"></span><span id="stateText">Hors ligne</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage">
+      <div class="radar" aria-hidden="true">
+        <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+        <div class="core">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 5.2-2.9"/><path d="M13.8 9.65a11 11 0 0 1 5.2 2.9"/>
+            <path d="M1.42 9a16 16 0 0 1 4.6-3"/><path d="M17.98 6a16 16 0 0 1 4.6 3"/>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><path d="M12 20h.01"/>
+            <path class="slash" d="M3 3l18 18"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1>Vous êtes hors ligne</h1>
+      <p class="lead">ProKorb ne parvient pas à joindre le réseau. L'application reprendra automatiquement dès que la connexion sera rétablie.</p>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="retry" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+          Réessayer
+        </button>
+        <a class="btn btn-ghost" href="/">Retour à l'accueil</a>
+      </div>
+
+      <div class="auto" id="auto" hidden>
+        <span id="autoText">Nouvelle tentative dans 5 s</span>
+        <div class="bar"><i id="barFill"></i></div>
+      </div>
+
+      <div class="cache" id="cache" hidden>
+        <h2>Disponible sans connexion</h2>
+        <p>Ces pages ont déjà été chargées sur cet appareil.</p>
+        <div class="pages" id="pages"></div>
+      </div>
+    </section>
+  </main>
+
+<script>
+(() => {
+  const INTERVAL = 5000;
+  const $ = (id) => document.getElementById(id);
+  const state = $('state'), stateText = $('stateText');
+  const auto = $('auto'), autoText = $('autoText'), bar = $('barFill');
+  let timer = null, started = 0, busy = false;
+
+  function setState(text, opts = {}) {
+    stateText.textContent = text;
+    state.dataset.ok = opts.ok ? 'true' : 'false';
+    state.dataset.checking = opts.checking ? 'true' : 'false';
+  }
+
+  async function check() {
+    if (busy) return;
+    busy = true;
+    setState('Vérification…', { checking: true });
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 4000);
+      const res = await fetch('/?_=' + Date.now(), { method: 'HEAD', cache: 'no-store', signal: ctrl.signal });
+      clearTimeout(t);
+      if (res && (res.ok || res.status < 500)) {
+        setState('Connexion rétablie', { ok: true });
+        auto.hidden = true;
+        setTimeout(() => location.reload(), 400);
+        return;
+      }
+    } catch (e) { /* toujours hors ligne */ }
+    busy = false;
+    setState('Hors ligne');
+    schedule();
+  }
+
+  function schedule() {
+    clearInterval(timer);
+    started = Date.now();
+    auto.hidden = false;
+    timer = setInterval(() => {
+      const elapsed = Date.now() - started;
+      const left = Math.max(0, Math.ceil((INTERVAL - elapsed) / 1000));
+      autoText.textContent = 'Nouvelle tentative dans ' + left + ' s';
+      bar.style.width = Math.min(100, (elapsed / INTERVAL) * 100) + '%';
+      if (elapsed >= INTERVAL) { clearInterval(timer); bar.style.width = '0'; check(); }
+    }, 100);
+  }
+
+  $('retry').addEventListener('click', () => { clearInterval(timer); bar.style.width = '0'; check(); });
+  window.addEventListener('online', check);
+  schedule();
+
+  // ✅ FILTRAGE INTELLIGENT DES PAGES EN CACHE
+  if ('caches' in window) {
+    caches.keys().then(async (names) => {
+      const keys = [];
+      for (const n of names.filter((n) => n.startsWith('prokorb-'))) {
+        keys.push(...(await (await caches.open(n)).keys()));
+      }
+      
+      const seen = new Set();
+      const pages = keys
+        .map((r) => {
+          try { return new URL(r.url); } catch { return null; }
+        })
+        .filter((u) => {
+          if (!u) return false;
+          // ✅ Exclure les URLs qui ne sont pas des pages réelles
+          if (u.origin !== location.origin) return false;
+          if (u.pathname === '/offline.html') return false;
+          // ✅ Exclure TOUT ce qui commence par /_next/ (assets Next.js)
+          if (u.pathname.startsWith('/_next/')) return false;
+          // ✅ Exclure les fichiers statiques (images, css, js, fonts, etc.)
+          if (/\.(png|jpg|jpeg|svg|webp|gif|css|js|woff2?|ttf|ico|json|xml)$/i.test(u.pathname)) return false;
+          // ✅ Exclure les URLs avec des paramètres de cache
+          if (u.searchParams.has('_')) return false;
+          // ✅ Exclure les URLs vides ou racine dupliquée
+          if (seen.has(u.pathname)) return false;
+          seen.add(u.pathname);
+          return true;
+        })
+        .slice(0, 8); // Max 8 pages
+      
+      if (!pages.length) return;
+      
+      const list = $('pages');
+      pages.forEach((u) => {
+        const a = document.createElement('a');
+        a.className = 'page';
+        a.href = u.pathname;
+        // ✅ Noms de pages propres et lisibles
+        const pageNames = {
+          '/': '🏠 Accueil',
+          '/marketplace': '🔍 Marketplace',
+          '/login': '🔐 Connexion',
+          '/register': '📝 Inscription',
+          '/faq': '❓ FAQ',
+          '/about': 'ℹ️ À propos',
+          '/company': '🏢 Entreprise',
+          '/verification': '✅ Vérification',
+          '/terms': '📄 Conditions',
+          '/data-protection': '🔒 Confidentialité',
+          '/pro/how-it-works': '💼 Guide Pro',
+          '/client/how-it-works': '👤 Guide Client',
+          '/articles': '📰 Articles'
+        };
+        a.textContent = pageNames[u.pathname] || u.pathname.replace(/^\//, '').replace(/\//g, ' › ');
+        list.appendChild(a);
+      });
+      $('cache').hidden = false;
+    }).catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
